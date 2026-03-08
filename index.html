@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -118,6 +118,12 @@
                         <button id="btn-open-analyze-list" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-blue-600 font-bold flex items-center justify-center md:justify-start gap-2 transition" title="วิเคราะห์โครงการ">
                             <i class="fas fa-chart-pie text-blue-500"></i> <span class="text-xs hidden md:inline text-blue-600">วิเคราะห์โครงการ</span>
                         </button>
+                        
+                        <!-- 🟢 ปุ่ม: สรุปภาพรวมทั้งหมด (Executive Dashboard) 🟢 -->
+                        <button id="btn-open-global-dashboard" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-emerald-600 font-bold flex items-center justify-center md:justify-start gap-2 transition" title="สรุปภาพรวมทั้งหมด">
+                            <i class="fas fa-chart-line text-emerald-500"></i> <span class="text-xs hidden md:inline text-emerald-700">สรุปภาพรวมทั้งหมด</span>
+                        </button>
+
                         <button id="btn-universal-import" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-purple-600 font-bold flex items-center justify-center md:justify-start gap-2 transition" title="นำเข้าพิกัด/ขอบเขต">
                             <i class="fas fa-file-import text-purple-500"></i> <span class="text-xs hidden md:inline text-purple-700">นำเข้าโครงการ</span>
                         </button>
@@ -205,6 +211,7 @@
                                 <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm mb-3">
                                     <div class="grid grid-cols-2 gap-2 text-sm mb-2 pb-2 border-b border-gray-100">
                                         <div><p class="text-[10px] text-gray-500 font-semibold mb-0.5">ราคากลาง (บาท)</p><p id="v-median-price" class="text-sm font-bold text-blue-700">0</p></div>
+                                        <div><p class="text-[10px] text-gray-500 font-semibold mb-0.5">ราคาที่จัดจ้าง (บาท)</p><p id="v-contract-price" class="text-sm font-bold text-green-700">0</p></div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-2 text-sm">
                                         <div><p class="text-[10px] text-gray-500 font-semibold mb-0.5">วันเริ่มสัญญา</p><p id="v-start-date" class="font-bold text-gray-800">-</p></div>
@@ -243,11 +250,31 @@
                                             <div><input type="text" id="e-doc-page" class="w-full border rounded px-1 py-1 text-[10px]" placeholder="หน้า"></div>
                                             <div><input type="number" id="e-budget" step="any" class="w-full border rounded px-1 py-1 text-[10px] font-bold text-green-700" placeholder="งบ(บาท)"></div>
                                         </div>
-                                        <div class="grid grid-cols-1 gap-2">
+                                        <div class="grid grid-cols-2 gap-2">
                                             <div><input type="number" id="e-median-price" step="any" class="w-full border border-gray-300 rounded px-1 py-1 text-[10px] font-bold text-blue-700 focus:outline-none focus:border-blue-500" placeholder="ราคากลาง (บาท)"></div>
+                                            <div><input type="number" id="e-contract-price" step="any" class="w-full border border-gray-300 rounded px-1 py-1 text-[10px] font-bold text-green-700 focus:outline-none focus:border-green-500" placeholder="ราคาที่จัดจ้าง (บาท)"></div>
                                         </div>
                                     </div>
-                                    <div class="mb-2 pb-2 border-b border-gray-100"><label class="text-[10px] font-bold text-gray-600 block mb-1">5. สถานะโครงการ</label><select id="e-op-status" class="w-full border rounded px-2 py-1.5 text-xs bg-gray-50"><option value="จัดทำแบบรูป">จัดทำแบบรูป</option><option value="จัดทำราคากลาง">จัดทำราคากลาง</option><option value="เสนออนุมัติราคากลาง">เสนออนุมัติราคากลาง</option><option value="ประกาศจัดซื้อจัดจ้าง">ประกาศจัดซื้อจัดจ้าง</option><option value="อยู่ระหว่างดำเนินการก่อสร้าง">อยู่ระหว่างดำเนินการก่อสร้าง</option></select></div>
+                                    <div class="mb-2 pb-2 border-b border-gray-100">
+                                        <label class="text-[10px] font-bold text-gray-600 block mb-1">5. สถานะโครงการ</label>
+                                        <select id="e-op-status" class="w-full border rounded px-2 py-1.5 text-xs bg-gray-50">
+                                            <option value="จัดทำแบบรูป">จัดทำแบบรูป</option>
+                                            <option value="จัดทำราคากลาง">จัดทำราคากลาง</option>
+                                            <option value="ประกาศจัดซื้อจัดจ้าง">ประกาศจัดซื้อจัดจ้าง</option>
+                                            <option value="อยู่ระหว่างดำเนินการก่อสร้าง">อยู่ระหว่างดำเนินการก่อสร้าง</option>
+                                            <option value="ส่งมอบงาน (ระบุงวด)">ส่งมอบงาน (ระบุงวด)</option>
+                                            <option value="ส่งมอบงาน (งวดสุดท้าย)">ส่งมอบงาน (งวดสุดท้าย)</option>
+                                        </select>
+                                        <div id="e-op-status-installment-container" class="hidden mt-2">
+                                            <input type="number" id="e-op-status-installment" class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs bg-indigo-50 font-bold text-indigo-700" placeholder="ระบุงวดที่ส่งมอบ (ตัวเลข)">
+                                        </div>
+                                        <div id="e-op-substatus-container" class="hidden mt-2">
+                                            <select id="e-op-substatus" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs bg-indigo-50 text-indigo-800"></select>
+                                        </div>
+                                        <div id="e-op-problem-container" class="hidden mt-2">
+                                            <input type="text" id="e-op-problem" class="w-full border border-red-300 rounded px-2 py-1.5 text-xs bg-red-50 text-red-700 font-semibold" placeholder="ระบุรายละเอียดปัญหา...">
+                                        </div>
+                                    </div>
                                     <div class="mb-2 pb-2 border-b border-gray-100"><label class="text-[10px] font-bold text-gray-600 block mb-1">6. สัญญาจ้างเลขที่</label><input type="text" id="e-contract-no" class="w-full border rounded px-2 py-1.5 text-xs" placeholder="ระบุเลขที่สัญญาจ้าง"></div>
                                     <div class="grid grid-cols-2 gap-2 mb-2 pb-2 border-b border-gray-100">
                                         <div><label class="text-[10px] font-bold text-gray-600 block mb-1">7. วันเริ่มสัญญา</label><input type="date" id="e-start-date" class="w-full border rounded px-2 py-1 text-xs"></div>
@@ -360,9 +387,31 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">4. ข้อมูลอ้างอิงงบประมาณ / ราคากลาง</label>
                     <div class="grid grid-cols-4 gap-2 mb-2"><div><input type="number" id="new-p-year" class="w-full border border-gray-300 rounded px-2 py-2 text-[10px] focus:outline-none focus:border-blue-500" placeholder="ปี พ.ศ."></div><div><input type="text" id="new-p-vol" class="w-full border border-gray-300 rounded px-2 py-2 text-[10px] focus:outline-none focus:border-blue-500" placeholder="เล่ม"></div><div><input type="text" id="new-p-page" class="w-full border border-gray-300 rounded px-2 py-2 text-[10px] focus:outline-none focus:border-blue-500" placeholder="หน้า"></div><div><input type="number" id="new-p-budget" step="any" class="w-full border border-gray-300 rounded px-2 py-2 text-[10px] font-bold text-green-700 focus:outline-none focus:border-green-500" placeholder="งบ (บาท)"></div></div>
-                    <div class="grid grid-cols-1 gap-2"><div><input type="number" id="new-p-median-price" step="any" class="w-full border border-gray-300 rounded px-2 py-2 text-[10px] font-bold text-blue-700 focus:outline-none focus:border-blue-500" placeholder="ราคากลาง (บาท)"></div></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><input type="number" id="new-p-median-price" step="any" class="w-full border border-gray-300 rounded px-2 py-2 text-[10px] font-bold text-blue-700 focus:outline-none focus:border-blue-500" placeholder="ราคากลาง (บาท)"></div>
+                        <div><input type="number" id="new-p-contract-price" step="any" class="w-full border border-gray-300 rounded px-2 py-2 text-[10px] font-bold text-green-700 focus:outline-none focus:border-green-500" placeholder="ราคาที่จัดจ้าง (บาท)"></div>
+                    </div>
                 </div>
-                <div><label class="block text-xs font-bold text-gray-700 mb-1">5. สถานะโครงการ</label><select id="new-p-op-status" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 bg-blue-50 text-blue-800 font-semibold"><option value="จัดทำแบบรูป">📝 จัดทำแบบรูป</option><option value="จัดทำราคากลาง">💰 จัดทำราคากลาง</option><option value="เสนออนุมัติราคากลาง">⏳ เสนออนุมัติราคากลาง</option><option value="ประกาศจัดซื้อจัดจ้าง">📢 ประกาศจัดซื้อจัดจ้าง</option><option value="อยู่ระหว่างดำเนินการก่อสร้าง">🏗️ อยู่ระหว่างดำเนินการก่อสร้าง</option></select></div>
+                <div class="bg-blue-50 p-2 rounded border border-blue-100">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">5. สถานะโครงการ</label>
+                    <select id="new-p-op-status" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 bg-white text-blue-800 font-semibold mb-1">
+                        <option value="จัดทำแบบรูป">📝 จัดทำแบบรูป</option>
+                        <option value="จัดทำราคากลาง">💰 จัดทำราคากลาง</option>
+                        <option value="ประกาศจัดซื้อจัดจ้าง">📢 ประกาศจัดซื้อจัดจ้าง</option>
+                        <option value="อยู่ระหว่างดำเนินการก่อสร้าง">🏗️ อยู่ระหว่างดำเนินการก่อสร้าง</option>
+                        <option value="ส่งมอบงาน (ระบุงวด)">📦 ส่งมอบงาน (ระบุงวด)</option>
+                        <option value="ส่งมอบงาน (งวดสุดท้าย)">✅ ส่งมอบงาน (งวดสุดท้าย)</option>
+                    </select>
+                    <div id="new-p-op-status-installment-container" class="hidden">
+                        <input type="number" id="new-p-op-status-installment" class="w-full border border-indigo-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 bg-indigo-50 text-indigo-800 font-bold" placeholder="ระบุงวดที่ส่งมอบ (กรอกเฉพาะตัวเลข)">
+                    </div>
+                    <div id="new-p-op-substatus-container" class="hidden mt-1">
+                        <select id="new-p-op-substatus" class="w-full border border-indigo-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 bg-indigo-50 text-indigo-800 font-semibold"></select>
+                    </div>
+                    <div id="new-p-op-problem-container" class="hidden mt-1">
+                        <input type="text" id="new-p-op-problem" class="w-full border border-red-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500 bg-red-50 text-red-800 font-semibold" placeholder="ระบุรายละเอียดปัญหา...">
+                    </div>
+                </div>
                 <div><label class="block text-xs font-bold text-gray-700 mb-1">6. สัญญาจ้างเลขที่</label><input type="text" id="new-p-contract-no" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" placeholder="ระบุเลขที่สัญญาจ้าง (ถ้ามี)"></div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">7. ระยะเวลาสัญญา</label>
@@ -490,6 +539,70 @@
                     <input type="file" id="backup-file-upload" accept=".json" class="hidden">
                     <div class="border-t border-gray-200 my-4"></div>
                     <button id="btn-clear-all-data" class="w-full bg-red-50 border border-red-200 text-red-600 py-2 rounded-lg text-xs font-bold hover:bg-red-100 flex items-center justify-center gap-2 cursor-pointer"><i class="fas fa-trash-alt"></i> ล้างข้อมูลทั้งหมดเพื่อเริ่มใหม่</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🟢 Global Dashboard Modal (สรุปภาพรวมสำหรับผู้บริหาร) 🟢 -->
+    <div id="global-dashboard-modal" class="hidden absolute inset-0 bg-black/80 z-[100] flex items-center justify-center p-2 md:p-6">
+        <div class="bg-gray-100 rounded-xl shadow-2xl w-full h-full max-w-6xl overflow-hidden flex flex-col">
+            <div class="bg-emerald-700 text-white px-4 py-3 flex justify-between items-center shrink-0">
+                <h2 class="text-lg font-bold"><i class="fas fa-chart-line mr-2"></i> สรุปภาพรวมโครงการทั้งหมด (Executive Summary)</h2>
+                <button id="btn-close-global-dashboard" class="text-white hover:text-emerald-200 text-xl w-8 h-8 flex items-center justify-center cursor-pointer"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 custom-scrollbar">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 shrink-0">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-blue-500 flex flex-col justify-center">
+                        <p class="text-[10px] md:text-xs text-gray-500 font-bold">จำนวนโครงการทั้งหมด</p>
+                        <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mt-1" id="gd-total-projects">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-green-500 flex flex-col justify-center">
+                        <p class="text-[10px] md:text-xs text-gray-500 font-bold">งบประมาณรวม (บาท)</p>
+                        <h3 class="text-lg md:text-2xl font-bold text-green-700 mt-1 truncate" id="gd-total-budget" title="งบประมาณรวม">0.00</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-indigo-500 flex flex-col justify-center">
+                        <p class="text-[10px] md:text-xs text-gray-500 font-bold">ส่งมอบแล้วเสร็จ</p>
+                        <h3 class="text-2xl md:text-3xl font-bold text-indigo-700 mt-1" id="gd-completed-projects">0</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-red-500 flex flex-col justify-center relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 opacity-10 text-red-500 text-6xl"><i class="fas fa-exclamation-circle"></i></div>
+                        <p class="text-[10px] md:text-xs text-gray-500 font-bold relative z-10">รอดำเนินการ / ตกค้าง</p>
+                        <h3 class="text-2xl md:text-3xl font-bold text-red-600 mt-1 relative z-10" id="gd-pending-projects">0</h3>
+                    </div>
+                </div>
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 shrink-0">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 h-[280px] flex flex-col">
+                        <h4 class="text-sm font-bold text-gray-700 mb-2 border-b border-gray-100 pb-2"><i class="fas fa-calendar-alt text-red-500 mr-1"></i> โครงการตกค้างแยกตามปี พ.ศ.</h4>
+                        <div class="relative w-full flex-1"><canvas id="gd-year-chart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 h-[280px] flex flex-col">
+                        <h4 class="text-sm font-bold text-gray-700 mb-2 border-b border-gray-100 pb-2"><i class="fas fa-tasks text-orange-500 mr-1"></i> สถานะโครงการที่กำลังดำเนินการ</h4>
+                        <div class="relative w-full flex-1"><canvas id="gd-status-chart"></canvas></div>
+                    </div>
+                </div>
+                <!-- Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex-1 flex flex-col min-h-[300px]">
+                    <h4 class="text-sm font-bold text-gray-700 mb-3"><i class="fas fa-list text-blue-500 mr-1"></i> รายละเอียดโครงการที่ยังตกค้าง</h4>
+                    <div class="overflow-x-auto border border-gray-200 rounded custom-scrollbar flex-1">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-gray-100 text-gray-700 sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="p-2 w-10 text-center">#</th>
+                                    <th class="p-2 w-20">ปี พ.ศ.</th>
+                                    <th class="p-2 min-w-[250px]">ชื่อโครงการ</th>
+                                    <th class="p-2 w-24">อำเภอ</th>
+                                    <th class="p-2 w-48">สถานะปัจจุบัน</th>
+                                    <th class="p-2 text-right w-32">งบประมาณ (บาท)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gd-pending-table-body" class="divide-y divide-gray-200 bg-white">
+                                <!-- Dynamic Content -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -968,6 +1081,46 @@
             return techs;
         }
 
+        // 🟢 ฟังก์ชันจัดการข้อย่อยของสถานะโครงการ
+        const statusSubOptions = {
+            'จัดทำแบบรูป': ['อยู่ในขั้นตอนการสำรวจและจัดทำแบบรูป', 'ปัญหา'],
+            'จัดทำราคากลาง': ['กำลังคำนวณในระบบ e-GP', 'กำลังเสนออนุมัติราคากลาง', 'ทบทวนราคากลาง', 'ปัญหาอื่นๆ']
+        };
+
+        function triggerStatusLogic(prefix) {
+            const status = val(`${prefix}-op-status`);
+            const instCont = $id(`${prefix}-op-status-installment-container`);
+            const subCont = $id(`${prefix}-op-substatus-container`);
+            const subSelect = $id(`${prefix}-op-substatus`);
+            const probCont = $id(`${prefix}-op-problem-container`);
+
+            if (instCont) instCont.classList.add('hidden');
+            if (subCont) subCont.classList.add('hidden');
+            if (probCont) probCont.classList.add('hidden');
+
+            if (status === 'ส่งมอบงาน (ระบุงวด)' && instCont) {
+                instCont.classList.remove('hidden');
+            } else if (statusSubOptions[status]) {
+                if (subCont && subSelect) {
+                    subCont.classList.remove('hidden');
+                    subSelect.innerHTML = statusSubOptions[status].map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    triggerSubStatusLogic(prefix); // ตรวจสอบว่าต้องโชว์ช่องปัญหาไหม
+                }
+            }
+        }
+
+        function triggerSubStatusLogic(prefix) {
+            const subStatus = val(`${prefix}-op-substatus`);
+            const probCont = $id(`${prefix}-op-problem-container`);
+            if (probCont) {
+                if (subStatus && subStatus.includes('ปัญหา')) {
+                    probCont.classList.remove('hidden');
+                } else {
+                    probCont.classList.add('hidden');
+                }
+            }
+        }
+
         window.selectProject = function(id, clickedFeatureProps = null) {
             const layer = loadedMarkers[id]; if (!layer || !layer.projectData) return; const data = layer.projectData; currentSelectedProjectId = id; 
             editPhotoBase64 = null; let displayTitle = data.name; let rawDataObj = clickedFeatureProps || data.importedRawData || null;
@@ -1005,7 +1158,17 @@
                 const mk = $id('material-kpi-section'); if(mk) mk.classList.add('hidden'); 
                 const pk = $id('project-kpi-section'); if(pk) pk.classList.remove('hidden');
                 
-                setTxt('v-district', data.district || '-'); setTxt('v-op-status', data.opStatus || '-'); setTxt('v-budget-type', data.budgetType || '-'); setTxt('v-doc-year', data.docYear || '-'); setTxt('v-doc-vol', data.docVol || '-'); setTxt('v-doc-page', data.docPage || '-'); setTxt('v-contract-no', data.contractNo || '-'); setTxt('v-median-price', formatNumber(data.medianPrice)); setTxt('v-start-date', formatDate(data.startDate)); setTxt('v-end-date', formatDate(data.endDate)); setTxt('v-budget', formatNumber(data.budget)); setTxt('v-plan', (data.planProgress || 0) + '%'); setTxt('v-actual', (data.actualProgress || 0) + '%');
+                let displayOpStatus = data.opStatus || '-';
+                if (data.opStatus === 'ส่งมอบงาน (ระบุงวด)' && data.opStatusInstallment) {
+                    displayOpStatus = `ส่งมอบงาน งวดที่ ${data.opStatusInstallment}`;
+                } else if (data.opSubStatus) {
+                    displayOpStatus += ` (${data.opSubStatus})`;
+                    if (data.opSubStatus.includes('ปัญหา') && data.opProblem) {
+                        displayOpStatus += ` : ${data.opProblem}`;
+                    }
+                }
+
+                setTxt('v-district', data.district || '-'); setTxt('v-op-status', displayOpStatus); setTxt('v-budget-type', data.budgetType || '-'); setTxt('v-doc-year', data.docYear || '-'); setTxt('v-doc-vol', data.docVol || '-'); setTxt('v-doc-page', data.docPage || '-'); setTxt('v-contract-no', data.contractNo || '-'); setTxt('v-median-price', formatNumber(data.medianPrice)); setTxt('v-contract-price', formatNumber(data.contractPrice)); setTxt('v-start-date', formatDate(data.startDate)); setTxt('v-end-date', formatDate(data.endDate)); setTxt('v-budget', formatNumber(data.budget)); setTxt('v-plan', (data.planProgress || 0) + '%'); setTxt('v-actual', (data.actualProgress || 0) + '%');
                 const vPhoto = $id('v-photo'); const vPhotoCont = $id('v-photo-container');
                 if (data.photo && vPhoto && vPhotoCont) { vPhoto.src = data.photo; vPhotoCont.classList.remove('hidden'); } else if (vPhotoCont) { vPhotoCont.classList.add('hidden'); }
                 
@@ -1021,8 +1184,14 @@
                     if (vTechList) vTechList.innerHTML = '';
                 }
 
-                setVal('e-name', displayTitle || ''); setVal('e-district', data.district || 'เมืองพิษณุโลก'); setVal('e-op-status', data.opStatus || 'จัดทำแบบรูป'); setVal('e-budget-type', data.budgetType || 'ข้อบัญญัติ'); setVal('e-doc-year', data.docYear || ''); setVal('e-doc-vol', data.docVol || ''); setVal('e-doc-page', data.docPage || ''); setVal('e-contract-no', data.contractNo || ''); setVal('e-median-price', data.medianPrice || ''); setVal('e-start-date', data.startDate || ''); setVal('e-end-date', data.endDate || ''); setVal('e-budget', data.budget || ''); setVal('e-photo', '');
+                setVal('e-name', displayTitle || ''); setVal('e-district', data.district || 'เมืองพิษณุโลก'); setVal('e-op-status', data.opStatus || 'จัดทำแบบรูป'); setVal('e-op-status-installment', data.opStatusInstallment || ''); setVal('e-budget-type', data.budgetType || 'ข้อบัญญัติ'); setVal('e-doc-year', data.docYear || ''); setVal('e-doc-vol', data.docVol || ''); setVal('e-doc-page', data.docPage || ''); setVal('e-contract-no', data.contractNo || ''); setVal('e-median-price', data.medianPrice || ''); setVal('e-contract-price', data.contractPrice || ''); setVal('e-start-date', data.startDate || ''); setVal('e-end-date', data.endDate || ''); setVal('e-budget', data.budget || ''); setVal('e-photo', '');
                 
+                // กระตุ้นให้โหลดตัวเลือกย่อยของสถานะ และตั้งค่าถ้ามี
+                triggerStatusLogic('e');
+                if (data.opSubStatus) setVal('e-op-substatus', data.opSubStatus);
+                triggerSubStatusLogic('e');
+                if (data.opProblem) setVal('e-op-problem', data.opProblem);
+
                 // 🟢 วาดฟอร์มช่างใน Edit Mode
                 renderEditTechList(data.technicians || []);
 
@@ -1306,6 +1475,127 @@
             tempEditSCurve = []; document.querySelectorAll('#scurve-table-body tr').forEach(tr => { const act = tr.querySelector('.dt-s-actual').value; tempEditSCurve.push({ label: tr.querySelector('.dt-s-label').value, plan: parseFloat(tr.querySelector('.dt-s-plan').value) || 0, actual: act !== '' ? parseFloat(act) : null }); });
         }
 
+        // 🟢 ฟังก์ชันคำนวณและสร้าง Dashboard ภาพรวมผู้บริหาร
+        window.openGlobalDashboard = function() {
+            const modal = $id('global-dashboard-modal');
+            if (modal) modal.classList.remove('hidden');
+            
+            let totalProjects = 0;
+            let totalBudget = 0;
+            let completedProjects = 0;
+            let pendingProjects = 0;
+            
+            let pendingByYear = {};
+            let pendingByStatus = {};
+            let pendingList = [];
+
+            for (let id in loadedMarkers) {
+                let data = loadedMarkers[id].projectData;
+                if (data.recordType === 'project') {
+                    totalProjects++;
+                    totalBudget += (parseFloat(data.budget) || 0);
+                    
+                    let isCompleted = data.opStatus === 'ส่งมอบงาน (งวดสุดท้าย)' || data.color === '#2563eb';
+                    
+                    if (isCompleted) {
+                        completedProjects++;
+                    } else {
+                        pendingProjects++;
+                        let year = data.docYear || 'ไม่ระบุ';
+                        let status = data.opStatus || 'รอดำเนินการ (ไม่ระบุสถานะ)';
+                        if (data.opSubStatus) status += ` (${data.opSubStatus})`;
+                        
+                        if (!pendingByYear[year]) pendingByYear[year] = 0;
+                        pendingByYear[year]++;
+                        
+                        if (!pendingByStatus[status]) pendingByStatus[status] = 0;
+                        pendingByStatus[status]++;
+                        
+                        pendingList.push({ ...data, id: id }); // แนบ id เผื่อคลิกไปที่หมุด
+                    }
+                }
+            }
+
+            setTxt('gd-total-projects', totalProjects.toLocaleString('th-TH'));
+            setTxt('gd-total-budget', formatNumber(totalBudget));
+            setTxt('gd-completed-projects', completedProjects.toLocaleString('th-TH'));
+            setTxt('gd-pending-projects', pendingProjects.toLocaleString('th-TH'));
+
+            // Sort pendingList by Year (descending)
+            pendingList.sort((a, b) => {
+                let yA = parseInt(a.docYear) || 0;
+                let yB = parseInt(b.docYear) || 0;
+                return yB - yA;
+            });
+
+            // Render Table
+            const tbody = $id('gd-pending-table-body');
+            if (tbody) {
+                tbody.innerHTML = pendingList.map((p, i) => `
+                    <tr class="hover:bg-red-50/50 transition cursor-pointer" onclick="window.selectProject('${p.id}'); $id('global-dashboard-modal').classList.add('hidden');" title="คลิกเพื่อดูหมุดโครงการนี้">
+                        <td class="p-2 text-center text-xs text-gray-500">${i + 1}</td>
+                        <td class="p-2 font-bold text-red-600">${p.docYear || '-'}</td>
+                        <td class="p-2 font-medium text-gray-800 whitespace-normal min-w-[250px]">${p.name || 'ไม่มีชื่อ'}</td>
+                        <td class="p-2 text-gray-600 text-xs">${p.district || '-'}</td>
+                        <td class="p-2 text-[10px] font-bold text-orange-600 whitespace-normal">${p.opStatus || '-'} ${p.opSubStatus ? `(${p.opSubStatus})` : ''}</td>
+                        <td class="p-2 text-right font-mono text-gray-700 font-semibold">${formatNumber(p.budget)}</td>
+                    </tr>
+                `).join('');
+                if (pendingList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500 font-bold"><i class="fas fa-check-circle text-green-500 mr-2 text-xl"></i> ไม่มีโครงการตกค้าง ดำเนินการเสร็จสิ้นทุกโครงการแล้ว!</td></tr>`;
+                }
+            }
+
+            // Prepare Chart Data
+            const yearLabels = Object.keys(pendingByYear).sort((a, b) => {
+                if(a==='ไม่ระบุ') return 1; if(b==='ไม่ระบุ') return -1;
+                return a - b;
+            });
+            const yearData = yearLabels.map(y => pendingByYear[y]);
+
+            const statusLabels = Object.keys(pendingByStatus);
+            const statusData = statusLabels.map(s => pendingByStatus[s]);
+
+            // Render Year Chart
+            const ctxYear = $id('gd-year-chart')?.getContext('2d');
+            if (ctxYear) {
+                if (window.globalYearChart) window.globalYearChart.destroy();
+                window.globalYearChart = new Chart(ctxYear, {
+                    type: 'bar',
+                    data: {
+                        labels: yearLabels,
+                        datasets: [{
+                            label: 'จำนวนโครงการตกค้าง',
+                            data: yearData,
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderColor: 'rgb(220, 38, 38)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Sarabun' } } }, x: { ticks: { font: { family: 'Sarabun' } } } } }
+                });
+            }
+
+            // Render Status Chart
+            const ctxStatus = $id('gd-status-chart')?.getContext('2d');
+            if (ctxStatus) {
+                if (window.globalStatusChart) window.globalStatusChart.destroy();
+                window.globalStatusChart = new Chart(ctxStatus, {
+                    type: 'doughnut',
+                    data: {
+                        labels: statusLabels,
+                        datasets: [{
+                            data: statusData,
+                            backgroundColor: ['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#64748b', '#ef4444', '#ec4899', '#14b8a6', '#f97316'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { family: 'Sarabun', size: 10 } } } }, cutout: '60%' }
+                });
+            }
+        };
+
         // ==========================================
         // 🟢 9. FILTER SYSTEM LOGIC (4 ขั้นตอน)
         // ==========================================
@@ -1481,6 +1771,11 @@
             addEvent('btn-cancel-add', 'click', closeAddProjectModal);
             addEvent('new-p-type', 'change', () => { const t = val('new-p-type'); if (t === 'point') { const pc = document.getElementById('point-settings-container'); if(pc) pc.classList.remove('hidden'); const lc = document.getElementById('line-settings-container'); if(lc) lc.classList.add('hidden'); } else if (t === 'line') { const pc = document.getElementById('point-settings-container'); if(pc) pc.classList.add('hidden'); const lc = document.getElementById('line-settings-container'); if(lc) lc.classList.remove('hidden'); } });
             
+            addEvent('new-p-op-status', 'change', () => triggerStatusLogic('new-p'));
+            addEvent('new-p-op-substatus', 'change', () => triggerSubStatusLogic('new-p'));
+            addEvent('e-op-status', 'change', () => triggerStatusLogic('e'));
+            addEvent('e-op-substatus', 'change', () => triggerSubStatusLogic('e'));
+            
             // 🟢 ปุ่มเพิ่มช่างในฟอร์ม Add และ Edit
             addEvent('btn-new-p-add-tech', 'click', () => appendAddTechRow());
             addEvent('btn-e-add-tech', 'click', () => {
@@ -1521,6 +1816,10 @@
             addEvent('backup-file-upload', 'change', handleFileUpload);
             addEvent('btn-clear-all-data', 'click', () => { window.showConfirm('<i class="fas fa-exclamation-triangle mr-2"></i>คำเตือนอันตราย', 'คุณต้องการล้างข้อมูลทั้งหมดในระบบใช่หรือไม่?', async () => { if(isUsingCloudServer && !authFailed && db && currentUser) { window.showToast('เพื่อความปลอดภัย การล้างข้อมูลทั้งหมดผ่านระบบ Cloud ถูกปิดกั้น กรุณาลบทีละรายการ', 'warning'); } else { try { localStorage.removeItem('pmis_projects_db'); } catch(e){} for (let id in loadedMarkers) { map.removeLayer(loadedMarkers[id]); } for (let id in loadedMarkers) delete loadedMarkers[id]; updateProjectCount(); window.showToast('ล้างข้อมูลเรียบร้อย', 'success'); const dm = document.getElementById('data-mgr-modal'); if(dm) dm.classList.add('hidden'); } }); });
 
+            // 🟢 Global Dashboard
+            addEvent('btn-open-global-dashboard', 'click', window.openGlobalDashboard);
+            addEvent('btn-close-global-dashboard', 'click', () => { const m = $id('global-dashboard-modal'); if(m) m.classList.add('hidden'); });
+
             // Form Submits
             addEvent('btn-save-project', 'click', async () => {
                 const typeElem = document.getElementById('new-p-type'); if(!typeElem) return; const type = typeElem.value;
@@ -1533,9 +1832,12 @@
                     icon: val('new-p-icon') || 'fa-map-marker-alt', 
                     pinSize: parseInt(val('new-p-pin-size')) || 32, 
                     opStatus: val('new-p-op-status') || '', 
+                    opStatusInstallment: val('new-p-op-status') === 'ส่งมอบงาน (ระบุงวด)' ? val('new-p-op-status-installment') : '',
+                    opSubStatus: (val('new-p-op-status') === 'จัดทำแบบรูป' || val('new-p-op-status') === 'จัดทำราคากลาง') ? val('new-p-op-substatus') : '',
+                    opProblem: (val('new-p-op-substatus') && val('new-p-op-substatus').includes('ปัญหา')) ? val('new-p-op-problem') : '',
                     budgetType: val('new-p-budget-type') || '', 
                     docYear: val('new-p-year') || '', docVol: val('new-p-vol') || '', docPage: val('new-p-page') || '', contractNo: val('new-p-contract-no') || '', 
-                    medianPrice: parseFloat(val('new-p-median-price')) || 0, budget: parseFloat(val('new-p-budget')) || 0, 
+                    medianPrice: parseFloat(val('new-p-median-price')) || 0, contractPrice: parseFloat(val('new-p-contract-price')) || 0, budget: parseFloat(val('new-p-budget')) || 0, 
                     startDate: val('new-p-start-date') || '', endDate: val('new-p-end-date') || '', 
                     technicians: getTechniciansFromDOM('new-p-tech-list'), // 🟢 ดึงข้อมูลช่างจากฟอร์มบันทึก
                     photo: tempPhotoBase64, createdAt: Date.now() 
@@ -1545,8 +1847,11 @@
                 await saveDataToDB(pd); window.showToast('บันทึกโครงการใหม่สำเร็จ!', 'success');
                 if (tempPolyline) { map.removeLayer(tempPolyline); tempPolyline = null; }
                 tempLinePoints = []; setTxt('line-points-count', '0'); setTxt('line-distance', '0.00'); currentDistance = 0; tempPhotoBase64 = null;
-                ['new-p-name', 'new-p-budget', 'new-p-median-price', 'new-p-year', 'new-p-vol', 'new-p-page', 'new-p-contract-no', 'new-p-lat', 'new-p-lng', 'new-p-photo'].forEach(id => setVal(id, ''));
+                ['new-p-name', 'new-p-budget', 'new-p-median-price', 'new-p-contract-price', 'new-p-year', 'new-p-vol', 'new-p-page', 'new-p-contract-no', 'new-p-lat', 'new-p-lng', 'new-p-photo', 'new-p-op-status-installment', 'new-p-op-problem'].forEach(id => setVal(id, ''));
                 const tList = $id('new-p-tech-list'); if(tList) tList.innerHTML = ''; // เคลียร์ฟอร์มช่าง
+                const instCont = $id('new-p-op-status-installment-container'); if(instCont) instCont.classList.add('hidden');
+                const subCont = $id('new-p-op-substatus-container'); if(subCont) subCont.classList.add('hidden');
+                const probCont = $id('new-p-op-problem-container'); if(probCont) probCont.classList.add('hidden');
                 const pc = document.getElementById('new-p-photo-preview-container'); if(pc) pc.classList.add('hidden'); closeAddProjectModal();
             });
 
@@ -1587,8 +1892,13 @@
                     pData.pinSize = parseInt(val('e-point-size')) || 32; 
                     pData.isProcessed = true; 
                 }
-                pData.opStatus = val('e-op-status') || ''; pData.budgetType = val('e-budget-type') || ''; pData.docYear = val('e-doc-year') || ''; pData.docVol = val('e-doc-vol') || ''; pData.docPage = val('e-doc-page') || ''; pData.contractNo = val('e-contract-no') || '';
+                pData.opStatus = val('e-op-status') || ''; 
+                pData.opStatusInstallment = val('e-op-status') === 'ส่งมอบงาน (ระบุงวด)' ? val('e-op-status-installment') : '';
+                pData.opSubStatus = (val('e-op-status') === 'จัดทำแบบรูป' || val('e-op-status') === 'จัดทำราคากลาง') ? val('e-op-substatus') : '';
+                pData.opProblem = (val('e-op-substatus') && val('e-op-substatus').includes('ปัญหา')) ? val('e-op-problem') : '';
+                pData.budgetType = val('e-budget-type') || ''; pData.docYear = val('e-doc-year') || ''; pData.docVol = val('e-doc-vol') || ''; pData.docPage = val('e-doc-page') || ''; pData.contractNo = val('e-contract-no') || '';
                 const medianPriceElem = document.getElementById('e-median-price'); if (medianPriceElem) { pData.medianPrice = parseFloat(medianPriceElem.value) || 0; }
+                const contractPriceElem = document.getElementById('e-contract-price'); if (contractPriceElem) { pData.contractPrice = parseFloat(contractPriceElem.value) || 0; }
                 pData.startDate = val('e-start-date') || ''; pData.endDate = val('e-end-date') || ''; pData.budget = parseFloat(val('e-budget')) || 0;
                 
                 pData.technicians = getTechniciansFromDOM('e-tech-list'); // 🟢 ดึงข้อมูลช่างจากการแก้ไขไปบันทึก
