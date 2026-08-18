@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบบริหารทางหลวงท้องถิ่น ฝ่ายสำรวจและออกแบบ กองช่าง องค์การบริหารส่วนจังหวัดพิษณุโลก</title>
     
-    <!-- CSS & Frameworks -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -50,7 +48,6 @@
 
         .chart-fullscreen { position: fixed !important; top: 20px !important; left: 20px !important; right: 20px !important; bottom: 20px !important; width: calc(100vw - 40px) !important; height: calc(100vh - 40px) !important; z-index: 9999 !important; background: white !important; padding: 20px !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; border: 1px solid #e2e8f0 !important; border-radius: 16px !important; max-height: none !important; }
         
-        /* Table Inputs */
         .table-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 8px; font-size: 12px; outline: none; transition: border-color 0.2s; }
         .table-input:focus { border-color: #6366f1; background-color: #eff6ff; }
     </style>
@@ -91,48 +88,57 @@
                 <main class="flex-1 relative z-0 flex flex-col">
                     <div id="map-container" class="absolute inset-0 z-0"></div>
 
-                    <!-- LEFT MENU BUTTONS -->
-                    <div class="absolute top-4 left-4 z-[40] flex flex-col gap-2 w-12 md:w-48 pointer-events-none">
-                        <button id="btn-toggle-map" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-blue-600 font-bold flex items-center justify-center md:justify-start gap-2 transition cursor-pointer" title="สลับภาพดาวเทียม">
-                            <i class="fas fa-satellite"></i> <span class="text-xs hidden md:inline">ดาวเทียม</span>
+                    <!-- 🟢 LEFT MENU BUTTONS (Floating Modern Individual Buttons) 🟢 -->
+                    <div class="absolute top-4 left-4 z-[40] flex flex-col gap-1.5 md:gap-2 w-12 md:w-48 pointer-events-none">
+                        
+                        <button id="btn-toggle-map" class="pointer-events-auto w-full bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-blue-300 hover:bg-blue-50/80 transition-all duration-300 group cursor-pointer" title="สลับภาพดาวเทียม">
+                            <div class="w-5 flex justify-center"><i class="fas fa-satellite text-gray-500 text-base group-hover:text-blue-600 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-gray-600 group-hover:text-blue-700 hidden md:block">ดาวเทียม</span>
                         </button>
                         
-                        <!-- ปุ่มค้นหาโครงการ -->
-                        <button id="btn-open-filter" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-indigo-700 hover:text-indigo-600 font-bold flex items-center justify-center md:justify-start gap-2 transition mt-1 border-2 border-indigo-100 cursor-pointer" title="ค้นหาโครงการตามพื้นที่">
-                            <i class="fas fa-search-location text-indigo-500"></i> <span class="text-xs hidden md:inline">ค้นหาโครงการ</span>
+                        <button id="btn-open-filter" class="pointer-events-auto w-full bg-indigo-50/95 backdrop-blur-md border border-indigo-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-indigo-400 hover:bg-indigo-100 transition-all duration-300 group cursor-pointer" title="ค้นหาโครงการตามพื้นที่">
+                            <div class="w-5 flex justify-center"><i class="fas fa-search-location text-indigo-500 text-base group-hover:text-indigo-700 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-indigo-700 group-hover:text-indigo-800 hidden md:block">ค้นหาโครงการ</span>
                         </button>
 
-                        <div class="h-px w-full bg-gray-300 my-1 hidden md:block"></div>
+                        <button id="btn-open-add" class="pointer-events-auto w-full bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-green-300 hover:bg-green-50/80 transition-all duration-300 group cursor-pointer mt-1 md:mt-1.5" title="เพิ่มรายละเอียดโครงการ">
+                            <div class="w-5 flex justify-center"><i class="fas fa-file-signature text-green-500 text-base group-hover:text-green-600 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-gray-600 group-hover:text-green-700 hidden md:block">เพิ่มข้อมูลโครงการ</span>
+                        </button>
+                        
+                        <button id="btn-street-view" class="pointer-events-auto w-full bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-orange-300 hover:bg-orange-50/80 transition-all duration-300 group cursor-pointer" title="มุมมองสตรีทวิว">
+                            <div class="w-5 flex justify-center"><i class="fas fa-street-view text-orange-500 text-base group-hover:text-orange-600 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-gray-600 group-hover:text-orange-700 hidden md:block">สตรีทวิว</span>
+                        </button>
+                        
+                        <button id="btn-open-analyze-list" class="pointer-events-auto w-full bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-blue-300 hover:bg-blue-50/80 transition-all duration-300 group cursor-pointer mt-1 md:mt-1.5" title="วิเคราะห์โครงการ">
+                            <div class="w-5 flex justify-center"><i class="fas fa-chart-pie text-blue-500 text-base group-hover:text-blue-600 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-gray-600 group-hover:text-blue-700 hidden md:block">วิเคราะห์โครงการ</span>
+                        </button>
+                        
+                        <button id="btn-open-global-dashboard" class="pointer-events-auto w-full bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-emerald-300 hover:bg-emerald-50/80 transition-all duration-300 group cursor-pointer" title="สรุปภาพรวมทั้งหมด">
+                            <div class="w-5 flex justify-center"><i class="fas fa-chart-line text-emerald-500 text-base group-hover:text-emerald-600 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-gray-600 group-hover:text-emerald-700 hidden md:block">สรุปภาพรวมทั้งหมด</span>
+                        </button>
+                        
+                        <button id="btn-universal-import" class="pointer-events-auto w-full bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-purple-300 hover:bg-purple-50/80 transition-all duration-300 group cursor-pointer mt-1 md:mt-1.5" title="นำเข้าโครงการจากไฟล์">
+                            <div class="w-5 flex justify-center"><i class="fas fa-file-import text-purple-500 text-base group-hover:text-purple-600 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-gray-600 group-hover:text-purple-700 hidden md:block truncate">นำเข้าโครงการจากไฟล์</span>
+                        </button>
+                        
+                        <button id="btn-import-kml-road" class="pointer-events-auto w-full bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-pink-300 hover:bg-pink-50/80 transition-all duration-300 group cursor-pointer" title="นำเข้าไฟล์ KML">
+                            <div class="w-5 flex justify-center"><i class="fas fa-road text-pink-500 text-base group-hover:text-pink-600 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-gray-600 group-hover:text-pink-700 hidden md:block">นำเข้าไฟล์ KML</span>
+                        </button>
 
-                        <!-- 🟢 ปุ่ม: รายละเอียดโครงการ 🟢 -->
-                        <button id="btn-open-add" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-green-600 font-bold flex items-center justify-center md:justify-start gap-2 transition cursor-pointer" title="รายละเอียดโครงการ">
-                            <i class="fas fa-file-signature"></i> <span class="text-xs hidden md:inline">เพิ่มรายละเอียดโครงการ</span>
-                        </button>
+                        <div class="h-px w-full bg-gray-300/50 my-1 hidden md:block"></div>
                         
-                        <button id="btn-street-view" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-orange-500 font-bold flex items-center justify-center md:justify-start gap-2 transition cursor-pointer" title="มุมมองสตรีทวิว">
-                            <i class="fas fa-street-view text-orange-500"></i> <span class="text-xs hidden md:inline text-orange-600">สตรีทวิว</span>
-                        </button>
-                        
-                        <div class="h-px w-full bg-gray-300 my-1 hidden md:block"></div>
-
-                        <button id="btn-open-analyze-list" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-blue-600 font-bold flex items-center justify-center md:justify-start gap-2 transition cursor-pointer" title="วิเคราะห์โครงการ">
-                            <i class="fas fa-chart-pie text-blue-500"></i> <span class="text-xs hidden md:inline text-blue-600">วิเคราะห์โครงการ</span>
-                        </button>
-                        
-                        <!-- 🟢 ปุ่ม: สรุปภาพรวมทั้งหมด (Executive Dashboard) 🟢 -->
-                        <button id="btn-open-global-dashboard" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-emerald-600 font-bold flex items-center justify-center md:justify-start gap-2 transition cursor-pointer" title="สรุปภาพรวมทั้งหมด">
-                            <i class="fas fa-chart-line text-emerald-500"></i> <span class="text-xs hidden md:inline text-emerald-700">สรุปภาพรวมทั้งหมด</span>
+                        <!-- 🟢 ปุ่มจำลองการแจ้งปัญหาจาก LINE (ทดสอบ) 🟢 -->
+                        <button id="btn-simulate-line" class="pointer-events-auto w-full bg-red-50/95 backdrop-blur-md border border-red-200/80 shadow-md rounded-xl p-2.5 md:px-3 md:py-2.5 flex items-center justify-center md:justify-start gap-2.5 hover:-translate-y-0.5 hover:shadow-lg hover:border-red-400 hover:bg-red-100 transition-all duration-300 group cursor-pointer animate-pulse" title="จำลองการแจ้งเหตุจาก LINE">
+                            <div class="w-5 flex justify-center"><i class="fas fa-mobile-alt text-red-500 text-base group-hover:text-red-600 group-hover:scale-110 transition-all duration-300"></i></div>
+                            <span class="text-xs font-bold text-red-700 group-hover:text-red-800 hidden md:block">ทดสอบจำลอง LINE</span>
                         </button>
 
-                        <button id="btn-universal-import" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-purple-600 font-bold flex items-center justify-center md:justify-start gap-2 transition cursor-pointer" title="นำเข้าพิกัด/ขอบเขต">
-                            <i class="fas fa-file-import text-purple-500"></i> <span class="text-xs hidden md:inline text-purple-700">นำเข้าโครงการจากไฟล์</span>
-                        </button>
-                        
-                        <!-- 🟢 ปุ่มใหม่: นำเข้า KML ถนน 🟢 -->
-                        <button id="btn-import-kml-road" class="pointer-events-auto bg-white w-12 h-12 md:w-auto md:h-10 md:px-3 rounded-lg shadow-lg text-gray-700 hover:text-pink-600 font-bold flex items-center justify-center md:justify-start gap-2 transition cursor-pointer mt-1" title="นำเข้าไฟล์ KML ถนน">
-                            <i class="fas fa-road text-pink-500"></i> <span class="text-xs hidden md:inline text-pink-700">นำเข้า KML ถนน</span>
-                        </button>
-                        
                         <!-- Hidden Inputs -->
                         <input type="file" id="universal-file-upload" accept=".json,.kml,.csv,.xls,.xlsx" class="hidden">
                         <input type="file" id="kml-road-file-upload" accept=".kml" class="hidden">
@@ -179,6 +185,58 @@
                             <div id="raw-data-content" class="text-xs text-gray-700 max-h-60 overflow-y-auto custom-scrollbar"></div>
                         </div>
 
+                        <!-- 🟢 ข้อมูลการรับแจ้งเหตุ (Issue) 🟢 -->
+                        <div id="issue-kpi-section" class="hidden mb-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-sm font-bold text-gray-700"><i class="fas fa-bullhorn text-red-500 mr-1"></i> รายละเอียดการรับแจ้งเหตุ</h3>
+                                <div class="flex gap-1">
+                                    <button id="btn-edit-issue" class="text-[10px] text-white font-bold bg-red-500 hover:bg-red-600 px-2 py-1 rounded shadow-sm transition cursor-pointer"><i class="fas fa-edit"></i> อัปเดต</button>
+                                    <button id="btn-upgrade-issue" class="text-[10px] text-blue-700 font-bold bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded shadow-sm transition cursor-pointer" title="ตั้งเป็นโครงการงบประมาณ"><i class="fas fa-arrow-up"></i> เป็นโครงการ</button>
+                                </div>
+                            </div>
+
+                            <!-- View Mode Issue -->
+                            <div id="view-mode-issue">
+                                <div id="v-issue-photo-container" class="hidden mb-3"><img id="v-issue-photo" src="" class="w-full h-40 object-cover rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:opacity-90 transition" onclick="window.open(this.src, '_blank')"></div>
+                                <div class="bg-white p-3 rounded-xl border border-red-200 shadow-sm mb-3">
+                                    <div class="mb-2 pb-2 border-b border-gray-100 text-sm">
+                                        <p class="text-[10px] text-gray-500 font-semibold mb-0.5">สถานะการดำเนินการ</p>
+                                        <p id="v-issue-status" class="font-bold text-red-700">-</p>
+                                    </div>
+                                    <div class="mb-2 pb-2 border-b border-gray-100 text-sm">
+                                        <p class="text-[10px] text-gray-500 font-semibold mb-0.5">รายละเอียดปัญหา / สถานที่</p>
+                                        <p id="v-issue-desc" class="font-medium text-gray-700 leading-tight">-</p>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <div><p class="text-[10px] text-gray-500 font-semibold mb-0.5">วันที่แจ้ง</p><p id="v-issue-date" class="font-bold text-gray-800">-</p></div>
+                                        <div><p class="text-[10px] text-gray-500 font-semibold mb-0.5">ช่องทาง</p><p id="v-issue-channel" class="font-bold text-gray-800">-</p></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Edit Mode Issue -->
+                            <div id="edit-mode-issue" class="hidden mb-3 bg-white p-3 rounded-xl border-2 border-red-300 shadow-sm">
+                                <div class="space-y-2 text-sm">
+                                    <div class="mb-2 pb-2 border-b border-gray-100">
+                                        <label class="text-[10px] font-bold text-gray-600 block mb-1">1. อัปเดตสถานะการดำเนินการ</label>
+                                        <select id="e-issue-status" class="w-full border rounded px-2 py-1.5 text-xs bg-red-50 font-bold text-gray-800">
+                                            <option value="รอดำเนินการตรวจสอบ">🚨 รอดำเนินการตรวจสอบ</option>
+                                            <option value="กำลังดำเนินการแก้ไข">🚧 กำลังดำเนินการแก้ไข</option>
+                                            <option value="แก้ไขเสร็จสิ้น">✅ แก้ไขเสร็จสิ้น</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-2 pb-2 border-b border-gray-100">
+                                        <label class="text-[10px] font-bold text-gray-600 block mb-1">2. อัปเดตรูปถ่ายหลังการแก้ไข (ถ้ามี)</label>
+                                        <input type="file" id="e-issue-photo" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer border rounded p-1">
+                                    </div>
+                                    <div class="flex gap-2 mt-3 pt-2">
+                                        <button id="btn-cancel-edit-issue" class="flex-1 bg-gray-100 text-gray-600 py-1.5 rounded text-xs font-bold transition hover:bg-gray-200 cursor-pointer">ยกเลิก</button>
+                                        <button id="btn-save-edit-issue" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-1.5 rounded text-xs font-bold shadow transition cursor-pointer">บันทึก</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- โครงการก่อสร้าง -->
                         <div id="project-kpi-section" class="hidden">
                             <div class="flex justify-between items-center mb-2">
@@ -192,6 +250,10 @@
                                 <div id="v-distance-section" class="hidden bg-blue-50 p-2.5 rounded-xl border border-blue-100 shadow-sm mb-3 flex flex-col gap-1">
                                     <div class="flex justify-between items-center"><span class="text-xs font-bold text-gray-600"><i class="fas fa-route mr-1"></i> ความยาว/พื้นที่รวม</span><span id="v-distance" class="font-bold text-gray-500 text-xs">0.00 ม.</span></div>
                                     <div id="v-working-distance-wrapper" class="flex justify-between items-center border-t border-blue-100 pt-1 hidden"><span class="text-xs font-bold text-green-700"><i class="fas fa-hard-hat mr-1"></i> ระยะก่อสร้างจริง</span><span id="v-working-distance" class="font-bold text-green-700 text-sm">0.00 ม.</span></div>
+                                    <div id="v-coords-section" class="hidden text-[10px] text-gray-500 mt-1 border-t border-blue-100 pt-1">
+                                        <div class="flex justify-between"><span><i class="fas fa-play-circle text-blue-400 mr-1"></i> จุดเริ่มต้น:</span> <span id="v-start-coord" class="font-mono font-semibold text-blue-700"></span></div>
+                                        <div class="flex justify-between mt-0.5"><span><i class="fas fa-stop-circle text-red-400 mr-1"></i> จุดสิ้นสุด:</span> <span id="v-end-coord" class="font-mono font-semibold text-red-700"></span></div>
+                                    </div>
                                 </div>
                                 <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm mb-3">
                                     <div class="grid grid-cols-2 gap-2 mb-2 pb-2 border-b border-gray-100 text-sm">
@@ -302,6 +364,19 @@
                                     </div>
                                     <div id="e-style-line-section" class="mb-2 pb-2 border-b border-gray-100 hidden bg-blue-50 p-2 rounded border border-blue-100">
                                         <label class="text-[10px] font-bold text-blue-800 block mb-1">9. รูปแบบสีและการดำเนินการ (เส้น/ขอบเขตพื้นที่)</label>
+                                        <div class="grid grid-cols-2 gap-2 mb-2">
+                                            <div class="bg-white p-2 rounded border border-blue-200 shadow-sm">
+                                                <label class="text-[9px] font-bold text-blue-700 block mb-1"><i class="fas fa-play-circle mr-1"></i>พิกัดจุดเริ่มต้น</label>
+                                                <input type="number" id="e-start-lat" step="any" class="w-full border border-gray-300 rounded px-2 py-1 text-[10px] mb-1 focus:border-blue-500" placeholder="ละติจูด (Lat)">
+                                                <input type="number" id="e-start-lng" step="any" class="w-full border border-gray-300 rounded px-2 py-1 text-[10px] focus:border-blue-500" placeholder="ลองจิจูด (Lng)">
+                                            </div>
+                                            <div class="bg-white p-2 rounded border border-blue-200 shadow-sm">
+                                                <label class="text-[9px] font-bold text-red-700 block mb-1"><i class="fas fa-stop-circle mr-1"></i>พิกัดจุดสิ้นสุด</label>
+                                                <input type="number" id="e-end-lat" step="any" class="w-full border border-gray-300 rounded px-2 py-1 text-[10px] mb-1 focus:border-blue-500" placeholder="ละติจูด (Lat)">
+                                                <input type="number" id="e-end-lng" step="any" class="w-full border border-gray-300 rounded px-2 py-1 text-[10px] focus:border-blue-500" placeholder="ลองจิจูด (Lng)">
+                                            </div>
+                                        </div>
+                                        <button type="button" id="btn-e-gen-line" class="w-full bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-bold py-1.5 rounded mb-2 hover:bg-blue-200 transition cursor-pointer shadow-sm"><i class="fas fa-magic"></i> อัปเดตเส้นตรงจากพิกัดข้างต้น</button>
                                         <div class="grid grid-cols-3 gap-2 mb-2"><div><label class="text-[9px] text-gray-500">สีขอบเขต</label><input type="color" id="e-line-color" class="w-full h-7 cursor-pointer border rounded p-0 bg-white"></div><div><label class="text-[9px] text-gray-500">ชนิดเส้น</label><select id="e-line-style" class="w-full border rounded text-[10px] p-1 h-7 bg-white"><option value="solid">เส้นทึบ</option><option value="dashed">เส้นประ</option></select></div><div><label class="text-[9px] text-gray-500">ความหนา</label><input type="number" id="e-line-weight" min="1" max="20" class="w-full border rounded text-[10px] p-1 h-7 bg-white"></div></div>
                                         <div class="grid grid-cols-1 gap-2 pt-2 border-t border-blue-200">
                                             <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-gray-600">ระยะทาง/ขนาดรวมของไฟล์</span><span id="e-distance-display" class="font-bold text-gray-600 text-xs">0.00 ม.</span></div>
@@ -467,6 +542,19 @@
                     </div>
 
                     <div id="line-settings-container" class="hidden mb-2">
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <div class="bg-gray-50 p-2 rounded border border-gray-200 shadow-sm">
+                                <label class="text-[9px] font-bold text-blue-700 block mb-1"><i class="fas fa-play-circle mr-1"></i>พิกัดจุดเริ่มต้น</label>
+                                <input type="number" id="new-p-start-lat" step="any" class="w-full border border-gray-300 rounded px-2 py-1 text-[10px] mb-1 focus:border-blue-500" placeholder="ละติจูด (Lat)">
+                                <input type="number" id="new-p-start-lng" step="any" class="w-full border border-gray-300 rounded px-2 py-1 text-[10px] focus:border-blue-500" placeholder="ลองจิจูด (Lng)">
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded border border-gray-200 shadow-sm">
+                                <label class="text-[9px] font-bold text-red-700 block mb-1"><i class="fas fa-stop-circle mr-1"></i>พิกัดจุดสิ้นสุด</label>
+                                <input type="number" id="new-p-end-lat" step="any" class="w-full border border-gray-300 rounded px-2 py-1 text-[10px] mb-1 focus:border-blue-500" placeholder="ละติจูด (Lat)">
+                                <input type="number" id="new-p-end-lng" step="any" class="w-full border border-gray-300 rounded px-2 py-1 text-[10px] focus:border-blue-500" placeholder="ลองจิจูด (Lng)">
+                            </div>
+                        </div>
+                        <button type="button" id="btn-new-p-gen-line" class="w-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold py-1.5 rounded mb-2 hover:bg-indigo-100 transition cursor-pointer shadow-sm"><i class="fas fa-magic"></i> สร้างเส้นตรงจากพิกัดข้างต้น</button>
                         <div class="bg-blue-50 p-2 rounded border border-blue-200 text-xs mb-2 text-center">
                             จุด: <span id="line-points-count" class="font-bold">0</span> | ระยะ: <span id="line-distance" class="font-bold">0.00</span> ม.
                         </div>
@@ -565,6 +653,8 @@
                     <button id="btn-export-data" class="w-full bg-white border border-blue-300 text-blue-700 py-2.5 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-50 flex items-center justify-center gap-2 cursor-pointer"><i class="fas fa-download"></i> สำรองข้อมูลทั้งหมด (Export JSON)</button>
                     <button id="btn-import-data" class="w-full bg-white border border-green-300 text-green-700 py-2.5 rounded-lg text-sm font-bold shadow-sm hover:bg-green-50 flex items-center justify-center gap-2 cursor-pointer"><i class="fas fa-upload"></i> นำเข้าข้อมูลที่สำรองไว้ (Restore JSON)</button>
                     <input type="file" id="backup-file-upload" accept=".json" class="hidden">
+                    <div class="border-t border-gray-200 my-4"></div>
+                    <button id="btn-clear-all-data" class="w-full bg-red-50 border border-red-200 text-red-600 py-2 rounded-lg text-xs font-bold hover:bg-red-100 flex items-center justify-center gap-2 cursor-pointer"><i class="fas fa-trash-alt"></i> ล้างข้อมูลทั้งหมดเพื่อเริ่มใหม่</button>
                 </div>
             </div>
         </div>
@@ -630,6 +720,13 @@
                         </table>
                     </div>
                 </div>
+            </div>
+            
+            <!-- 🟢 เพิ่มปุ่มปิดหน้าต่างด้านล่าง 🟢 -->
+            <div class="bg-white px-4 py-3 border-t border-gray-200 flex justify-center md:justify-end shrink-0">
+                <button id="btn-close-global-dashboard-bottom" class="px-6 py-2.5 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-200 transition cursor-pointer shadow-sm flex items-center gap-2">
+                    <i class="fas fa-times"></i> ปิดหน้าต่างสรุปภาพรวม
+                </button>
             </div>
         </div>
     </div>
@@ -724,10 +821,10 @@
     <!-- 🟢 FIREBASE CORE LOGIC & JS 🟢 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        window.FirebaseModule = { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, collection, addDoc, doc, setDoc, deleteDoc, onSnapshot };
+        window.FirebaseModule = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, collection, addDoc, doc, setDoc, deleteDoc, onSnapshot };
         window.dispatchEvent(new Event('firebaseLoaded'));
     </script>
 
@@ -847,7 +944,7 @@
         // ==========================================
         function initAuth() {
             if (!window.FirebaseModule) return;
-            const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore } = window.FirebaseModule;
+            const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore } = window.FirebaseModule;
             
             try {
                 if(Object.keys(firebaseConfig).length > 0) {
@@ -857,8 +954,6 @@
 
                     const doAuth = async () => {
                         try {
-                            // ข้ามการใช้ Token เริ่มต้นของระบบ Canvas เนื่องจากเราใช้ Firebase Config ของผู้ใช้เอง
-                            // วิธีนี้จะช่วยป้องกันปัญหา Error (auth/custom-token-mismatch) บน Console
                             await signInAnonymously(auth);
                         } catch(e) {
                             console.error("Auth Error:", e);
@@ -926,7 +1021,6 @@
             for (let k in dataToSave) {
                 if (dataToSave[k] !== undefined && typeof dataToSave[k] !== 'function') {
                     if (typeof dataToSave[k] === 'object' && dataToSave[k] !== null) {
-                        // Skipping un-stringified objects to prevent firestore nested object issues with arrays
                     } else { 
                         safeData[k] = dataToSave[k]; 
                     }
@@ -980,7 +1074,15 @@
                 } 
                 else if (pickingMode === 'project-line') {
                     tempLinePoints.push({lat: e.latlng.lat, lng: e.latlng.lng}); 
-                    if (tempLinePoints.length > 1) { let lastPt = tempLinePoints[tempLinePoints.length - 2]; currentDistance += map.distance([lastPt.lat, lastPt.lng], [e.latlng.lat, e.latlng.lng]); }
+                    if (tempLinePoints.length === 1) {
+                        setVal('new-p-start-lat', e.latlng.lat.toFixed(6)); setVal('new-p-start-lng', e.latlng.lng.toFixed(6));
+                        setVal('e-start-lat', e.latlng.lat.toFixed(6)); setVal('e-start-lng', e.latlng.lng.toFixed(6));
+                    }
+                    if (tempLinePoints.length > 1) { 
+                        let lastPt = tempLinePoints[tempLinePoints.length - 2]; currentDistance += map.distance([lastPt.lat, lastPt.lng], [e.latlng.lat, e.latlng.lng]); 
+                        setVal('new-p-end-lat', e.latlng.lat.toFixed(6)); setVal('new-p-end-lng', e.latlng.lng.toFixed(6));
+                        setVal('e-end-lat', e.latlng.lat.toFixed(6)); setVal('e-end-lng', e.latlng.lng.toFixed(6));
+                    }
                     setTxt('line-distance', currentDistance.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
                     const lColor = val('new-l-color') || '#3b82f6'; const lWeight = val('new-l-weight') || 6; const lStyle = val('new-l-style') === 'dashed' ? '10, 10' : null;
                     if (!tempPolyline) tempPolyline = L.polyline(tempLinePoints, {color: lColor, weight: lWeight, opacity: 0.8, dashArray: lStyle}).addTo(map);
@@ -993,12 +1095,13 @@
             setTimeout(() => { if(map) map.invalidateSize(); }, 1500);
         }
 
-        const createCustomIcon = (color, iconClass = 'fa-map-marker-alt', size = 32) => {
+        const createCustomIcon = (color, iconClass = 'fa-map-marker-alt', size = 32, isIssue = false) => {
             const numSize = parseInt(size) || 32;
             const fontSize = Math.max(14, Math.floor(numSize * 0.65)); 
+            const pulseClass = isIssue ? 'issue-pin-pulse z-[2000]' : '';
             return L.divIcon({ 
                 className: 'custom-pin-wrapper', 
-                html: `<div class="custom-map-pin flex flex-col items-center justify-center h-full w-full" style="color: ${color}; font-size: ${fontSize}px; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;"><i class="fas ${iconClass}"></i></div>`, 
+                html: `<div class="custom-map-pin ${pulseClass} flex flex-col items-center justify-center h-full w-full" style="color: ${color}; font-size: ${fontSize}px; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;"><i class="fas ${iconClass}"></i></div>`, 
                 iconSize: [numSize, numSize], 
                 iconAnchor: [numSize/2, numSize] 
             });
@@ -1009,17 +1112,24 @@
             html += `<h4 class="font-bold text-blue-800 text-sm border-b border-gray-200 pb-1.5 mb-2">${data.name || 'ไม่มีชื่อ'}</h4>`;
             
             if (data.importedRawData && Object.keys(data.importedRawData).length > 0) {
-                html += `<div class="max-h-48 overflow-y-auto custom-scrollbar"><table class="w-full text-[11px] text-left border-collapse">`;
+                html += `<div class="max-h-48 overflow-y-auto custom-scrollbar mt-2 bg-gray-50 p-2 rounded border border-gray-100"><table class="w-full text-[11px] text-left border-collapse">`;
                 for (let k in data.importedRawData) {
-                    if (k !== 'styleUrl' && k !== 'styleHash') {
+                    if (k !== 'styleUrl' && k !== 'styleHash' && k !== 'name' && k !== 'Name' && k !== 'description') {
                         let val = data.importedRawData[k];
                         if (typeof val === 'object') val = JSON.stringify(val);
-                        html += `<tr class="border-b border-gray-100"><td class="py-1.5 font-bold text-gray-500 w-1/3 align-top pr-2">${k}</td><td class="py-1.5 text-gray-800 font-medium break-words">${val}</td></tr>`;
+                        if (typeof val === 'string') val = val.replace(/<[^>]*>?/gm, '').trim(); // ลบ Tag HTML ที่ฝังมา
+                        if (val) html += `<tr class="border-b border-gray-200 last:border-0"><td class="py-1.5 font-bold text-gray-600 w-1/3 align-top pr-1">${k}</td><td class="py-1.5 text-gray-800 font-medium break-words">${val}</td></tr>`;
                     }
+                }
+                // จัดการแท็ก Description พิเศษ
+                if (data.importedRawData['description']) {
+                    let desc = data.importedRawData['description'];
+                    if (typeof desc === 'string') desc = desc.replace(/<[^>]*>?/gm, '').trim();
+                    if (desc) html += `<tr><td colspan="2" class="py-1.5 text-gray-700 italic border-t border-gray-200 mt-1 pt-1.5 break-words">${desc}</td></tr>`;
                 }
                 html += `</table></div>`;
             } else {
-                html += `<p class="text-xs text-gray-500 italic">ไม่มีข้อมูล Properties ที่ฝังมา</p>`;
+                html += `<p class="text-xs text-gray-500 italic mt-2">ไม่มีข้อมูล Attributes ที่ฝังมา</p>`;
             }
             
             if (data.distance) {
@@ -1036,7 +1146,10 @@
             
             const popupContent = buildPopupContent(data);
 
-            if (data.type === 'point') {
+            if (data.recordType === 'issue') {
+                mapLayer = L.marker([data.lat, data.lng], { icon: createCustomIcon(data.color || '#ef4444', data.icon || 'fa-exclamation-triangle', data.pinSize || 40, true) }).addTo(map);
+            }
+            else if (data.type === 'point') {
                 mapLayer = L.marker([data.lat, data.lng], { icon: createCustomIcon(data.color, data.icon, data.pinSize) }).addTo(map);
             }
             else if (data.type === 'line' || data.type === 'polygon') {
@@ -1192,17 +1305,61 @@
                 const rs = $id('raw-data-section'); if(rs) rs.classList.remove('hidden'); 
                 let html = '<table class="w-full text-[10px] text-left border-collapse">';
                 for (let key in rawDataObj) {
-                    if (key !== 'styleUrl' && key !== 'styleHash') { 
+                    if (key !== 'styleUrl' && key !== 'styleHash' && key !== 'name' && key !== 'Name') { 
                         let val = rawDataObj[key]; if (typeof val === 'object') val = JSON.stringify(val); 
-                        html += `<tr class="border-b border-indigo-100/50 hover:bg-indigo-50/30 transition"><td class="py-1.5 pr-2 font-bold text-indigo-900 w-1/3 align-top">${key}</td><td class="py-1.5 text-indigo-800 break-words font-medium">${val}</td></tr>`; 
+                        if (typeof val === 'string') val = val.replace(/<[^>]*>?/gm, '').trim(); 
+                        if (val) html += `<tr class="border-b border-indigo-100/50 hover:bg-indigo-50/30 transition"><td class="py-1.5 pr-2 font-bold text-indigo-900 w-1/3 align-top">${key}</td><td class="py-1.5 text-indigo-800 break-words font-medium">${val}</td></tr>`; 
                     }
                 }
                 html += '</table>'; const rawContent = $id('raw-data-content'); if (rawContent) rawContent.innerHTML = html;
             } else { const rs = $id('raw-data-section'); if(rs) rs.classList.add('hidden'); }
 
-            if (data.recordType === 'material') {
-                // (Optional Material Tab Handling logic omitted)
+            if (data.recordType === 'issue') {
+                const pStatus = $id('p-status'); 
+                if (pStatus) { 
+                    pStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> แจ้งปัญหาจากประชาชน'; 
+                    let statusColorCls = 'bg-red-100 text-red-700 animate-pulse';
+                    if (data.opStatus === 'กำลังดำเนินการแก้ไข') statusColorCls = 'bg-yellow-100 text-yellow-700';
+                    else if (data.opStatus === 'แก้ไขเสร็จสิ้น') statusColorCls = 'bg-green-100 text-green-700';
+                    pStatus.className = `px-2 py-1 rounded text-[10px] font-bold mb-1 inline-block shadow-sm ${statusColorCls}`; 
+                }
+                const pk = $id('project-kpi-section'); if(pk) pk.classList.add('hidden');
+                const ik = $id('issue-kpi-section'); if(ik) ik.classList.remove('hidden');
+                
+                let address = "-";
+                let channel = "-";
+                if(data.importedRawData) {
+                    address = data.importedRawData["ที่อยู่จาก GPS"] || data.importedRawData["สถานที่"] || data.importedRawData["รายละเอียด"] || "-";
+                    channel = data.importedRawData["ช่องทาง"] || "-";
+                }
+                
+                let issueStatusColor = 'text-red-700';
+                if (data.opStatus === 'กำลังดำเนินการแก้ไข') issueStatusColor = 'text-yellow-600';
+                else if (data.opStatus === 'แก้ไขเสร็จสิ้น') issueStatusColor = 'text-green-600';
+                
+                const vStatus = $id('v-issue-status'); 
+                if(vStatus) {
+                    vStatus.innerText = data.opStatus || 'รอดำเนินการตรวจสอบ';
+                    vStatus.className = `font-bold ${issueStatusColor}`;
+                }
+
+                setTxt('v-issue-desc', address);
+                setTxt('v-issue-date', formatDate(data.createdAt));
+                setTxt('v-issue-channel', channel);
+
+                const vIPhoto = $id('v-issue-photo'); const vIPhotoCont = $id('v-issue-photo-container');
+                if (data.photo && vIPhoto && vIPhotoCont) { vIPhoto.src = data.photo; vIPhotoCont.classList.remove('hidden'); } 
+                else if (vIPhotoCont) { vIPhotoCont.classList.add('hidden'); }
+
+                setVal('e-issue-status', data.opStatus || 'รอดำเนินการตรวจสอบ');
+                setVal('e-issue-photo', '');
+
+                const vmd = $id('view-mode-issue'); if(vmd) vmd.classList.remove('hidden'); 
+                const emd = $id('edit-mode-issue'); if(emd) emd.classList.add('hidden');
+                
+                const dashTrig = $id('dashboard-trigger-section'); if(dashTrig) dashTrig.classList.add('hidden');
             } else {
+                const ik = $id('issue-kpi-section'); if(ik) ik.classList.add('hidden');
                 const statusMap = { '#16a34a': 'ปกติ (ตามแผน)', '#dc2626': 'ล่าช้ากว่าแผน', '#2563eb': 'ส่งมอบงานแล้ว', '#eab308': 'รอดำเนินการ', '#9333ea': 'โครงการพิเศษ' };
                 const statusColors = { '#16a34a': 'bg-green-100 text-green-700', '#dc2626': 'bg-red-100 text-red-700', '#2563eb': 'bg-blue-100 text-blue-700', '#eab308': 'bg-yellow-100 text-yellow-700', '#9333ea': 'bg-purple-100 text-purple-700' };
                 const pStatus = $id('p-status'); if (pStatus) { pStatus.innerText = statusMap[data.color] || 'ข้อมูลทั่วไป'; pStatus.className = `px-2 py-0.5 rounded text-[10px] font-bold mb-1 inline-block ${statusColors[data.color] || 'bg-gray-100'}`; }
@@ -1248,7 +1405,7 @@
                     eRawDataList.innerHTML = '';
                     if (rawDataObj && Object.keys(rawDataObj).length > 0) {
                         for (let key in rawDataObj) {
-                            if (key !== 'styleUrl' && key !== 'styleHash') {
+                            if (key !== 'styleUrl' && key !== 'styleHash' && key !== 'name' && key !== 'Name') {
                                 let val = rawDataObj[key]; if (typeof val === 'object') val = JSON.stringify(val);
                                 eRawDataList.insertAdjacentHTML('beforeend', `
                                     <div class="flex gap-1 items-center prop-row">
@@ -1274,6 +1431,16 @@
                         if (vDistSec) { vDistSec.classList.remove('hidden'); setTxt('v-distance', distStr); const vWorkDistWrap = $id('v-working-distance-wrapper'); if (data.workingDistance && data.workingDistance !== data.distance) { if(vWorkDistWrap) vWorkDistWrap.classList.remove('hidden'); setTxt('v-working-distance', parseFloat(data.workingDistance).toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ม.'); } else { if(vWorkDistWrap) vWorkDistWrap.classList.add('hidden'); } }
                         if (eDistDisp) eDistDisp.innerText = distStr; if (eWorkDist) eWorkDist.value = data.workingDistance || data.distance.toFixed(2);
                     } else { if (vDistSec) vDistSec.classList.add('hidden'); if (eDistDisp) eDistDisp.innerText = '-'; if (eWorkDist) eWorkDist.value = ''; }
+                    
+                    if (data.startLat) {
+                        const vcs = $id('v-coords-section'); if(vcs) vcs.classList.remove('hidden');
+                        setTxt('v-start-coord', `${data.startLat}, ${data.startLng}`);
+                        setTxt('v-end-coord', `${data.endLat}, ${data.endLng}`);
+                        setVal('e-start-lat', data.startLat); setVal('e-start-lng', data.startLng); setVal('e-end-lat', data.endLat); setVal('e-end-lng', data.endLng);
+                    } else {
+                        const vcs = $id('v-coords-section'); if(vcs) vcs.classList.add('hidden');
+                        setVal('e-start-lat', ''); setVal('e-start-lng', ''); setVal('e-end-lat', ''); setVal('e-end-lng', '');
+                    }
                 } else if (data.type === 'point') {
                     const lsec = $id('e-style-line-section'); if(lsec) lsec.classList.add('hidden'); 
                     const psec = $id('e-style-point-section'); if(psec) psec.classList.remove('hidden');
@@ -1288,6 +1455,8 @@
                 }
                 const vmd = $id('view-mode-details'); if(vmd) vmd.classList.remove('hidden'); 
                 const emd = $id('edit-mode-details'); if(emd) emd.classList.add('hidden');
+                
+                const dashTrig = $id('dashboard-trigger-section'); if(dashTrig) dashTrig.classList.remove('hidden');
             }
             
             const dp = $id('detail-panel');
@@ -1363,6 +1532,39 @@
                         }
                     } else if (ext === 'kml') {
                         const text = await readFileAsArrayBuffer(file).then(ab => new TextDecoder().decode(ab));
+                        
+                        // 🟢 ดึงข้อมูล Attributes ฝังลึกด้วย DOMParser (ExtendedData, SchemaData) 🟢
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(text, "text/xml");
+                        const placemarks = xmlDoc.getElementsByTagName("Placemark");
+                        const kmlCustomDataMap = new Map();
+                        
+                        for (let i = 0; i < placemarks.length; i++) {
+                            let p = placemarks[i];
+                            let nameTag = p.getElementsByTagName("name")[0];
+                            let pName = nameTag ? nameTag.textContent.trim() : null;
+                            let pData = {};
+                            
+                            // 1. Get SimpleData (QGIS/ArcGIS)
+                            let simpleData = p.getElementsByTagName("SimpleData");
+                            for(let j=0; j<simpleData.length; j++) {
+                                let key = simpleData[j].getAttribute("name");
+                                if(key) pData[key] = simpleData[j].textContent;
+                            }
+                            // 2. Get Data (Google Earth)
+                            let dataTags = p.getElementsByTagName("Data");
+                            for(let j=0; j<dataTags.length; j++) {
+                                let key = dataTags[j].getAttribute("name");
+                                let valTag = dataTags[j].getElementsByTagName("value")[0];
+                                if(key && valTag) pData[key] = valTag.textContent;
+                            }
+                            // 3. Get Description
+                            let descTag = p.getElementsByTagName("description")[0];
+                            if (descTag) pData['description'] = descTag.textContent;
+                            
+                            if (pName) kmlCustomDataMap.set(pName, pData);
+                        }
+
                         const safeParseLayer = L.geoJson(null, { coordsToLatLng: function (coords) { if (!coords || isNaN(coords[0]) || isNaN(coords[1])) return new L.LatLng(0, 0); return new L.LatLng(coords[1], coords[0], coords[2]); }, filter: function(feature) { return feature && feature.geometry && feature.geometry.coordinates; } });
                         const kmlLayer = omnivore.kml.parse(text, null, safeParseLayer);
                         let allExtractedLayers = [];
@@ -1383,7 +1585,11 @@
                             }
                             if (typeof fName === 'string') { fName = fName.replace(/<[^>]*>?/gm, '').trim(); if (fName.length > 60) fName = fName.substring(0, 60) + '...'; }
                             if (!fName || fName === '') { fName = `${file.name.replace('.kml','')} - ส่วนที่ ${pendingImportData.length + 1}`; }
-                            let cleanProps = {...props}; delete cleanProps.styleUrl; delete cleanProps.styleHash;
+                            
+                            // 🟢 ผสานข้อมูล ExtendedData ที่ดึงมาเองเข้ากับ Props ปกติ
+                            let customData = kmlCustomDataMap.get(fName) || {};
+                            let cleanProps = {...props, ...customData}; 
+                            delete cleanProps.styleUrl; delete cleanProps.styleHash;
                             
                             if (l instanceof L.Marker || l instanceof L.CircleMarker) {
                                 let ll = l.getLatLng(); if (ll.lat === 0 && ll.lng === 0) return; 
@@ -1397,8 +1603,11 @@
                                     
                                     let shapeType = (l instanceof L.Polygon) ? 'polygon' : 'line';
                                     
-                                    if (currentImportTarget === 'material') pendingImportData.push({ recordType: 'material', materialType: materialTypeFromForm, name: fName, type: shapeType, linePoints: linePts, distance: dist, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
-                                    else pendingImportData.push({ recordType: 'project', name: fName, district: 'เมืองพิษณุโลก', type: shapeType, lineColor: '#9333ea', lineWeight: 5, lineStyle: 'solid', linePoints: linePts, distance: dist, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
+                                    let sLat = linePts[0].lat; let sLng = linePts[0].lng;
+                                    let eLat = linePts[linePts.length-1].lat; let eLng = linePts[linePts.length-1].lng;
+
+                                    if (currentImportTarget === 'material') pendingImportData.push({ recordType: 'material', materialType: materialTypeFromForm, name: fName, type: shapeType, linePoints: linePts, distance: dist, startLat: sLat, startLng: sLng, endLat: eLat, endLng: eLng, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
+                                    else pendingImportData.push({ recordType: 'project', name: fName, district: 'เมืองพิษณุโลก', type: shapeType, lineColor: '#9333ea', lineWeight: 5, lineStyle: 'solid', linePoints: linePts, distance: dist, startLat: sLat, startLng: sLng, endLat: eLat, endLng: eLng, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
                                 }
                             }
                         });
@@ -1423,7 +1632,13 @@
                                 let bgRaw = currentImportTarget === 'material' ? 'bg-amber-50/50 border-amber-100 text-amber-900' : 'bg-purple-50/50 border-purple-100 text-purple-900';
                                 rawDataHtml = `<div class="mt-2 p-2 rounded border ${bgRaw} text-[10px] text-gray-600 max-h-24 overflow-y-auto space-y-1 custom-scrollbar">`;
                                 rawDataHtml += `<div class="font-bold text-gray-700 border-b border-gray-200 pb-0.5 mb-1">ข้อมูลที่ฝังมา:</div>`;
-                                for (let key in item.importedRawData) { let val = item.importedRawData[key]; if(typeof val === 'object') val = JSON.stringify(val); rawDataHtml += `<div><span class="font-semibold opacity-75">${key}:</span> ${val}</div>`; }
+                                for (let key in item.importedRawData) { 
+                                    if (key !== 'name' && key !== 'Name') {
+                                        let val = item.importedRawData[key]; if(typeof val === 'object') val = JSON.stringify(val); 
+                                        if (typeof val === 'string') val = val.replace(/<[^>]*>?/gm, '').trim();
+                                        if(val) rawDataHtml += `<div><span class="font-semibold opacity-75">${key}:</span> ${val}</div>`; 
+                                    }
+                                }
                                 rawDataHtml += `</div>`;
                             }
 
@@ -1445,6 +1660,33 @@
             } catch (error) { console.error(error); window.showToast('เกิดข้อผิดพลาดในการอ่านไฟล์', 'error'); }
             e.target.value = '';
         }
+
+        // 🟢 บันทึกการตั้งค่าสีลงไปในข้อมูลนำเข้า 🟢
+        addEvent('btn-confirm-import', 'click', async () => { 
+            const batchColor = val('import-batch-color') || '#9333ea';
+            const batchWeight = parseInt(val('import-batch-weight')) || 6;
+            
+            const inputs = document.querySelectorAll('.import-name-input'); 
+            inputs.forEach(input => { 
+                const idx = input.getAttribute('data-index'); 
+                pendingImportData[idx].name = input.value || `รายการนำเข้าที่ ${parseInt(idx)+1}`; 
+                
+                if (pendingImportData[idx].type === 'line' || pendingImportData[idx].type === 'polygon' || pendingImportData[idx].type === 'kml') {
+                    pendingImportData[idx].lineColor = batchColor;
+                    pendingImportData[idx].color = batchColor;
+                    pendingImportData[idx].lineWeight = batchWeight;
+                } else if (pendingImportData[idx].type === 'point') {
+                    pendingImportData[idx].color = batchColor;
+                }
+            }); 
+            
+            const im = document.getElementById('import-confirm-modal'); if(im) im.classList.add('hidden'); 
+            window.showToast('กำลังบันทึกข้อมูลเข้าสู่ระบบ...', 'info'); 
+            let successCount = 0; 
+            for (const data of pendingImportData) { data.isProcessed = false; await saveDataToDB(data); successCount++; } 
+            window.showToast(`นำเข้าสำเร็จ ${successCount} รายการ`, 'success'); 
+            pendingImportData = []; 
+        });
 
         // ==========================================
         // 🟢 8. ANALYSIS DASHBOARD & CHARTS
@@ -1874,6 +2116,33 @@
                 `);
             });
 
+            // 🟢 ฟังก์ชันวาดเส้นตรงจากช่องกรอกพิกัด 🟢
+            const handleGenLine = (prefix) => {
+                const slat = parseFloat(val(prefix + '-start-lat')); const slng = parseFloat(val(prefix + '-start-lng'));
+                const elat = parseFloat(val(prefix + '-end-lat')); const elng = parseFloat(val(prefix + '-end-lng'));
+                if (isNaN(slat) || isNaN(slng) || isNaN(elat) || isNaN(elng)) return window.showToast('กรุณาระบุพิกัดให้ครบถ้วน 4 ช่อง', 'warning');
+                
+                tempLinePoints = [{lat: slat, lng: slng}, {lat: elat, lng: elng}];
+                currentDistance = map.distance([slat, slng], [elat, elng]);
+                
+                if (prefix === 'new-p') {
+                    setTxt('line-points-count', '2');
+                    setTxt('line-distance', currentDistance.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                } else {
+                    if ($id('e-distance-display')) setTxt('e-distance-display', currentDistance.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ม.');
+                    if ($id('e-working-distance')) setVal('e-working-distance', currentDistance.toFixed(2));
+                }
+
+                if (tempPolyline) map.removeLayer(tempPolyline);
+                const lColor = prefix === 'new-p' ? (val('new-l-color') || '#3b82f6') : (val('e-line-color') || '#3b82f6');
+                const lWeight = prefix === 'new-p' ? (val('new-l-weight') || 6) : (val('e-line-weight') || 6);
+                tempPolyline = L.polyline(tempLinePoints, {color: lColor, weight: lWeight, opacity: 0.8}).addTo(map);
+                map.fitBounds(tempPolyline.getBounds(), { padding: [50, 50] });
+                window.showToast('สร้างเส้นเชื่อมพิกัดเรียบร้อย', 'success');
+            };
+            addEvent('btn-new-p-gen-line', 'click', () => handleGenLine('new-p'));
+            addEvent('btn-e-gen-line', 'click', () => handleGenLine('e'));
+
             // Map Picking Tools
             addEvent('btn-pick-location', 'click', () => { const t = val('new-p-type'); closeAddProjectModal(); document.getElementById('map-container').style.cursor = 'crosshair'; if (t === 'line') { pickingMode = 'project-line'; const pt = document.getElementById('picking-line-toast'); if(pt) pt.classList.remove('hidden'); } else { pickingMode = 'project'; const pt = document.getElementById('picking-toast'); if(pt) pt.classList.remove('hidden'); } });
             addEvent('btn-finish-line', 'click', () => { if (tempLinePoints.length < 2) return window.showToast("วาดเส้นอย่างน้อย 2 จุด", "warning"); pickingMode = null; document.getElementById('map-container').style.cursor = ''; const pt = document.getElementById('picking-line-toast'); if(pt) pt.classList.add('hidden'); const am = document.getElementById('add-project-modal'); if(am) am.classList.remove('hidden'); });
@@ -1896,7 +2165,6 @@
                 document.getElementById('import-modal-info').innerHTML = '<i class="fas fa-info-circle mr-1"></i> ระบบได้วิเคราะห์ไฟล์และดึงข้อมูลมาให้แล้ว คุณสามารถตรวจสอบรายละเอียดและ <b>แก้ไขชื่อโครงการที่ต้องการ</b> ได้ที่นี่ก่อนนำเข้าแผนที่'; 
                 const ufu = document.getElementById('universal-file-upload'); if(ufu) ufu.click(); 
             });
-            addEvent('universal-file-upload', 'change', handleFileUpload);
             
             // 🟢 Event ลอจิกสำหรับปุ่มนำเข้า KML ถนน 🟢
             addEvent('btn-import-kml-road', 'click', () => { 
@@ -1909,6 +2177,39 @@
                 const kru = document.getElementById('kml-road-file-upload'); if(kru) kru.click(); 
             });
             addEvent('kml-road-file-upload', 'change', handleFileUpload);
+            
+            // 🟢 จำลองการแจ้งปัญหาจาก LINE 🟢
+            addEvent('btn-simulate-line', 'click', async () => {
+                if (!currentUser || !db || !window.FirebaseModule) return window.showToast('กรุณารอการเชื่อมต่อฐานข้อมูล', 'warning');
+                
+                // สุ่มพิกัดให้อยู่ใกล้ๆ กับจุดกึ่งกลางหน้าจอที่กำลังดูอยู่
+                const center = map.getCenter();
+                const lat = center.lat + (Math.random() - 0.5) * 0.005;
+                const lng = center.lng + (Math.random() - 0.5) * 0.005;
+                
+                const dummyData = {
+                    recordType: "issue",
+                    name: "แจ้งปัญหาจากประชาชน (จำลอง)",
+                    district: "แจ้งจาก LINE",
+                    type: "point",
+                    lat: lat,
+                    lng: lng,
+                    opStatus: "รอดำเนินการตรวจสอบ",
+                    color: "#ef4444",
+                    icon: "fa-exclamation-triangle",
+                    pinSize: 40,
+                    createdAt: Date.now(),
+                    importedRawData: {
+                        "ที่อยู่จาก GPS": "123 ถ.จำลอง ต.สมมติ อ.เมือง จ.พิษณุโลก",
+                        "สถานะ": "รอดำเนินการ",
+                        "ช่องทาง": "LINE OA (ทดสอบจากปุ่มจำลอง)"
+                    }
+                };
+                
+                window.showToast('กำลังรับข้อมูลจำลองจากมือถือประชาชน...', 'info');
+                await saveDataToDB(dummyData);
+                window.showToast('รับแจ้งเหตุสำเร็จ! หมุดสีแดงปรากฏขึ้นแล้ว', 'success');
+            });
             
             addEvent('btn-close-import-modal', 'click', () => { const im = document.getElementById('import-confirm-modal'); if(im) im.classList.add('hidden'); pendingImportData = []; });
             addEvent('btn-cancel-import', 'click', () => { const im = document.getElementById('import-confirm-modal'); if(im) im.classList.add('hidden'); pendingImportData = []; });
@@ -1963,6 +2264,7 @@
             // 🟢 Global Dashboard
             addEvent('btn-open-global-dashboard', 'click', window.openGlobalDashboard);
             addEvent('btn-close-global-dashboard', 'click', () => { const m = $id('global-dashboard-modal'); if(m) m.classList.add('hidden'); });
+            addEvent('btn-close-global-dashboard-bottom', 'click', () => { const m = $id('global-dashboard-modal'); if(m) m.classList.add('hidden'); });
 
             // Form Submits
             addEvent('btn-save-project', 'click', async () => {
@@ -1983,19 +2285,24 @@
                     docYear: val('new-p-year') || '', docVol: val('new-p-vol') || '', docPage: val('new-p-page') || '', contractNo: val('new-p-contract-no') || '', 
                     medianPrice: parseFloat(val('new-p-median-price')) || 0, contractPrice: parseFloat(val('new-p-contract-price')) || 0, budget: parseFloat(val('new-p-budget')) || 0, 
                     startDate: val('new-p-start-date') || '', endDate: val('new-p-end-date') || '', 
-                    technicians: getTechniciansFromDOM('new-p-tech-list'),
+                    technicians: getTechniciansFromDOM('new-p-tech-list'), // 🟢 ดึงข้อมูลช่างจากฟอร์มบันทึก
                     photo: tempPhotoBase64, createdAt: Date.now() 
                 };
                 if (type === 'point') { pd.lat = parseFloat(val('new-p-lat')); pd.lng = parseFloat(val('new-p-lng')); if (isNaN(pd.lat) || isNaN(pd.lng)) return window.showToast('ระบุพิกัดให้ครบถ้วน', 'error'); map.flyTo([pd.lat, pd.lng], 14, { duration: 1.5 }); } 
-                else if (type === 'line') { if (!tempPolyline || tempLinePoints.length < 2) return window.showToast('กรุณาวาดเส้นแนวถนน', 'error'); pd.linePoints = tempLinePoints; pd.lineColor = val('new-l-color') || '#3b82f6'; pd.lineStyle = val('new-l-style') || 'solid'; pd.lineWeight = val('new-l-weight') || 6; pd.distance = currentDistance; map.fitBounds(L.polyline(tempLinePoints).getBounds()); }
+                else if (type === 'line') { 
+                    if (!tempPolyline || tempLinePoints.length < 2) return window.showToast('กรุณาวาดเส้นแนวถนน หรือ ป้อนพิกัดให้ครบ 4 ช่อง', 'error'); 
+                    pd.linePoints = tempLinePoints; pd.lineColor = val('new-l-color') || '#3b82f6'; pd.lineStyle = val('new-l-style') || 'solid'; pd.lineWeight = val('new-l-weight') || 6; pd.distance = currentDistance; map.fitBounds(L.polyline(tempLinePoints).getBounds()); 
+                    pd.startLat = val('new-p-start-lat') || ''; pd.startLng = val('new-p-start-lng') || '';
+                    pd.endLat = val('new-p-end-lat') || ''; pd.endLng = val('new-p-end-lng') || '';
+                }
                 
                 await saveDataToDB(pd); 
                 window.showToast('บันทึกโครงการใหม่สำเร็จ!', 'success');
                 
                 if (tempPolyline) { map.removeLayer(tempPolyline); tempPolyline = null; }
                 tempLinePoints = []; setTxt('line-points-count', '0'); setTxt('line-distance', '0.00'); currentDistance = 0; tempPhotoBase64 = null;
-                ['new-p-name', 'new-p-budget', 'new-p-median-price', 'new-p-contract-price', 'new-p-year', 'new-p-vol', 'new-p-page', 'new-p-contract-no', 'new-p-lat', 'new-p-lng', 'new-p-photo', 'new-p-op-status-installment', 'new-p-op-problem'].forEach(id => setVal(id, ''));
-                const tList = $id('new-p-tech-list'); if(tList) tList.innerHTML = ''; 
+                ['new-p-name', 'new-p-budget', 'new-p-median-price', 'new-p-contract-price', 'new-p-year', 'new-p-vol', 'new-p-page', 'new-p-contract-no', 'new-p-lat', 'new-p-lng', 'new-p-start-lat', 'new-p-start-lng', 'new-p-end-lat', 'new-p-end-lng', 'new-p-photo', 'new-p-op-status-installment', 'new-p-op-problem'].forEach(id => setVal(id, ''));
+                const tList = $id('new-p-tech-list'); if(tList) tList.innerHTML = ''; // เคลียร์ฟอร์มช่าง
                 const instCont = $id('new-p-op-status-installment-container'); if(instCont) instCont.classList.add('hidden');
                 const subCont = $id('new-p-op-substatus-container'); if(subCont) subCont.classList.add('hidden');
                 const probCont = $id('new-p-op-problem-container'); if(probCont) probCont.classList.add('hidden');
@@ -2026,9 +2333,53 @@
                 });
             });
 
+            // 🟢 ระบบจัดการหน้าต่างแก้ไข Issue 🟢
+            addEvent('btn-edit-issue', 'click', () => { const vmd = document.getElementById('view-mode-issue'); if(vmd) vmd.classList.add('hidden'); const emd = document.getElementById('edit-mode-issue'); if(emd) emd.classList.remove('hidden'); });
+            addEvent('btn-cancel-edit-issue', 'click', () => { const emd = document.getElementById('edit-mode-issue'); if(emd) emd.classList.add('hidden'); const vmd = document.getElementById('view-mode-issue'); if(vmd) vmd.classList.remove('hidden'); });
+            addEvent('e-issue-photo', 'change', (e) => { compressImage(e.target.files[0], (base64) => { editPhotoBase64 = base64; }); });
+
+            addEvent('btn-save-edit-issue', 'click', async () => {
+                if(!currentSelectedProjectId) return; const pData = loadedMarkers[currentSelectedProjectId].projectData;
+                pData.opStatus = val('e-issue-status') || 'รอดำเนินการตรวจสอบ';
+                
+                // เปลี่ยนสีหมุดตามสถานะการแก้ไขปัญหา
+                if (pData.opStatus === 'กำลังดำเนินการแก้ไข') { pData.color = '#eab308'; } 
+                else if (pData.opStatus === 'แก้ไขเสร็จสิ้น') { pData.color = '#16a34a'; } 
+                else { pData.color = '#ef4444'; } 
+
+                if (editPhotoBase64) pData.photo = editPhotoBase64;
+                await saveDataToDB(pData, currentSelectedProjectId); window.showToast('อัปเดตสถานะสำเร็จ', 'success'); 
+                const emd = document.getElementById('edit-mode-issue'); if(emd) emd.classList.add('hidden'); 
+                const vmd = document.getElementById('view-mode-issue'); if(vmd) vmd.classList.remove('hidden'); 
+                window.selectProject(currentSelectedProjectId);
+            });
+
+            // 🟢 ฟังก์ชันอัปเกรด Issue เป็น โครงการงบประมาณ 🟢
+            addEvent('btn-upgrade-issue', 'click', () => {
+                const ik = $id('issue-kpi-section'); if(ik) ik.classList.add('hidden');
+                const pk = $id('project-kpi-section'); if(pk) pk.classList.remove('hidden');
+                const vmd = document.getElementById('view-mode-details'); if(vmd) vmd.classList.add('hidden'); 
+                const emd = document.getElementById('edit-mode-details'); if(emd) emd.classList.remove('hidden');
+                
+                // นำข้อมูลแจ้งเหตุเดิมมาใส่ในฟอร์มโครงการ
+                const pData = loadedMarkers[currentSelectedProjectId].projectData;
+                setVal('e-name', pData.name || '');
+                setVal('e-district', 'เมืองพิษณุโลก');
+                setVal('e-op-status', 'จัดทำแบบรูป');
+                setVal('e-point-color', '#eab308'); // เปลี่ยนเป็นสีเหลือง (รอดำเนินการโครงการ)
+                setVal('e-point-icon', 'fa-map-marker-alt');
+                setVal('e-point-size', pData.pinSize || 32);
+                
+                const psec = $id('e-style-point-section'); if(psec) psec.classList.remove('hidden');
+                const lsec = $id('e-style-line-section'); if(lsec) lsec.classList.add('hidden');
+                
+                window.showToast('สลับเป็นโหมดโครงการ กรุณากรอกรายละเอียดของโครงการแล้วกดบันทึก', 'info');
+            });
+
             addEvent('btn-save-edit', 'click', async () => {
                 if(!currentSelectedProjectId) return; const pData = loadedMarkers[currentSelectedProjectId].projectData;
                 pData.name = val('e-name') || 'โครงการไม่มีชื่อ';
+                pData.recordType = 'project'; // 🟢 ปรับให้เป็นหมวดหมู่ Project เสมอเมื่อเซฟจากฟอร์มนี้
                 pData.district = val('e-district') || 'เมืองพิษณุโลก';
                 if (pData.type === 'line' || pData.type === 'kml' || pData.type === 'polygon') { 
                     pData.color = val('e-line-color') || '#3b82f6'; 
@@ -2036,6 +2387,8 @@
                     pData.lineStyle = val('e-line-style') || 'solid'; 
                     pData.lineWeight = val('e-line-weight') || 6; 
                     pData.workingDistance = parseFloat(val('e-working-distance')) || pData.distance; 
+                    pData.startLat = val('e-start-lat') || ''; pData.startLng = val('e-start-lng') || '';
+                    pData.endLat = val('e-end-lat') || ''; pData.endLng = val('e-end-lng') || '';
                     pData.isProcessed = true; 
                 } 
                 else if (pData.type === 'point') { 
