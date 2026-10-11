@@ -46,6 +46,35 @@
         .leaflet-control-attribution { font-family: 'Sarabun', sans-serif; font-size: 10px !important; }
         .project-polyline { cursor: pointer; transition: stroke-width 0.2s; }
         .project-polyline:hover { stroke-width: 10px !important; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+        .transferred-road-polyline { cursor: pointer; stroke-linecap: round; filter: drop-shadow(0 0 1px rgba(255,255,255,.9)); }
+        .transferred-road-polyline:hover { stroke-width: 7px !important; }
+        .plan-proposal-polyline { cursor: pointer; stroke-linecap: round; filter: drop-shadow(0 0 3px rgba(255,255,255,.95)); }
+        .plan-proposal-polyline:hover { stroke-width: 11px !important; filter: drop-shadow(0 0 5px rgba(37,99,235,.8)); }
+        .historical-project-polyline { cursor: pointer; stroke-linecap: round; filter: drop-shadow(0 0 3px rgba(255,255,255,.95)); }
+        .historical-project-polyline:hover { stroke-width: 10px !important; filter: drop-shadow(0 0 5px rgba(22,163,74,.8)); }
+
+        /* กล่องข้อมูลบนแผนที่: เว้นระยะให้อ่านง่าย และไม่ใช้ลูกศรแบบ tooltip เดิม */
+        .leaflet-tooltip.highway-hover-card {
+            padding: 0 !important; border: 0 !important; border-radius: 14px !important;
+            background: transparent !important; box-shadow: 0 14px 35px rgba(15,23,42,.24) !important;
+            white-space: normal !important;
+        }
+        .leaflet-tooltip.highway-hover-card::before { display: none !important; }
+        .highway-map-card {
+            width: min(360px, calc(100vw - 42px)); max-height: 390px; overflow: hidden;
+            border: 1px solid #dbe3ee; border-radius: 14px; background: rgba(255,255,255,.98);
+            color: #334155; font-family: 'Sarabun', sans-serif; line-height: 1.45;
+        }
+        .highway-map-card__head { padding: 12px 14px 10px; border-bottom: 1px solid #e5e7eb; }
+        .highway-map-card__body { padding: 10px 14px; max-height: 270px; overflow-y: auto; }
+        .highway-map-card__title { margin-top: 7px; font-size: 14px; line-height: 1.45; font-weight: 800; overflow-wrap: anywhere; }
+        .highway-map-card__badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+        .highway-map-card__row { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 8px; padding: 3px 0; font-size: 11px; }
+        .highway-map-card__label { color: #64748b; }
+        .highway-map-card__value { color: #1e293b; font-weight: 700; overflow-wrap: anywhere; }
+        .highway-map-card__project { padding: 8px 9px; border: 1px solid #e2e8f0; border-radius: 9px; background: #f8fafc; }
+        .highway-map-card__project + .highway-map-card__project { margin-top: 6px; }
+        .highway-map-card__foot { padding: 8px 14px; border-top: 1px solid #e5e7eb; font-size: 10px; font-weight: 800; text-align: center; }
 
         .chart-fullscreen { position: fixed !important; top: 20px !important; left: 20px !important; right: 20px !important; bottom: 20px !important; width: calc(100vw - 40px) !important; height: calc(100vh - 40px) !important; z-index: 9999 !important; background: white !important; padding: 20px !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; border: 1px solid #e2e8f0 !important; border-radius: 16px !important; max-height: none !important; }
         
@@ -56,6 +85,7 @@
         @media (max-width: 767px) {
             .coord-card { width: 10.5rem; }
             #coord-value { min-width: 0 !important; font-size: 10px; }
+            #road-project-legend { bottom: 72px; width: calc(100vw - 120px); max-width: 520px; font-size: 10px; padding: 7px 10px; }
         }
     </style>
 </head>
@@ -112,6 +142,9 @@
                         <button id="btn-road-measure" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-blue-200 hover:bg-blue-50 text-blue-800 font-bold py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="หาแนวถนนตามระยะทาง">
                             <i class="fas fa-ruler w-6 text-center md:mr-3 text-lg text-blue-600"></i><span class="max-md:hidden">หาแนวถนนตามระยะทาง</span>
                         </button>
+                        <button id="btn-road-corridor-manager" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-emerald-200 hover:bg-emerald-50 text-emerald-800 font-bold py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="บริหารสายทางและโครงการตามช่วง กม.">
+                            <i class="fas fa-road-circle-check w-6 text-center md:mr-3 text-lg text-emerald-600"></i><span class="max-md:hidden">บริหารสายทาง/ช่วงโครงการ</span>
+                        </button>
                         <button id="btn-spatial-analysis" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-teal-200 hover:bg-teal-50 text-teal-800 font-bold py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="วิเคราะห์ความเหมาะสมเชิงพื้นที่">
                             <i class="fas fa-layer-group w-6 text-center md:mr-3 text-lg text-teal-600"></i><span class="max-md:hidden">วิเคราะห์ความเหมาะสมเชิงพื้นที่</span>
                         </button>
@@ -161,6 +194,14 @@
                         <select id="coord-format" class="bg-transparent font-bold text-gray-700 outline-none cursor-pointer border-none p-0 m-0"><option value="latlng">Lat / Long</option><option value="utm">UTM (Zone 47N)</option></select>
                         </div>
                         <span id="coord-value" class="font-mono text-gray-600 min-w-[180px]">Lat: -, Long: -</span>
+                    </div>
+
+                    <!-- แยกประเภทข้อมูลบนแผนที่ให้ชัดเจน -->
+                    <div id="road-project-legend" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-[40] bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-gray-200 text-xs pointer-events-auto flex flex-wrap items-center justify-center gap-x-5 gap-y-1 whitespace-nowrap">
+                        <div class="font-black text-gray-700"><i class="fas fa-layer-group mr-1 text-gray-500"></i>ประเภทแนว</div>
+                        <div class="flex items-center gap-2"><span class="inline-block w-9 border-t-[5px] border-pink-600 rounded"></span><span><b class="text-pink-700">สายทางถ่ายโอน</b> <span class="text-gray-500">(สายทางแม่)</span></span></div>
+                        <div class="flex items-center gap-2"><span class="inline-block w-9 border-t-[7px] border-green-600 rounded"></span><span><b class="text-green-700">ดำเนินการแล้ว</b> <span class="text-gray-500">(ประวัติโครงการ)</span></span></div>
+                        <div class="flex items-center gap-2"><span class="inline-block w-9 border-t-[7px] border-blue-600 rounded"></span><span><b class="text-blue-700">โครงการเสนอเข้าแผน</b> <span class="text-gray-500">(ช่วงโครงการ)</span></span></div>
                     </div>
 
                     <!-- TOASTS FOR MAP PICKING -->
@@ -1211,7 +1252,7 @@
         // ใช้ collection เดิมและเพิ่มเฉพาะฟิลด์งานประสานแผนแบบ merge
         // ==========================================
         const CoordinationUI = {
-            host:null, editingId:null, activeReportGroupId:null, pickMode:null, route:[], previewLayer:null, attachments:[], charts:[],
+            host:null, editingId:null, editingRoadSegmentId:null, activeReportGroupId:null, activeRoadContext:null, selectedRoadId:null, selectedRoadDistrict:'', pendingRoadSegment:null, pendingNextProject:null, roadPreviewPanel:null, pickMode:null, route:[], roadDraftRoute:[], previewLayer:null, attachments:[], charts:[],
             spatialLayers:{slope:null,flood:null,community:null,road:null,facility:null}, spatialResults:[],
             districts:['เมืองพิษณุโลก','นครไทย','ชาติตระการ','บางระกำ','บางกระทุ่ม','พรหมพิราม','วัดโบสถ์','วังทอง','เนินมะปราง'],
             workflow:[
@@ -1223,6 +1264,7 @@
                 if(!this.host){ this.host=document.createElement('div'); this.host.id='coordination-workflow-modal'; document.body.appendChild(this.host); }
                 const bindings={
                     'btn-open-add':()=>this.openForm(), 'btn-open-filter':()=>this.openSearch(), 'btn-open-analyze-list':()=>this.openAnalyze(),
+                    'btn-road-corridor-manager':()=>this.openRoadManager(),
                     'btn-spatial-analysis':()=>this.openSpatial(), 'btn-selected-folder':()=>this.openFolder(),
                     'btn-open-global-dashboard':()=>this.openDashboard(), 'btn-open-data-mgr':()=>this.openDataManager()
                 };
@@ -1230,7 +1272,61 @@
                 this.refreshBadge();
             },
             parse(value,fallback){ try{return typeof value==='string'?JSON.parse(value):(value??fallback);}catch{return fallback;} },
-            projects(){ return getHighwayProjects().filter(p=>p.projectType!=='ordinance'); },
+            isExplicitRoadMaster(p){
+                return !!p&&(p.recordType==='road'||p.roadRole==='transferred_road'||p.isTransferredRoad===true);
+            },
+            isRoadMaster(p){
+                if(!p)return false;
+                const hasLinePoints=Array.isArray(p.linePoints)&&p.linePoints.length>1;
+                const hasKmlContent=p.type==='kml'&&typeof p.kmlContent==='string'&&p.kmlContent.trim().length>0;
+                if(!hasLinePoints&&!hasKmlContent)return false;
+                if(this.isExplicitRoadMaster(p))return true;
+                // ข้อมูล Highway รุ่นเดิมบันทึกแนวถนนไว้เป็น recordType=project
+                // แม้จะมีเลขสัญญา/ปีงบประมาณ จึงต้องรับเป็นสายทางด้วย แต่ห้ามดึง
+                // โครงการประสานแผนที่ผู้ใช้สร้างใหม่กลับมาเป็นแม่สายทาง
+                const isCoordinationProject=!!(
+                    p.coordinationEntrySource==='coordination'||p.coordinationBudgetStr||p.projectNameOld||p.projectNameNew||
+                    p.parentRoadId||p.coordinationCoordinatesStr||p.coordinationChecklistStr
+                );
+                const isLegacyHighwayLine=p.recordType==='project'&&!isCoordinationProject&&(hasLinePoints||hasKmlContent);
+                if(isLegacyHighwayLine)return true;
+                const isKml=String(p.sourceFile||'').toLowerCase().endsWith('.kml')||hasKmlContent;
+                const noProjectForm=!isCoordinationProject;
+                const roadHint=String(p.lineColor||p.color||'').toLowerCase()==='#ec4899'||/(ถนน|สายทาง|ทางหลวง|พล\.|อบจ\.)/i.test(String(p.name||''));
+                const legacyRoadWithoutDistrict=isKml&&!String(p.district||'').trim();
+                return isKml&&noProjectForm&&(roadHint||legacyRoadWithoutDistrict);
+            },
+            // โครงการ Highway รุ่นเดิมจำนวนมากมี linePoints และถูกใช้เป็นแนวสายทางแม่ด้วย
+            // จึงให้รายการเดิมแสดงในหน้าค้นหาเสมอ และตัดออกเฉพาะสายทางแม่ที่สร้าง/ระบุไว้ชัดเจนเท่านั้น
+            projects(){ return getHighwayProjects().filter(p=>p.projectType!=='ordinance'&&p.recordType!=='ordinance'&&!this.isExplicitRoadMaster(p)); },
+            kmlRoadParts(record){
+                if(!record?.kmlContent||typeof DOMParser==='undefined')return [];
+                try{
+                    const xml=new DOMParser().parseFromString(record.kmlContent,'text/xml');
+                    if(xml.querySelector('parsererror'))return [];
+                    const placemarks=[...xml.getElementsByTagName('Placemark')],parts=[];
+                    placemarks.forEach((placemark,placemarkIndex)=>{
+                        const placemarkName=placemark.getElementsByTagName('name')[0]?.textContent?.trim();
+                        const lines=[...placemark.getElementsByTagName('LineString')];
+                        lines.forEach((line,lineIndex)=>{
+                            const text=line.getElementsByTagName('coordinates')[0]?.textContent||'';
+                            const points=text.trim().split(/\s+/).map(token=>token.split(',').map(Number)).filter(v=>Number.isFinite(v[0])&&Number.isFinite(v[1])).map(v=>({lat:v[1],lng:v[0]}));
+                            if(points.length<2)return;
+                            const index=parts.length;
+                            const name=placemarkName||record.name||`สายทางส่วนที่ ${index+1}`;
+                            const distance=points.slice(1).reduce((sum,p,i)=>sum+this.pointDistance(points[i],p),0);
+                            parts.push({...record,id:index===0?record.id:`${record.id}::kml_${placemarkIndex+1}_${lineIndex+1}`,sourceRoadRecordId:record.id,name,linePoints:points,type:'line',distance});
+                        });
+                    });
+                    return parts;
+                }catch(error){console.warn('อ่านแนวถนน KML เดิมไม่สำเร็จ',error);return [];}
+            },
+            roads(){
+                return getHighwayProjects().filter(p=>this.isRoadMaster(p)).flatMap(p=>{
+                    if(Array.isArray(p.linePoints)&&p.linePoints.length>1)return [p];
+                    return this.kmlRoadParts(p);
+                });
+            },
             ordinances(){ return getHighwayProjects().filter(p=>p.projectType==='ordinance'&&p.ordinanceActive!==false); },
             get(id){ return allProjectRecords[id]||loadedMarkers[id]?.projectData||null; },
             name(p){ return String(p?.projectNameNew||p?.projectNameOld||p?.name||p?.title||'').trim(); },
@@ -1284,24 +1380,28 @@
                 const read=(v,key,idx)=>v==null?null:Number(typeof v==='object'?v[key]:v[idx]);
                 return {startLat:pts.length?read(a,'lat',0):(Number.isFinite(Number(p?.lat))?Number(p.lat):null),startLng:pts.length?read(a,'lng',1):(Number.isFinite(Number(p?.lng))?Number(p.lng):null),endLat:pts.length>1?read(z,'lat',0):null,endLng:pts.length>1?read(z,'lng',1):null};
             },
-            totalBudget(p){ const b=this.budgets(p); return ['b2566','b2567','b2568','b2569','b2570'].reduce((s,k)=>s+(Number(String(b[k]||'').replace(/,/g,''))||0),0); },
+            totalBudget(p){ if(this.isHistoricalProject(p))return Number(String(p?.budget||'').replace(/,/g,''))||0;const b=this.budgets(p); return ['b2566','b2567','b2568','b2569','b2570'].reduce((s,k)=>s+(Number(String(b[k]||'').replace(/,/g,''))||0),0); },
             esc:escapeHtml,
             show(title,color,body,footer='',maxWidth='max-w-6xl'){
                 this.host.className='fixed inset-0 bg-gray-900/60 z-[5000] hidden items-center justify-center p-3 md:p-6 backdrop-blur-sm';
                 this.host.innerHTML=`<div class="bg-white rounded-xl shadow-2xl w-full ${maxWidth} max-h-[92vh] flex flex-col overflow-hidden"><div class="${color} text-white px-6 py-4 flex justify-between items-center shrink-0"><h3 class="font-bold text-lg">${title}</h3><button type="button" onclick="CoordinationUI.close()" class="w-8 h-8 rounded-full bg-black/15 hover:bg-black/25"><i class="fas fa-times"></i></button></div><div class="p-5 md:p-6 bg-slate-50 flex-1 overflow-auto custom-scrollbar">${body}</div>${footer?`<div class="bg-white border-t px-5 py-3 shrink-0">${footer}</div>`:''}</div>`;
                 this.host.classList.remove('hidden'); this.host.classList.add('flex');
             },
-            close(){ this.host?.classList.add('hidden'); this.host?.classList.remove('flex'); this.pickMode=null; if(map)$id('map-container').style.cursor=''; if(this.previewLayer)this.previewLayer.clearLayers(); },
+            close(){ this.host?.classList.add('hidden'); this.host?.classList.remove('flex'); this.pickMode=null;this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;if(map)$id('map-container').style.cursor=''; if(this.previewLayer)this.previewLayer.clearLayers(); },
             hide(){ this.host?.classList.add('hidden'); this.host?.classList.remove('flex'); },
             districtOptions(selected=''){ return `<option value="">-- เลือกอำเภอ --</option>`+this.districts.map((d)=>`<option value="${d}" ${d===selected?'selected':''}>${d}</option>`).join(''); },
             workflowOptions(selected='รับเรื่อง'){ return this.workflow.map((s,i)=>`<option value="${s}" ${s===selected?'selected':''}>${i+1}. ${s}</option>`).join('')+`<option value="ยกระดับเป็นโครงการข้อบัญญัติแล้ว" ${selected==='ยกระดับเป็นโครงการข้อบัญญัติแล้ว'?'selected':''}>ยกระดับเป็นข้อบัญญัติแล้ว</option>`; },
-            openForm(id=null,keepIdentity=false,reportGroupId=null){
+            openForm(id=null,keepIdentity=false,reportGroupId=null,roadContext=null){
                 if($id('co-inspector'))this.rememberInspector({inspectorName:val('co-inspector'),inspectorPosition:val('co-position')});
-                this.editingId=id; const p=id?this.get(id):null;this.activeReportGroupId=reportGroupId||p?.coordinationReportGroupId||null; const c=this.coords(p), b=this.budgets(p), chk=this.checklist(p),inspectorMemory=this.inspectorMemory(); const otherCustom=String(chk.otherText||'').split(',').map(x=>x.trim()).filter(x=>x&&x!=='รอตรวจสอบพื้นที่'&&x!=='รอเอกสารการขออนุญาต').join(', ');
+                this.editingId=id; const p=id?this.get(id):null;this.activeReportGroupId=reportGroupId||p?.coordinationReportGroupId||null;
+                const savedRoadContext=p?.parentRoadId?{roadId:p.parentRoadId,roadName:p.parentRoadName||'',start:Number(p.roadStartChainage)||0,end:Number(p.roadEndChainage)||0,length:Number(p.roadSegmentLength)||Number(p.distance)||0}:null;
+                this.activeRoadContext=roadContext||savedRoadContext||null;
+                const c=this.coords(p), b=this.budgets(p), chk=this.checklist(p),inspectorMemory=this.inspectorMemory(); const otherCustom=String(chk.otherText||'').split(',').map(x=>x.trim()).filter(x=>x&&x!=='รอตรวจสอบพื้นที่'&&x!=='รอเอกสารการขออนุญาต').join(', ');
                 if(!keepIdentity){ this.route=[]; this.attachments=this.parse(p?.coordinationAttachmentsStr,p?.attachments||[]); }
                 if(p&&Array.isArray(p.linePoints)) this.route=p.linePoints.map(x=>({lat:Number(x.lat??x[0]),lng:Number(x.lng??x[1])})).filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lng));
                 const field=(id,label,value='',type='text')=>`<div><label class="block text-sm font-bold mb-1">${label}</label><input id="${id}" type="${type}" value="${this.esc(value??'')}" class="w-full border rounded-md px-3 py-2 text-sm"></div>`;
-                const body=`<form id="co-form" class="space-y-5" onsubmit="return false">
+                const roadInfo=this.activeRoadContext?`<div class="bg-emerald-50 border border-emerald-300 rounded-lg p-4 text-sm"><div class="font-bold text-emerald-900"><i class="fas fa-road mr-2"></i>โครงการบนสายทาง: ${this.esc(this.activeRoadContext.roadName||'-')}</div><div class="mt-1 text-emerald-800">ช่วง ${this.formatChainage(this.activeRoadContext.start)} – ${this.formatChainage(this.activeRoadContext.end)} ระยะ ${(Number(this.activeRoadContext.length)||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} เมตร</div></div>`:'';
+                const body=`<form id="co-form" class="space-y-5" onsubmit="return false">${roadInfo}
                 <section class="bg-white p-5 rounded-lg border shadow-sm"><h4 class="font-bold text-blue-800 border-b pb-2 mb-4"><i class="fas fa-building-flag mr-2"></i>1. ข้อมูลโครงการ</h4><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="block text-sm font-bold mb-1">อำเภอ *</label><select id="co-district" class="w-full border rounded-md px-3 py-2 text-sm">${this.districtOptions(p?.district||'')}</select></div>${field('co-seq','ลำดับที่',p?.seqNo||'')}${field('co-agency','หน่วยงานที่ขอ *',p?.agencyName||'')}<div class="md:col-span-3"><label class="block text-sm font-bold mb-1">ชื่อโครงการ (เดิม) *</label><textarea id="co-name-old" rows="2" class="w-full border rounded-md px-3 py-2 text-sm">${this.esc(p?.projectNameOld||p?.name||'')}</textarea></div><div class="md:col-span-3"><label class="block text-sm font-bold mb-1">ชื่อโครงการ (ขอเปลี่ยนแปลง)</label><textarea id="co-name-new" rows="2" class="w-full border rounded-md px-3 py-2 text-sm">${this.esc(p?.projectNameNew||'')}</textarea></div></div></section>
                 <section class="bg-white p-5 rounded-lg border shadow-sm"><h4 class="font-bold text-blue-800 border-b pb-2 mb-4"><i class="fas fa-map-location-dot mr-2"></i>2. รายละเอียดและสถานที่ตั้ง</h4><label class="block text-sm font-bold mb-1">รายละเอียดโครงการ *</label><textarea id="co-details" rows="2" class="w-full border rounded-md px-3 py-2 text-sm mb-4">${this.esc(p?.projectDetails||'')}</textarea><div class="bg-blue-50/50 p-4 rounded-md border border-blue-100"><div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-b pb-4"><div><label class="text-xs font-bold">จุดเริ่มต้น (Lat, Lng)</label><div class="flex gap-2"><input id="co-start-lat" value="${c.startLat??''}" class="w-full border p-2 text-sm"><input id="co-start-lng" value="${c.startLng??''}" class="w-full border p-2 text-sm"></div></div><div><label class="text-xs font-bold">จุดสิ้นสุด (Lat, Lng)</label><div class="flex gap-2"><input id="co-end-lat" value="${c.endLat??''}" class="w-full border p-2 text-sm"><input id="co-end-lng" value="${c.endLng??''}" class="w-full border p-2 text-sm"></div></div></div><div class="flex flex-col md:flex-row gap-3 justify-between mt-4"><div class="flex flex-wrap gap-2"><button type="button" onclick="CoordinationUI.pick('start')" class="bg-blue-100 text-blue-700 border border-blue-200 font-bold px-4 py-2 rounded"><i class="fas fa-location-dot mr-1"></i>จุดเริ่มต้น</button><button type="button" onclick="CoordinationUI.pick('end')" class="bg-red-100 text-red-700 border border-red-200 font-bold px-4 py-2 rounded"><i class="fas fa-location-dot mr-1"></i>จุดสิ้นสุด</button><button type="button" onclick="CoordinationUI.snapToRoad()" class="bg-purple-600 text-white font-bold px-4 py-2 rounded"><i class="fas fa-route mr-1"></i>ตามถนน</button><label class="bg-emerald-600 text-white font-bold px-4 py-2 rounded cursor-pointer"><i class="fas fa-file-import mr-1"></i>KML<input type="file" accept=".kml" class="hidden" onchange="CoordinationUI.importKML(this)"></label></div><div class="flex items-center gap-2 bg-white border rounded-md px-3 py-2 shadow-sm"><select id="co-line-style" class="border rounded text-xs p-1"><option value="solid" ${(p?.lineStyle||'solid')==='solid'?'selected':''}>เส้นทึบ</option><option value="dashed" ${p?.lineStyle==='dashed'?'selected':''}>เส้นประ</option></select><input id="co-line-color" type="color" value="${p?.lineColor||'#3b82f6'}" class="w-7 h-7"><select id="co-line-weight" class="border rounded text-xs p-1"><option value="3" ${Number(p?.lineWeight)===3?'selected':''}>บาง</option><option value="5" ${!p?.lineWeight||Number(p?.lineWeight)===5?'selected':''}>กลาง</option><option value="8" ${Number(p?.lineWeight)===8?'selected':''}>หนา</option></select><span id="co-distance" class="border-l pl-3 text-sky-700 text-xs font-bold whitespace-nowrap"><i class="fas fa-ruler mr-1"></i>ระยะทางบนแผนที่: ${Number(p?.distance||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} ม.</span></div></div></div></section>
                 <section class="bg-white p-5 rounded-lg border shadow-sm"><h4 class="font-bold text-blue-800 border-b pb-2 mb-4"><i class="fas fa-coins mr-2"></i>3. งบประมาณที่เสนอขอ (บาท)</h4><div class="flex flex-wrap items-end gap-3 mb-4 bg-amber-50 border border-amber-200 rounded-lg p-3"><div><label class="block text-sm font-bold mb-1 text-amber-900">ปีงบประมาณเริ่มต้น (พ.ศ.)</label><input id="co-budget-start-year" type="number" min="2400" max="3000" value="${this.budgetStartYear(p)}" oninput="CoordinationUI.updateBudgetYearLabels()" class="w-44 border border-amber-300 rounded-md px-3 py-2 text-sm font-bold"></div><span class="text-xs text-amber-800 pb-2">ระบบจะแสดงงบประมาณต่อเนื่อง 5 ปี และใช้ปีชุดเดียวกันในรายงาน</span></div><div class="grid grid-cols-2 md:grid-cols-5 gap-3">${[0,1,2,3,4].map((i)=>`<div><label id="co-budget-year-label-${i}" class="block text-sm font-bold mb-1">ปี ${this.budgetStartYear(p)+i}</label><input id="co-b${2566+i}" value="${this.esc(b[`b${2566+i}`]||'')}" class="w-full border rounded-md px-3 py-2 text-sm"></div>`).join('')}</div></section>
@@ -1315,10 +1415,10 @@
                 ['co-inspector','co-position'].forEach(x=>$id(x)?.addEventListener('input',()=>this.rememberInspector({inspectorName:val('co-inspector'),inspectorPosition:val('co-position')})));
                 this.drawPreview();
             },
-            openFormWithRoute(points,distance=0){
+            openFormWithRoute(points,distance=0,roadContext=null){
                 const route=(Array.isArray(points)?points:[]).map(p=>({lat:Number(p.lat??p[1]),lng:Number(p.lng??p[0])})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
                 if(route.length<2)return window.showToast('แนวถนนมีจุดไม่ครบ กรุณาคำนวณแนวใหม่','warning');
-                this.openForm();
+                this.openForm(null,false,null,roadContext);
                 this.route=route;
                 const first=route[0],last=route.at(-1);
                 setVal('co-start-lat',first.lat.toFixed(7));setVal('co-start-lng',first.lng.toFixed(7));
@@ -1329,11 +1429,286 @@
                 setTxt('co-distance',`ระยะทางบนแผนที่: ${measured.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} ม.`);
                 window.showToast('นำแนวถนนเข้าหน้าป้อนรายละเอียดโครงการแล้ว กรุณากรอกข้อมูลและบันทึก','success');
             },
+            formatChainage(value){
+                const meters=Math.max(0,Number(value)||0),rounded=Math.round(meters),km=Math.floor(rounded/1000),remain=rounded%1000;
+                return `กม. ${km}+${String(remain).padStart(3,'0')}`;
+            },
+            pointDistance(a,b){
+                if(map)return map.distance([a.lat,a.lng],[b.lat,b.lng]);
+                const rad=x=>x*Math.PI/180,dLat=rad(b.lat-a.lat),dLng=rad(b.lng-a.lng),q=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLng/2)**2;
+                return 6371000*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q));
+            },
+            roadLength(road){
+                const stored=Number(road?.distance);if(Number.isFinite(stored)&&stored>0)return stored;
+                const pts=(road?.linePoints||[]).map(p=>({lat:Number(p.lat??p[0]),lng:Number(p.lng??p[1])})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
+                if(pts.length>1)return pts.slice(1).reduce((sum,p,i)=>sum+this.pointDistance(pts[i],p),0);
+                return this.kmlRoadParts(road).reduce((sum,part)=>sum+(Number(part.distance)||0),0);
+            },
+            roadProjects(roadId){return this.projects().filter(p=>String(p.parentRoadId||'')===String(roadId||''));},
+            isHistoricalProject(p){return p?.projectLifecycle==='historical'||p?.dataCategory==='historical_project';},
+            roadHistoricalProjects(roadId){return this.roadProjects(roadId).filter(p=>this.isHistoricalProject(p));},
+            roadPlanProjects(roadId){return this.roadProjects(roadId).filter(p=>!this.isHistoricalProject(p));},
+            planningProjects(){return this.projects().filter(p=>!this.isHistoricalProject(p)&&!this.isRoadMaster(p));},
+            roadUsage(projects,total){
+                const intervals=projects.map(p=>[Math.max(0,Number(p.roadStartChainage)||0),Math.min(total,Number(p.roadEndChainage)||0)]).filter(x=>x[1]>x[0]).sort((a,b)=>a[0]-b[0]);
+                const merged=[];intervals.forEach(x=>{const last=merged.at(-1);if(!last||x[0]>last[1])merged.push([...x]);else last[1]=Math.max(last[1],x[1]);});
+                return merged.reduce((sum,x)=>sum+x[1]-x[0],0);
+            },
+            sliceRoad(road,start,end){
+                const pts=(road?.linePoints||[]).map(p=>({lat:Number(p.lat??p[0]),lng:Number(p.lng??p[1])})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
+                if(pts.length<2)return [];
+                const lengths=[],cum=[0];for(let i=1;i<pts.length;i++){lengths.push(this.pointDistance(pts[i-1],pts[i]));cum.push(cum.at(-1)+lengths.at(-1));}
+                const total=cum.at(-1),a=Math.max(0,Math.min(total,Number(start)||0)),z=Math.max(a,Math.min(total,Number(end)||0));if(z<=a)return [];
+                const at=d=>{let i=0;while(i<lengths.length-1&&cum[i+1]<d)i++;const len=lengths[i]||1,t=Math.max(0,Math.min(1,(d-cum[i])/len));return {lat:pts[i].lat+(pts[i+1].lat-pts[i].lat)*t,lng:pts[i].lng+(pts[i+1].lng-pts[i].lng)*t};};
+                const result=[at(a)];for(let i=1;i<pts.length-1;i++)if(cum[i]>a&&cum[i]<z)result.push(pts[i]);result.push(at(z));return result;
+            },
+            openRoadManager(roadId=null,segmentEditId=null){
+                const roads=this.roads().sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'th'));
+                const requestedRoadId=roadId||this.selectedRoadId;
+                this.editingRoadSegmentId=segmentEditId;this.selectedRoadId=roads.some(r=>r.id===requestedRoadId)?requestedRoadId:(roads[0]?.id||null);this.pendingRoadSegment=null;
+                const selector=roads.length?`<select id="co-road-select" onchange="CoordinationUI.selectRoad(this.value)" class="w-full border border-emerald-300 rounded-lg px-3 py-2 bg-white font-bold text-emerald-900">${roads.map(r=>`<option value="${this.esc(r.id)}" ${r.id===this.selectedRoadId?'selected':''}>${this.esc(r.name||'ไม่มีชื่อสายทาง')} — ${(this.roadLength(r)/1000).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:3})} กม.</option>`).join('')}</select>`:`<div class="bg-amber-50 border border-amber-300 text-amber-900 rounded-lg p-4">ยังไม่พบแนวสายทาง กรุณาใช้เมนู “นำเข้าแนวถนน KML” ก่อน</div>`;
+                const districtSelector=`<select id="co-road-district" onchange="CoordinationUI.selectRoadDistrict(this.value)" class="w-full border border-emerald-300 rounded-lg px-3 py-2 bg-white font-bold text-emerald-900"><option value="">-- เลือกอำเภอ --</option>${this.districts.map(d=>`<option value="${d}" ${d===this.selectedRoadDistrict?'selected':''}>${d}</option>`).join('')}</select>`;
+                const body=`<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4"><div class="bg-pink-50 border border-pink-200 rounded-xl p-3"><div class="font-black text-pink-800"><i class="fas fa-road mr-2"></i>1. สายทางที่ได้รับถ่ายโอน</div><div class="text-xs text-pink-700 mt-1">ทะเบียนแนวสายทางแม่และความยาวทั้งหมด</div></div><div class="bg-green-50 border border-green-200 rounded-xl p-3"><div class="font-black text-green-800"><i class="fas fa-clock-rotate-left mr-2"></i>2. โครงการที่ดำเนินการแล้ว</div><div class="text-xs text-green-700 mt-1">ประวัติการก่อสร้างหรือปรับปรุงเดิม แสดงเป็นเส้นสีเขียว</div></div><div class="bg-blue-50 border border-blue-200 rounded-xl p-3"><div class="font-black text-blue-800"><i class="fas fa-file-circle-plus mr-2"></i>3. โครงการเสนอเข้าแผนงาน</div><div class="text-xs text-blue-700 mt-1">ช่วงโครงการใหม่พร้อมงบประมาณและสถานะการพิจารณา</div></div></div><div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4"><div class="grid grid-cols-1 md:grid-cols-3 gap-3"><div><div class="font-bold text-emerald-900 mb-2"><i class="fas fa-location-dot mr-2"></i>เลือกอำเภอ</div>${districtSelector}</div><div class="md:col-span-2"><div class="font-bold text-pink-800 mb-2"><i class="fas fa-road mr-2"></i>เลือกทะเบียนสายทางที่ได้รับถ่ายโอน <span class="ml-2 text-xs bg-white border border-pink-300 rounded-full px-2 py-0.5">พบ ${roads.length} สายทางแม่</span></div>${selector}</div></div><div class="text-xs text-emerald-700 mt-2">อำเภอที่เลือกจะถูกนำไปใส่ในหน้าป้อนรายละเอียดโครงการให้อัตโนมัติ • ระบบอ่านแนวถนนจากข้อมูลใหม่และ KML เดิมทุก LineString</div></div><div id="co-road-content"></div>`;
+                this.show('<div><i class="fas fa-road-circle-check mr-2"></i>บริหารสายทางและช่วงโครงการ<div class="text-emerald-100 text-xs mt-1">หนึ่งสายทางรองรับหลายโครงการ หลายปี และหลายช่วง กม.</div></div>','bg-emerald-700',body,`<div class="flex justify-between items-center"><span class="text-xs text-gray-500">ข้อมูลสายทางเดิมจะไม่ถูกแก้ไข ระบบบันทึกเฉพาะความเชื่อมโยงของโครงการ</span><button onclick="CoordinationUI.close()" class="px-5 py-2 bg-gray-200 rounded font-bold">ปิด</button></div>`,'max-w-6xl');
+                const roadContent=$id('co-road-content');
+                roadContent?.insertAdjacentHTML('beforebegin',`<div class="flex justify-end mb-4"><button type="button" onclick="CoordinationUI.openTransferredRoadForm()" class="w-full md:w-auto bg-pink-700 hover:bg-pink-800 text-white rounded-lg px-5 py-2.5 font-black shadow-sm"><i class="fas fa-road-circle-plus mr-2"></i>เพิ่มสายทางถ่ายโอน / สร้างแนวสายทางแม่</button></div>`);
+                this.renderRoadManager();
+            },
+            openTransferredRoadForm(){
+                this.roadDraftRoute=[];this.pickMode=null;if(this.previewLayer)this.previewLayer.clearLayers();
+                const body=`<div class="bg-pink-50 border border-pink-200 rounded-xl p-4 mb-4 text-sm text-pink-900"><div class="font-black"><i class="fas fa-road mr-2"></i>ทะเบียนสายทางที่ได้รับถ่ายโอน</div><div class="text-xs mt-1">ข้อมูลชุดนี้เป็นแนวสายทางแม่สำหรับใช้อ้างอิง ไม่ใช่โครงการเสนอเข้าแผนและไม่มีข้อมูลงบประมาณ</div></div><form onsubmit="return false" class="space-y-4"><section class="bg-white border rounded-xl p-4"><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="block text-sm font-bold mb-1">อำเภอ *</label><select id="co-new-road-district" class="w-full border rounded-lg px-3 py-2">${this.districtOptions(this.selectedRoadDistrict)}</select></div><div><label class="block text-sm font-bold mb-1">รหัสสายทาง</label><input id="co-new-road-code" placeholder="เช่น พล.ถ. 1-0033" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">ชื่อสายทาง *</label><input id="co-new-road-name" placeholder="เช่น แยกทางหลวงหมายเลข 2013 - บ้านวังชมพู" class="w-full border rounded-lg px-3 py-2"></div><div class="md:col-span-3"><label class="block text-sm font-bold mb-1">รายละเอียดสายทาง</label><textarea id="co-new-road-details" rows="2" placeholder="รายละเอียดการถ่ายโอน หน่วยงานเดิม หรือหมายเหตุ" class="w-full border rounded-lg px-3 py-2"></textarea></div></div></section><section class="bg-white border rounded-xl p-4"><h4 class="font-black text-pink-800 mb-3"><i class="fas fa-draw-polygon mr-2"></i>กำหนดแนวสายทางแม่</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3"><button type="button" onclick="CoordinationUI.beginTransferredRoadDraw()" class="bg-pink-700 hover:bg-pink-800 text-white rounded-lg px-4 py-3 font-black"><i class="fas fa-map-location-dot mr-2"></i>วาดแนวสายทางบนแผนที่</button><label class="bg-white text-pink-700 border-2 border-pink-300 hover:bg-pink-50 rounded-lg px-4 py-3 font-black text-center cursor-pointer"><i class="fas fa-file-import mr-2"></i>นำเข้าแนวสายทางจาก KML<input type="file" accept=".kml" class="hidden" onchange="CoordinationUI.importTransferredRoadKML(this)"></label></div><div id="co-new-road-status" class="bg-slate-50 border rounded-lg p-3 text-sm text-gray-600">ยังไม่ได้กำหนดแนวสายทาง กรุณาวาดบนแผนที่หรือนำเข้า KML</div><div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 text-xs"><div class="bg-gray-50 border rounded p-2"><span class="text-gray-500">จุดเริ่มต้น</span><div id="co-new-road-start" class="font-mono font-bold mt-1">-</div></div><div class="bg-gray-50 border rounded p-2"><span class="text-gray-500">จุดสิ้นสุด</span><div id="co-new-road-end" class="font-mono font-bold mt-1">-</div></div><div class="bg-pink-50 border border-pink-200 rounded p-2"><span class="text-pink-600">ความยาวสายทางทั้งหมด</span><div id="co-new-road-distance" class="font-black text-pink-800 text-lg mt-1">0.00 กม.</div></div></div></section></form>`;
+                const footer=`<div class="flex flex-wrap justify-between gap-3"><button onclick="CoordinationUI.openRoadManager()" class="px-5 py-2 bg-gray-200 rounded-lg font-bold"><i class="fas fa-arrow-left mr-1"></i>กลับหน้าบริหารสายทาง</button><button onclick="CoordinationUI.saveTransferredRoad()" class="px-6 py-2 bg-pink-700 hover:bg-pink-800 text-white rounded-lg font-black"><i class="fas fa-floppy-disk mr-2"></i>บันทึกเป็นสายทางถ่ายโอน</button></div>`;
+                this.show('<i class="fas fa-road-circle-plus mr-2"></i>เพิ่มทะเบียนสายทางที่ได้รับถ่ายโอน','bg-pink-700',body,footer,'max-w-4xl');
+                this.mountTransferredRoadCoordinateControls();
+            },
+            mountTransferredRoadCoordinateControls(){
+                const status=$id('co-new-road-status'),section=status?.closest('section'),heading=section?.querySelector('h4');if(!heading)return;
+                heading.insertAdjacentHTML('afterend',`<div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-3"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-xs font-black mb-1">จุดเริ่มต้น (Lat, Lng)</label><div class="grid grid-cols-2 gap-2"><input id="co-new-road-start-lat" type="number" step="any" placeholder="Latitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"><input id="co-new-road-start-lng" type="number" step="any" placeholder="Longitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"></div></div><div><label class="block text-xs font-black mb-1">จุดสิ้นสุด (Lat, Lng)</label><div class="grid grid-cols-2 gap-2"><input id="co-new-road-end-lat" type="number" step="any" placeholder="Latitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"><input id="co-new-road-end-lng" type="number" step="any" placeholder="Longitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"></div></div></div><div class="flex flex-wrap gap-2 mt-4"><button type="button" onclick="CoordinationUI.pickTransferredRoadEndpoint('start')" class="bg-blue-100 text-blue-700 border border-blue-200 rounded-lg px-4 py-2 font-black"><i class="fas fa-location-dot mr-1"></i>จุดเริ่มต้น</button><button type="button" onclick="CoordinationUI.pickTransferredRoadEndpoint('end')" class="bg-red-100 text-red-700 border border-red-200 rounded-lg px-4 py-2 font-black"><i class="fas fa-location-dot mr-1"></i>จุดสิ้นสุด</button><button type="button" onclick="CoordinationUI.routeTransferredRoad()" class="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-4 py-2 font-black"><i class="fas fa-route mr-1"></i>ตามถนน</button><div class="ml-auto flex flex-wrap items-center gap-2 bg-white border rounded-lg px-3 py-2"><select id="co-new-road-line-style" onchange="CoordinationUI.drawTransferredRoadDraft()" class="border rounded px-2 py-1 text-xs"><option value="solid">เส้นทึบ</option><option value="dashed">เส้นประ</option></select><span class="w-7 h-7 rounded border-2 border-white shadow bg-pink-600" title="สีประจำสายทางถ่ายโอน"></span><select id="co-new-road-line-weight" onchange="CoordinationUI.drawTransferredRoadDraft()" class="border rounded px-2 py-1 text-xs"><option value="3">บาง</option><option value="5" selected>กลาง</option><option value="8">หนา</option></select><span class="text-[10px] font-bold text-pink-700">สีสายทางถ่ายโอน</span></div></div></div>`);
+            },
+            pickTransferredRoadEndpoint(mode){
+                this.pickMode=`road-master-${mode}`;this.hide();if(map)$id('map-container').style.cursor='crosshair';this.roadPreviewPanel?.remove();this.roadPreviewPanel=document.createElement('div');this.roadPreviewPanel.className='fixed left-1/2 -translate-x-1/2 bottom-8 z-[4900] bg-white border-2 border-pink-300 rounded-xl shadow-2xl p-3 flex items-center gap-3';this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="${mode==='start'?'text-blue-700':'text-red-700'}">คลิกเลือก${mode==='start'?'จุดเริ่มต้น':'จุดสิ้นสุด'}บนแผนที่</b><div class="text-xs text-gray-500">ระบบจะนำค่าพิกัดกลับไปใส่ในแบบฟอร์ม</div></div><button onclick="CoordinationUI.cancelTransferredRoadEndpoint()" class="bg-gray-100 px-4 py-2 rounded font-bold">ยกเลิก</button>`;document.body.appendChild(this.roadPreviewPanel);
+            },
+            cancelTransferredRoadEndpoint(){this.pickMode=null;if(map)$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;this.host?.classList.remove('hidden');this.host?.classList.add('flex');},
+            syncTransferredRoadEndpoints(){
+                const read=id=>val(id).trim()===''?NaN:Number(val(id)),start={lat:read('co-new-road-start-lat'),lng:read('co-new-road-start-lng')},end={lat:read('co-new-road-end-lat'),lng:read('co-new-road-end-lng')};if([start.lat,start.lng,end.lat,end.lng].every(Number.isFinite)){this.roadDraftRoute=[start,end];this.refreshTransferredRoadDraft();}
+            },
+            async routeTransferredRoad(){
+                const read=id=>val(id).trim()===''?NaN:Number(val(id)),start={lat:read('co-new-road-start-lat'),lng:read('co-new-road-start-lng')},end={lat:read('co-new-road-end-lat'),lng:read('co-new-road-end-lng')};if(![start.lat,start.lng,end.lat,end.lng].every(Number.isFinite))return window.showToast('กรุณาระบุจุดเริ่มต้นและจุดสิ้นสุดให้ครบก่อนกด “ตามถนน”','warning');
+                try{window.showToast('กำลังคำนวณแนวตามถนน…','info');const response=await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson&alternatives=false`),json=await response.json();if(json.code!=='Ok'||!json.routes?.[0])throw new Error('ไม่พบแนวถนนระหว่างจุดที่เลือก');this.roadDraftRoute=json.routes[0].geometry.coordinates.map(p=>({lat:Number(p[1]),lng:Number(p[0])}));this.refreshTransferredRoadDraft();window.showToast('สร้างแนวสายทางตามถนนสำเร็จ กรุณาตรวจสอบแนวก่อนบันทึก','success');}catch(error){window.showToast(error.message||'บริการค้นหาแนวถนนไม่พร้อม','error');}
+            },
+            beginTransferredRoadDraw(){
+                this.roadDraftRoute=[];this.pickMode='road-master-draw';this.hide();if(map)$id('map-container').style.cursor='crosshair';if(!this.previewLayer)this.previewLayer=L.featureGroup().addTo(map);this.previewLayer.clearLayers();
+                this.roadPreviewPanel?.remove();this.roadPreviewPanel=document.createElement('div');this.roadPreviewPanel.className='fixed left-1/2 -translate-x-1/2 bottom-8 z-[4900] bg-white border-2 border-pink-300 rounded-xl shadow-2xl p-3 flex flex-wrap items-center gap-3';this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="text-pink-700">คลิกตามแนวสายทางทีละจุด</b><div class="text-xs text-gray-500">เลือกจุดเริ่มต้น จุดผ่านโค้ง และจุดสิ้นสุดตามลำดับ</div></div><span id="co-road-draw-count" class="bg-pink-100 text-pink-800 rounded-full px-3 py-1 text-xs font-black">0 จุด</span><button onclick="CoordinationUI.undoTransferredRoadPoint()" class="bg-gray-100 px-3 py-2 rounded font-bold">ย้อนจุด</button><button onclick="CoordinationUI.cancelTransferredRoadDraw()" class="bg-gray-100 px-3 py-2 rounded font-bold">ยกเลิก</button><button onclick="CoordinationUI.finishTransferredRoadDraw()" class="bg-pink-700 text-white px-4 py-2 rounded font-black">เสร็จสิ้นแนวสายทาง</button>`;document.body.appendChild(this.roadPreviewPanel);
+            },
+            drawTransferredRoadDraft(){
+                if(!this.previewLayer)this.previewLayer=L.featureGroup().addTo(map);this.previewLayer.clearLayers();const pts=this.roadDraftRoute;
+                pts.forEach((p,i)=>L.circleMarker([p.lat,p.lng],{radius:i===0||i===pts.length-1?7:4,color:'#db2777',fillColor:'#fff',fillOpacity:1,weight:3}).addTo(this.previewLayer));
+                if(pts.length>1)L.polyline(pts,{color:'#db2777',weight:Number(val('co-new-road-line-weight'))||5,opacity:.9,dashArray:val('co-new-road-line-style')==='dashed'?'10,10':null}).addTo(this.previewLayer);
+                setTxt('co-road-draw-count',`${pts.length} จุด`);
+            },
+            undoTransferredRoadPoint(){if(this.roadDraftRoute.length)this.roadDraftRoute.pop();this.drawTransferredRoadDraft();},
+            cancelTransferredRoadDraw(){this.pickMode=null;if(map)$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;this.host?.classList.remove('hidden');this.host?.classList.add('flex');this.refreshTransferredRoadDraft();},
+            finishTransferredRoadDraw(){if(this.roadDraftRoute.length<2)return window.showToast('กรุณากำหนดแนวอย่างน้อย 2 จุด','warning');this.pickMode=null;if(map)$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;this.host?.classList.remove('hidden');this.host?.classList.add('flex');this.refreshTransferredRoadDraft();window.showToast('กำหนดแนวสายทางแม่แล้ว กรุณาตรวจสอบและบันทึก','success');},
+            refreshTransferredRoadDraft(){
+                const pts=this.roadDraftRoute;if(!pts.length)return;const distance=pts.slice(1).reduce((sum,p,i)=>sum+this.pointDistance(pts[i],p),0),first=pts[0],last=pts.at(-1);setVal('co-new-road-start-lat',first.lat.toFixed(7));setVal('co-new-road-start-lng',first.lng.toFixed(7));setVal('co-new-road-end-lat',last.lat.toFixed(7));setVal('co-new-road-end-lng',last.lng.toFixed(7));setTxt('co-new-road-start',`${first.lat.toFixed(6)}, ${first.lng.toFixed(6)}`);setTxt('co-new-road-end',`${last.lat.toFixed(6)}, ${last.lng.toFixed(6)}`);setTxt('co-new-road-distance',`${(distance/1000).toLocaleString('th-TH',{minimumFractionDigits:3,maximumFractionDigits:3})} กม.`);const status=$id('co-new-road-status');if(status){status.className='bg-pink-50 border border-pink-200 rounded-lg p-3 text-sm text-pink-800';status.innerHTML=`กำหนดแนวแล้ว <b>${pts.length} จุด</b> • ระยะทางบนแผนที่ <b>${distance.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} เมตร</b>`;}this.drawTransferredRoadDraft();if(map&&this.previewLayer?.getBounds?.().isValid())map.fitBounds(this.previewLayer.getBounds(),{padding:[40,40],maxZoom:17});
+            },
+            importTransferredRoadKML(input){
+                const file=input.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const xml=new DOMParser().parseFromString(reader.result,'text/xml');if(xml.querySelector('parsererror'))throw new Error('รูปแบบ KML ไม่ถูกต้อง');const routes=[...xml.getElementsByTagName('LineString')].map(line=>(line.getElementsByTagName('coordinates')[0]?.textContent||'').trim().split(/\s+/).map(token=>token.split(',').map(Number)).filter(v=>Number.isFinite(v[0])&&Number.isFinite(v[1])).map(v=>({lat:v[1],lng:v[0]}))).filter(route=>route.length>1);if(!routes.length)throw new Error('ไม่พบแนว LineString ในไฟล์ KML');this.roadDraftRoute=routes.sort((a,b)=>b.slice(1).reduce((s,p,i)=>s+this.pointDistance(b[i],p),0)-a.slice(1).reduce((s,p,i)=>s+this.pointDistance(a[i],p),0))[0];this.refreshTransferredRoadDraft();window.showToast(`นำเข้าแนวสายทางจาก ${file.name} แล้ว`,'success');}catch(error){window.showToast(error.message||'อ่านไฟล์ KML ไม่สำเร็จ','error');}finally{input.value='';}};reader.readAsText(file);
+            },
+            async saveTransferredRoad(){
+                const district=val('co-new-road-district'),code=val('co-new-road-code').trim(),roadName=val('co-new-road-name').trim(),details=val('co-new-road-details').trim(),pts=this.roadDraftRoute;if(!district||!roadName)return window.showToast('กรุณาเลือกอำเภอและกรอกชื่อสายทาง','warning');if(pts.length<2)return window.showToast('กรุณากำหนดแนวสายทางอย่างน้อย 2 จุด','warning');
+                const distance=pts.slice(1).reduce((sum,p,i)=>sum+this.pointDistance(pts[i],p),0),first=pts[0],last=pts.at(-1),name=code&&!roadName.includes(code)?`${code} ${roadName}`:roadName,now=Date.now();const data={recordType:'road',roadRole:'transferred_road',isTransferredRoad:true,dataCategory:'transferred_road',coordinationEntrySource:'highway',roadCode:code,name,projectDetails:details,district,type:'line',linePoints:pts,distance,startLat:first.lat,startLng:first.lng,endLat:last.lat,endLng:last.lng,lineColor:'#db2777',lineWeight:Number(val('co-new-road-line-weight'))||5,lineStyle:val('co-new-road-line-style')||'solid',sourceFile:'สร้างแนวสายทางในระบบ',createdAt:now,updatedAt:now};
+                const id=await saveDataToDB(data);if(!id)return;allProjectRecords[id]={...data,id};drawProjectOnMap(id,allProjectRecords[id]);this.selectedRoadId=id;this.selectedRoadDistrict=district;this.roadDraftRoute=[];if(this.previewLayer)this.previewLayer.clearLayers();this.openRoadManager(id);window.showToast(`บันทึกสายทางถ่ายโอน “${name}” แล้ว`,'success');
+            },
+            selectRoadDistrict(district){this.selectedRoadDistrict=String(district||'');},
+            selectRoad(id){this.selectedRoadId=id;this.editingRoadSegmentId=null;this.pendingRoadSegment=null;this.renderRoadManager();},
+            renderRoadManager(){
+                const host=$id('co-road-content');if(!host)return;const road=this.roads().find(r=>r.id===this.selectedRoadId);if(!road){host.innerHTML='<div class="p-10 text-center text-gray-500">ไม่พบข้อมูลสายทาง</div>';return;}
+                const total=this.roadLength(road),projects=this.roadProjects(road.id).sort((a,b)=>(Number(a.roadStartChainage)||0)-(Number(b.roadStartChainage)||0)),planProjects=projects.filter(p=>!this.isHistoricalProject(p)),historicalProjects=projects.filter(p=>this.isHistoricalProject(p)).sort((a,b)=>(Number(b.historicalYear)||0)-(Number(a.historicalYear)||0)||(Number(a.roadStartChainage)||0)-(Number(b.roadStartChainage)||0)),used=this.roadUsage(planProjects,total),historicalUsed=this.roadUsage(historicalProjects,total),remaining=Math.max(0,total-used);
+                const segments=planProjects.map((p,i)=>{const s=Math.max(0,Number(p.roadStartChainage)||0),e=Math.min(total,Number(p.roadEndChainage)||0),left=total?s/total*100:0,width=total?Math.max(.7,(e-s)/total*100):0,color=['#2563eb','#7c3aed','#ea580c','#0891b2'][i%4];return `<button type="button" onclick="CoordinationUI.openForm('${this.esc(p.id)}')" title="${this.esc(this.name(p))}: ${this.formatChainage(s)}–${this.formatChainage(e)}" style="left:${left}%;width:${width}%;background:${color}" class="absolute top-0 h-full border-r border-white/70 hover:brightness-110"></button>`;}).join('');
+                const rows=planProjects.length?planProjects.map((p,i)=>`<tr class="border-t hover:bg-emerald-50"><td class="p-2 text-center">${i+1}</td><td class="p-2 font-bold">${this.esc(this.name(p)||'-')}</td><td class="p-2 text-center whitespace-nowrap">${this.formatChainage(p.roadStartChainage)} – ${this.formatChainage(p.roadEndChainage)}</td><td class="p-2 text-right">${(Number(p.roadSegmentLength)||Number(p.distance)||0).toLocaleString('th-TH',{maximumFractionDigits:2})}</td><td class="p-2 text-center">${this.esc(getCoordinationStatus(p))}</td><td class="p-2 text-center whitespace-nowrap"><button onclick="CoordinationUI.panTo('${this.esc(p.id)}')" class="bg-sky-100 text-sky-700 px-2 py-1 rounded" title="ดูบนแผนที่"><i class="fas fa-map"></i></button> <button onclick="CoordinationUI.editRoadSegment('${this.esc(p.id)}')" class="bg-violet-100 text-violet-700 px-2 py-1 rounded font-bold" title="แก้ไขช่วงและระยะทาง"><i class="fas fa-ruler-combined mr-1"></i>แก้ช่วง</button> <button onclick="CoordinationUI.openForm('${this.esc(p.id)}')" class="bg-amber-100 text-amber-700 px-2 py-1 rounded" title="แก้ไขรายละเอียดโครงการ"><i class="fas fa-pen"></i></button></td></tr>`).join(''):'<tr><td colspan="6" class="p-8 text-center text-gray-400">สายทางนี้ยังไม่มีโครงการเสนอเข้าแผน</td></tr>';
+                host.innerHTML=`<div class="grid grid-cols-1 xl:grid-cols-3 gap-4"><section class="xl:col-span-2 space-y-4"><div class="grid grid-cols-2 md:grid-cols-4 gap-3"><div class="bg-white border rounded-lg p-3"><div class="text-xs text-gray-500">ความยาวสายทาง</div><div class="text-xl font-black text-emerald-800">${(total/1000).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:3})} กม.</div></div><div class="bg-white border border-green-200 rounded-lg p-3"><div class="text-xs text-gray-500">เคยดำเนินการแล้ว</div><div class="text-xl font-black text-green-700">${(historicalUsed/1000).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:3})} กม.</div></div><div class="bg-white border border-blue-200 rounded-lg p-3"><div class="text-xs text-gray-500">ช่วงเสนอเข้าแผน</div><div class="text-xl font-black text-blue-700">${(used/1000).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:3})} กม.</div></div><div class="bg-white border rounded-lg p-3"><div class="text-xs text-gray-500">ช่วงยังไม่เสนอ</div><div class="text-xl font-black text-amber-700">${(remaining/1000).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:3})} กม.</div></div></div><div class="bg-white border rounded-xl p-4"><div class="flex justify-between text-xs font-bold mb-2"><span>${this.formatChainage(0)}</span><span>${this.formatChainage(total)}</span></div><div class="relative h-9 bg-slate-200 rounded-lg overflow-hidden border">${segments}<div class="absolute inset-0 flex items-center justify-center pointer-events-none text-[10px] font-bold text-slate-700">${planProjects.length?`${planProjects.length} โครงการเสนอเข้าแผน`:'ยังไม่มีช่วงเสนอเข้าแผน'}</div></div><div class="text-[11px] text-gray-500 mt-2">แถบสีแสดงเฉพาะโครงการเสนอเข้าแผน ส่วนประวัติโครงการเดิมแสดงในตารางสีเขียวด้านล่าง</div></div><div class="bg-white border rounded-xl overflow-auto max-h-[37vh]"><table class="w-full text-xs min-w-[760px]"><thead class="sticky top-0 bg-gray-100"><tr><th class="p-2">ลำดับ</th><th class="p-2 text-left">โครงการเสนอเข้าแผน</th><th class="p-2">ช่วงสายทาง</th><th class="p-2 text-right">ระยะ (ม.)</th><th class="p-2">สถานะ</th><th class="p-2">จัดการ</th></tr></thead><tbody>${rows}</tbody></table></div></section><aside class="bg-white border border-emerald-200 rounded-xl p-4 h-fit"><h4 class="font-bold text-emerald-900 mb-1"><i class="fas fa-scissors mr-2"></i>กำหนดช่วงบนสายทาง</h4><p class="text-xs text-gray-500 mb-4">ช่วงเดียวกันใช้บันทึกได้ทั้งโครงการเดิมและโครงการเสนอใหม่</p><label class="block text-xs font-bold mb-1">เริ่มต้นที่ระยะ (เมตร)</label><input id="co-road-start" type="number" min="0" max="${total}" value="0" oninput="CoordinationUI.updateRoadEnd()" class="w-full border rounded p-2 mb-3"><label class="block text-xs font-bold mb-1">ความยาวโครงการ (เมตร)</label><input id="co-road-length" type="number" min="1" max="${total}" value="1000" oninput="CoordinationUI.updateRoadEnd()" class="w-full border rounded p-2 mb-3"><label class="block text-xs font-bold mb-1">สิ้นสุดที่ระยะ (เมตร)</label><input id="co-road-end" type="number" value="1000" readonly class="w-full border rounded p-2 mb-3 bg-gray-50"><div id="co-road-segment-status" class="text-xs bg-slate-50 border rounded p-3 mb-3">กรอกช่วงแล้วกดตรวจสอบแนว</div><button onclick="CoordinationUI.pickRoadStart()" class="w-full bg-amber-500 hover:bg-amber-600 text-white rounded p-2 font-bold mb-2"><i class="fas fa-location-crosshairs mr-1"></i>กำหนดจุดบนแผนที่</button><button onclick="CoordinationUI.previewRoadSegment()" class="w-full bg-sky-600 text-white rounded p-2 font-bold mb-2"><i class="fas fa-eye mr-1"></i>ตรวจสอบแนวบนแผนที่</button><button onclick="CoordinationUI.createRoadProject()" class="w-full bg-blue-700 text-white rounded p-2 font-bold"><i class="fas fa-file-circle-plus mr-1"></i>สร้างโครงการเสนอเข้าแผน</button><button onclick="CoordinationUI.zoomRoad('${this.esc(road.id)}')" class="w-full bg-gray-100 text-gray-700 rounded p-2 font-bold mt-2"><i class="fas fa-expand mr-1"></i>ดูสายทางเต็มเส้น</button></aside></div>`;
+                const segmentAside=host.querySelector('aside'),segmentHint=segmentAside?.querySelector('p');
+                segmentHint?.insertAdjacentHTML('afterend',`<button onclick="CoordinationUI.pickHistoricalSegmentOnRoad()" class="w-full bg-green-700 hover:bg-green-800 text-white rounded-lg p-3 font-black mb-4 shadow-sm"><i class="fas fa-hand-pointer mr-2"></i>คลิกเลือกจุดเริ่ม–สิ้นสุดบนเส้น</button>`);
+                const mainSection=host.querySelector('section');
+                const historicalRows=historicalProjects.length?historicalProjects.map((p,i)=>`<tr class="border-t hover:bg-green-50"><td class="p-2 text-center">${i+1}</td><td class="p-2 font-bold text-green-800">${this.esc(this.name(p)||'-')}<div class="text-[10px] text-gray-500">${this.esc(p.historicalWorkType||'-')}</div></td><td class="p-2 text-center font-bold">${this.esc(p.historicalYear||'-')}</td><td class="p-2 text-center whitespace-nowrap">${this.formatChainage(p.roadStartChainage)} – ${this.formatChainage(p.roadEndChainage)}</td><td class="p-2 text-right">฿${Number(p.budget||0).toLocaleString()}</td><td class="p-2 text-center whitespace-nowrap"><button onclick="CoordinationUI.panTo('${this.esc(p.id)}')" class="bg-sky-100 text-sky-700 px-2 py-1 rounded" title="ดูบนแผนที่"><i class="fas fa-map"></i></button> <button onclick="CoordinationUI.editRoadSegment('${this.esc(p.id)}')" class="bg-violet-100 text-violet-700 px-2 py-1 rounded" title="แก้ช่วง"><i class="fas fa-ruler-combined"></i></button> <button onclick="CoordinationUI.openHistoricalProjectForm('${this.esc(p.id)}')" class="bg-green-100 text-green-700 px-2 py-1 rounded" title="แก้ไขประวัติโครงการ"><i class="fas fa-pen"></i></button></td></tr>`).join(''):'<tr><td colspan="6" class="p-6 text-center text-gray-400">ยังไม่มีประวัติโครงการที่ดำเนินการแล้ว</td></tr>';
+                mainSection?.insertAdjacentHTML('beforeend',`<div class="bg-white border border-green-200 rounded-xl overflow-hidden"><div class="bg-green-50 px-4 py-3 flex justify-between items-center"><div><h4 class="font-black text-green-800"><i class="fas fa-clock-rotate-left mr-2"></i>ประวัติโครงการที่ดำเนินการแล้ว</h4><div class="text-xs text-green-700">${historicalProjects.length} รายการ · ครอบคลุม ${(historicalUsed/1000).toLocaleString('th-TH',{maximumFractionDigits:3})} กม.</div></div><span class="bg-green-600 text-white rounded-full px-3 py-1 text-xs font-bold">เส้นสีเขียว</span></div><div class="overflow-auto max-h-[30vh]"><table class="w-full text-xs min-w-[760px]"><thead class="bg-gray-100"><tr><th class="p-2">ลำดับ</th><th class="p-2 text-left">โครงการเดิม</th><th class="p-2">ปี พ.ศ.</th><th class="p-2">ช่วงสายทาง</th><th class="p-2 text-right">งบประมาณ</th><th class="p-2">จัดการ</th></tr></thead><tbody>${historicalRows}</tbody></table></div></div>`);
+                const createPlanButton=[...host.querySelectorAll('button')].find(button=>button.getAttribute('onclick')==='CoordinationUI.createRoadProject()');
+                createPlanButton?.insertAdjacentHTML('afterend',`<button onclick="CoordinationUI.openHistoricalProjectForm()" class="w-full bg-green-700 hover:bg-green-800 text-white rounded p-2 font-bold mt-2"><i class="fas fa-clock-rotate-left mr-1"></i>บันทึกเป็นโครงการที่ดำเนินการแล้ว</button>`);
+                if(planProjects.length){
+                    const options=planProjects.map((p,i)=>`<option value="${this.esc(p.id)}" ${this.pendingNextProject?.sourceId===p.id?'selected':''}>ลำดับที่ ${this.esc(p.seqNo||i+1)} — สิ้นสุด ${this.formatChainage(p.roadEndChainage)}</option>`).join('');
+                    const aside=host.querySelector('aside');
+                    aside?.insertAdjacentHTML('afterbegin',`<div class="bg-sky-50 border border-sky-200 rounded-lg p-3 mb-4"><label class="block text-xs font-bold text-sky-900 mb-1"><i class="fas fa-link mr-1"></i>เลือกตำแหน่งต่อจากโครงการเดิม</label><select id="co-road-continue-project" class="w-full border border-sky-300 rounded p-2 text-xs mb-2">${options}</select><button onclick="CoordinationUI.continueAfterProject(document.getElementById('co-road-continue-project').value)" class="w-full bg-sky-700 text-white rounded p-2 font-bold text-xs"><i class="fas fa-arrow-right-long mr-1"></i>ใช้จุดสิ้นสุดเป็นจุดเริ่มโครงการถัดไป</button></div>`);
+                }
+                const editProject=this.editingRoadSegmentId?projects.find(p=>p.id===this.editingRoadSegmentId):null;
+                const next=this.pendingNextProject;
+                if(editProject){
+                    setVal('co-road-start',(Number(editProject.roadStartChainage)||0).toFixed(2));
+                    setVal('co-road-length',(Number(editProject.roadSegmentLength)||Number(editProject.distance)||Math.max(1,(Number(editProject.roadEndChainage)||0)-(Number(editProject.roadStartChainage)||0))).toFixed(2));
+                }else if(next&&String(next.roadId)===String(road.id)){
+                    setVal('co-road-start',Math.min(total,Number(next.start)||0).toFixed(2));
+                    setVal('co-road-length',Math.min(Math.max(1,total-(Number(next.start)||0)),Number(next.length)||1000).toFixed(2));
+                }
+                this.updateRoadEnd();
+                const saveSegmentButton=[...host.querySelectorAll('button')].find(button=>button.getAttribute('onclick')==='CoordinationUI.createRoadProject()');
+                if(editProject){
+                    if(saveSegmentButton){saveSegmentButton.className='w-full bg-violet-700 hover:bg-violet-800 text-white rounded p-2 font-bold';saveSegmentButton.innerHTML='<i class="fas fa-floppy-disk mr-1"></i>บันทึกการแก้ไขช่วงและระยะทาง';}
+                    const status=$id('co-road-segment-status');
+                    if(status){status.className='text-xs bg-violet-50 border border-violet-300 text-violet-900 rounded p-3 mb-3';status.innerHTML=`กำลังแก้ไขช่วงของ <b>ลำดับที่ ${this.esc(editProject.seqNo||'-')}</b><br>ค่าเดิม ${this.formatChainage(editProject.roadStartChainage)} – ${this.formatChainage(editProject.roadEndChainage)}<br>แก้จุดเริ่มต้นหรือความยาว แล้วกดตรวจสอบแนวก่อนบันทึก`;}
+                }else if(next&&String(next.roadId)===String(road.id)){
+                    const status=$id('co-road-segment-status');
+                    if(status){status.className='text-xs bg-sky-50 border border-sky-300 text-sky-900 rounded p-3 mb-3';status.innerHTML=`พร้อมสร้างลำดับที่ <b>${this.esc(next.seqNo||'ถัดไป')}</b><br>เริ่มต่อจากลำดับที่ ${this.esc(next.sourceSeqNo||'-')} ที่ <b>${this.formatChainage(next.start)}</b><br>ปรับความยาวได้ก่อนกดตรวจสอบแนว`;}
+                }
+            },
+            editRoadSegment(id){
+                const project=this.get(id)||this.projects().find(p=>p.id===id);if(!project)return window.showToast('ไม่พบโครงการที่ต้องการแก้ไขช่วง','warning');
+                const road=this.roads().find(r=>String(r.id)===String(project.parentRoadId||''));if(!road)return window.showToast('โครงการนี้ยังไม่ได้เชื่อมโยงกับสายทางแม่ จึงแก้ช่วงจากหน้านี้ไม่ได้','warning');
+                this.pendingNextProject=null;this.selectedRoadDistrict=project.district||this.selectedRoadDistrict;this.openRoadManager(road.id,id);
+                window.showToast(`โหลดช่วงเดิมของลำดับที่ ${project.seqNo||'-'} มาให้แก้ไขแล้ว`,'info');
+            },
+            async continueAfterProject(id){
+                const project=this.get(id)||this.projects().find(p=>p.id===id);if(!project)return window.showToast('ไม่พบโครงการต้นทางที่เลือก','warning');
+                const road=this.roads().find(r=>String(r.id)===String(project.parentRoadId||''));if(!road)return window.showToast('โครงการนี้ยังไม่ได้เชื่อมโยงกับสายทางแม่','warning');
+                const total=this.roadLength(road),start=Number(project.roadEndChainage)||0;if(start<=0||start>=total)return window.showToast('จุดสิ้นสุดของโครงการอยู่ปลายสายทางแล้ว ไม่สามารถต่อช่วงใหม่ได้','warning');
+                let groupId=project.coordinationReportGroupId||'';
+                if(!groupId){groupId=`CRG_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;project.coordinationReportGroupId=groupId;if(allProjectRecords[id])allProjectRecords[id].coordinationReportGroupId=groupId;await saveDataToDB({coordinationReportGroupId:groupId,updatedAt:Date.now()},id);}
+                this.pendingNextProject={sourceId:id,sourceSeqNo:project.seqNo||1,roadId:road.id,start,length:Math.min(Number(project.roadSegmentLength)||Number(project.distance)||1000,total-start),district:project.district||'',agencyName:project.agencyName||'',seqNo:(parseInt(project.seqNo)||1)+1,budgetStartYear:this.budgetStartYear(project),reportGroupId:groupId,inspectorName:project.inspectorName||'',inspectorPosition:project.inspectorPosition||'',inspectionDate:project.inspectionDate||''};
+                this.selectedRoadId=road.id;this.selectedRoadDistrict=project.district||this.selectedRoadDistrict;this.openRoadManager(road.id);
+                window.showToast(`ตั้งจุดเริ่มลำดับถัดไปต่อจากลำดับที่ ${project.seqNo||1} แล้ว`,'success');
+            },
+            updateRoadEnd(){const road=this.roads().find(r=>r.id===this.selectedRoadId);if(!road)return;const total=this.roadLength(road),start=Math.max(0,Number(val('co-road-start'))||0),length=Math.max(0,Number(val('co-road-length'))||0);setVal('co-road-end',Math.min(total,start+length).toFixed(2));},
+            nearestRoadChainage(road,latlng){
+                const pts=(road?.linePoints||[]).map(p=>({lat:Number(p.lat??p[0]),lng:Number(p.lng??p[1])})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
+                if(pts.length<2)return null;
+                let cumulative=0,best=null;
+                for(let i=1;i<pts.length;i++){
+                    const a=pts[i-1],b=pts[i],midLat=(a.lat+b.lat+latlng.lat)/3*Math.PI/180;
+                    const sx=(b.lng-a.lng)*111320*Math.cos(midLat),sy=(b.lat-a.lat)*110540;
+                    const px=(latlng.lng-a.lng)*111320*Math.cos(midLat),py=(latlng.lat-a.lat)*110540;
+                    const denom=sx*sx+sy*sy,t=denom?Math.max(0,Math.min(1,(px*sx+py*sy)/denom)):0;
+                    const snap={lat:a.lat+(b.lat-a.lat)*t,lng:a.lng+(b.lng-a.lng)*t};
+                    const offset=this.pointDistance(latlng,snap),segmentLength=this.pointDistance(a,b),chainage=cumulative+segmentLength*t;
+                    if(!best||offset<best.offset)best={chainage,snap,offset};
+                    cumulative+=segmentLength;
+                }
+                return best;
+            },
+            pickRoadStart(){
+                const road=this.roads().find(r=>r.id===this.selectedRoadId);if(!road)return window.showToast('ไม่พบแนวสายทางที่เลือก','warning');
+                if(HighwayRoadMeasure?.active)HighwayRoadMeasure.close();pickingMode=null;this.pickMode='road-chainage';this.hide();if(map)$id('map-container').style.cursor='crosshair';
+                if(!this.previewLayer)this.previewLayer=L.featureGroup().addTo(map);this.previewLayer.clearLayers();
+                const pts=(road.linePoints||[]).map(p=>[Number(p.lat??p[0]),Number(p.lng??p[1])]).filter(p=>Number.isFinite(p[0])&&Number.isFinite(p[1]));
+                if(pts.length>1){L.polyline(pts,{color:'#f59e0b',weight:9,opacity:.75}).addTo(this.previewLayer);map.fitBounds(this.previewLayer.getBounds(),{padding:[50,50],maxZoom:17});}
+                this.roadPreviewPanel?.remove();this.roadPreviewPanel=document.createElement('div');this.roadPreviewPanel.className='fixed left-1/2 -translate-x-1/2 bottom-8 z-[4900] bg-white border border-amber-300 rounded-xl shadow-2xl p-3 flex flex-wrap items-center gap-3';
+                this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="text-amber-700">คลิกจุดเริ่มต้นบนเส้นสีส้ม</b><div class="text-xs text-gray-500">ระบบจะจับจุดเข้าหาแนวสายทางและคำนวณระยะสะสมให้อัตโนมัติ</div></div><button onclick="CoordinationUI.cancelRoadStartPick()" class="bg-gray-100 px-4 py-2 rounded font-bold">ยกเลิก</button>`;document.body.appendChild(this.roadPreviewPanel);
+            },
+            pickHistoricalSegmentOnRoad(){
+                const road=this.roads().find(r=>r.id===this.selectedRoadId);if(!road)return window.showToast('ไม่พบแนวสายทางที่เลือก','warning');
+                if(HighwayRoadMeasure?.active)HighwayRoadMeasure.close();pickingMode=null;this.pickMode='historical-segment';this.historicalPick={road,start:null};this.hide();if(map)$id('map-container').style.cursor='crosshair';
+                if(!this.previewLayer)this.previewLayer=L.featureGroup().addTo(map);this.previewLayer.clearLayers();
+                const pts=(road.linePoints||[]).map(p=>[Number(p.lat??p[0]),Number(p.lng??p[1])]).filter(p=>Number.isFinite(p[0])&&Number.isFinite(p[1]));
+                if(pts.length>1){L.polyline(pts,{color:'#16a34a',weight:11,opacity:.78}).addTo(this.previewLayer);map.fitBounds(this.previewLayer.getBounds(),{padding:[50,50],maxZoom:17});}
+                this.roadPreviewPanel?.remove();this.roadPreviewPanel=document.createElement('div');this.roadPreviewPanel.className='fixed left-1/2 -translate-x-1/2 bottom-8 z-[4900] bg-white border-2 border-green-400 rounded-xl shadow-2xl p-3 flex flex-wrap items-center gap-3';
+                this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="text-green-700"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-600 text-white mr-2">1</span>คลิกจุดเริ่มต้นบนเส้นสีเขียว</b><div class="text-xs text-gray-500 mt-1">ไม่จำเป็นต้องคลิกตรงเส้นพอดี ระบบจะดูดจุดเข้าหาแนวสายทาง</div></div><button onclick="CoordinationUI.cancelHistoricalSegmentPick()" class="bg-gray-100 px-4 py-2 rounded font-bold">ยกเลิก</button>`;document.body.appendChild(this.roadPreviewPanel);
+            },
+            cancelHistoricalSegmentPick(){this.pickMode=null;this.historicalPick=null;if(map)$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;if(this.previewLayer)this.previewLayer.clearLayers();this.host?.classList.remove('hidden');this.host?.classList.add('flex');},
+            useHistoricalPickedSegment(){
+                if(!this.historicalPick?.complete)return window.showToast('กรุณาเลือกจุดเริ่มต้นและจุดสิ้นสุดให้ครบ','warning');
+                this.pickMode=null;if(map)$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;this.openHistoricalProjectForm();
+            },
+            cancelRoadStartPick(){this.pickMode=null;if(map)$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;if(this.previewLayer)this.previewLayer.clearLayers();this.host?.classList.remove('hidden');this.host?.classList.add('flex');},
+            getRoadSegment(){
+                const road=this.roads().find(r=>r.id===this.selectedRoadId);if(!road)return null;const total=this.roadLength(road),start=Number(val('co-road-start')),requested=Number(val('co-road-length')),end=Math.min(total,start+requested);
+                if(!Number.isFinite(start)||!Number.isFinite(requested)||start<0||start>=total||requested<=0||end<=start){window.showToast('กรุณาระบุจุดเริ่มต้นและความยาวให้อยู่ภายในสายทาง','warning');return null;}
+                const route=this.sliceRoad(road,start,end);if(route.length<2){window.showToast('ไม่สามารถตัดแนวช่วงนี้ได้ กรุณาตรวจข้อมูลสายทาง','error');return null;}
+                const overlaps=this.roadPlanProjects(road.id).filter(p=>p.id!==this.editingRoadSegmentId&&Math.max(start,Number(p.roadStartChainage)||0)<Math.min(end,Number(p.roadEndChainage)||0));
+                return {road,start,end,length:end-start,route,overlaps};
+            },
+            previewRoadSegment(showMap=true){
+                const seg=this.getRoadSegment();if(!seg)return null;this.pendingRoadSegment=seg;if(!this.previewLayer)this.previewLayer=L.featureGroup().addTo(map);this.previewLayer.clearLayers();L.polyline(seg.route,{color:'#ef4444',weight:9,opacity:.9}).addTo(this.previewLayer);L.circleMarker(seg.route[0],{radius:7,color:'#16a34a',fillOpacity:1}).addTo(this.previewLayer);L.circleMarker(seg.route.at(-1),{radius:7,color:'#dc2626',fillOpacity:1}).addTo(this.previewLayer);map.fitBounds(this.previewLayer.getBounds(),{padding:[50,50],maxZoom:17});const status=$id('co-road-segment-status');if(status){status.className=`text-xs border rounded p-3 mb-3 ${seg.overlaps.length?'bg-amber-50 border-amber-300 text-amber-900':'bg-emerald-50 border-emerald-300 text-emerald-900'}`;status.innerHTML=`<b>${this.formatChainage(seg.start)} – ${this.formatChainage(seg.end)}</b><br>ระยะ ${seg.length.toLocaleString('th-TH',{maximumFractionDigits:2})} เมตร${seg.overlaps.length?`<br><b>คำเตือน:</b> ทับซ้อนกับ ${seg.overlaps.length} โครงการเดิม`:'<br>ไม่พบช่วงซ้อนกับโครงการเดิม'}`;}
+                if(showMap){this.hide();this.roadPreviewPanel?.remove();this.roadPreviewPanel=document.createElement('div');this.roadPreviewPanel.className='fixed left-1/2 -translate-x-1/2 bottom-8 z-[4900] bg-white border border-emerald-300 rounded-xl shadow-2xl p-3 flex flex-wrap items-center gap-3';const editing=!!this.editingRoadSegmentId;this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="text-emerald-800">${this.formatChainage(seg.start)} – ${this.formatChainage(seg.end)}</b><div class="text-xs text-gray-500">เส้นสีแดงคือช่วง${editing?'ใหม่หลังแก้ไข':'ที่จะสร้างโครงการ'}</div></div><button onclick="CoordinationUI.returnRoadManager()" class="bg-gray-100 px-4 py-2 rounded font-bold">กลับไปแก้ช่วง</button><button onclick="CoordinationUI.createRoadProject()" class="${editing?'bg-violet-700':'bg-emerald-700'} text-white px-4 py-2 rounded font-bold">${editing?'บันทึกช่วงและระยะทางใหม่':'ใช้ช่วงนี้สร้างโครงการ'}</button>`;document.body.appendChild(this.roadPreviewPanel);}
+                return seg;
+            },
+            returnRoadManager(){this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;this.host?.classList.remove('hidden');this.host?.classList.add('flex');},
+            async createRoadProject(){
+                const district=this.selectedRoadDistrict||val('co-road-district');if(!district)return window.showToast('กรุณาเลือกอำเภอก่อนสร้างโครงการ','warning');const seg=this.previewRoadSegment(false);if(!seg)return;this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;
+                if(this.editingRoadSegmentId)return this.saveRoadSegmentEdit(seg);
+                const next=this.pendingNextProject&&String(this.pendingNextProject.roadId)===String(seg.road.id)?this.pendingNextProject:null;
+                const context={roadId:seg.road.id,roadName:seg.road.name||'สายทาง',start:seg.start,end:seg.end,length:seg.length,district};this.openFormWithRoute(seg.route,seg.length,context);
+                if(next){this.activeReportGroupId=next.reportGroupId||null;setVal('co-agency',next.agencyName);setVal('co-seq',next.seqNo);setVal('co-budget-start-year',next.budgetStartYear);setVal('co-inspector',next.inspectorName);setVal('co-position',next.inspectorPosition);setVal('co-date',next.inspectionDate);this.updateBudgetYearLabels();}
+                setVal('co-name-old',`โครงการปรับปรุง${seg.road.name||'สายทาง'} ช่วง ${this.formatChainage(seg.start)} - ${this.formatChainage(seg.end)}`);setVal('co-details',`ดำเนินการบนสายทาง ${seg.road.name||'-'} ระยะทาง ${seg.length.toLocaleString('th-TH',{maximumFractionDigits:2})} เมตร`);setVal('co-district',district);this.pendingNextProject=null;
+            },
+            openHistoricalProjectForm(id=null){
+                let old=id?this.get(id):null,seg=null;
+                if(old&&this.isHistoricalProject(old)){
+                    const road=this.roads().find(r=>String(r.id)===String(old.parentRoadId||''));if(!road)return window.showToast('ไม่พบสายทางหลักของโครงการเดิม','warning');
+                    seg={road,start:Number(old.roadStartChainage)||0,end:Number(old.roadEndChainage)||0,length:Number(old.roadSegmentLength)||Number(old.distance)||0,route:Array.isArray(old.linePoints)?old.linePoints:[]};this.selectedRoadId=road.id;this.selectedRoadDistrict=old.district||road.district||'';
+                }else{
+                    const district=this.selectedRoadDistrict||val('co-road-district');if(!district)return window.showToast('กรุณาเลือกอำเภอก่อนบันทึกประวัติโครงการ','warning');seg=this.previewRoadSegment(false);if(!seg)return;this.selectedRoadDistrict=district;
+                }
+                this.historicalDraft={id:old?.id||null,old:old||{},seg};this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;
+                const currentYear=new Date().getFullYear()+543,name=old?this.name(old):`โครงการเดิมบน${seg.road.name||'สายทาง'} ช่วง ${this.formatChainage(seg.start)} - ${this.formatChainage(seg.end)}`;
+                const workTypes=['ก่อสร้างถนนลาดยาง','ปรับปรุงผิวทางแอสฟัลต์','ก่อสร้างถนนคอนกรีต','ซ่อมสร้างผิวทาง','เสริมผิวทาง','งานระบายน้ำ','งานสะพาน','งานอื่น ๆ'];
+                const body=`<div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 text-green-900"><div class="font-black"><i class="fas fa-clock-rotate-left mr-2"></i>โครงการที่ดำเนินการแล้วในอดีต</div><div class="text-xs mt-1">บันทึกเพื่อแสดงประวัติของช่วงสายทาง ไม่ถูกนำไปรวมกับโครงการเสนอเข้าแผน</div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2 bg-white border rounded-lg p-3 text-sm"><b>${this.esc(seg.road.name||'-')}</b><div class="text-green-700 mt-1">${this.formatChainage(seg.start)} – ${this.formatChainage(seg.end)} · ${Number(seg.length).toLocaleString('th-TH',{maximumFractionDigits:2})} เมตร</div></div><div class="md:col-span-2"><label class="block text-sm font-bold mb-1">ชื่อโครงการเดิม *</label><input id="co-hist-name" value="${this.esc(name)}" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">ปีงบประมาณ พ.ศ. *</label><input id="co-hist-year" type="number" min="2400" max="3000" value="${this.esc(old?.historicalYear||currentYear)}" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">ประเภทงาน</label><select id="co-hist-work-type" class="w-full border rounded-lg px-3 py-2">${workTypes.map(t=>`<option ${old?.historicalWorkType===t?'selected':''}>${t}</option>`).join('')}</select></div><div><label class="block text-sm font-bold mb-1">งบประมาณ (บาท)</label><input id="co-hist-budget" type="number" min="0" step="0.01" value="${Number(old?.budget)||0}" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">แหล่งงบประมาณ</label><input id="co-hist-funding" value="${this.esc(old?.historicalFundingSource||'')}" placeholder="เช่น ข้อบัญญัติ / เงินสะสม / เงินอุดหนุน" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">วันที่แล้วเสร็จ</label><input id="co-hist-completed" type="date" value="${this.esc(old?.historicalCompletedDate||'')}" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">หน่วยงานดำเนินการ</label><input id="co-hist-agency" value="${this.esc(old?.agencyName||'องค์การบริหารส่วนจังหวัดพิษณุโลก')}" class="w-full border rounded-lg px-3 py-2"></div><div class="md:col-span-2"><label class="block text-sm font-bold mb-1">รายละเอียด/หมายเหตุ</label><textarea id="co-hist-details" rows="3" class="w-full border rounded-lg px-3 py-2">${this.esc(old?.projectDetails||'')}</textarea></div></div>`;
+                const footer=`<div class="flex justify-between gap-3"><button onclick="CoordinationUI.openRoadManager('${this.esc(seg.road.id)}')" class="px-5 py-2 bg-gray-200 rounded-lg font-bold"><i class="fas fa-arrow-left mr-1"></i>กลับ</button><button onclick="CoordinationUI.saveHistoricalProject()" class="px-6 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg font-black"><i class="fas fa-floppy-disk mr-2"></i>${old?'บันทึกการแก้ไข':'บันทึกโครงการที่ดำเนินการแล้ว'}</button></div>`;
+                this.show('<i class="fas fa-clock-rotate-left mr-2"></i>ประวัติโครงการบนสายทาง','bg-green-700',body,footer,'max-w-4xl');
+            },
+            async saveHistoricalProject(){
+                const draft=this.historicalDraft,seg=draft?.seg;if(!seg?.road)return window.showToast('ไม่พบช่วงสายทางสำหรับบันทึก','error');
+                const name=val('co-hist-name').trim(),year=parseInt(val('co-hist-year'));if(!name)return window.showToast('กรุณาระบุชื่อโครงการเดิม','warning');if(!Number.isFinite(year)||year<2400||year>3000)return window.showToast('กรุณาระบุปีงบประมาณ พ.ศ. ให้ถูกต้อง','warning');
+                const route=(seg.route||[]).map(p=>({lat:Number(p.lat??p[0]),lng:Number(p.lng??p[1])})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));if(route.length<2)return window.showToast('แนวช่วงสายทางไม่สมบูรณ์','error');
+                const first=route[0],last=route.at(-1),now=Date.now(),data={...draft.old,recordType:'project',projectLifecycle:'historical',dataCategory:'historical_project',coordinationEntrySource:'highway_history',parentRoadId:seg.road.id,parentRoadName:seg.road.name||'',name,projectNameOld:name,projectNameNew:'',district:this.selectedRoadDistrict||seg.road.district||'',agencyName:val('co-hist-agency').trim(),historicalYear:year,historicalWorkType:val('co-hist-work-type'),historicalFundingSource:val('co-hist-funding').trim(),historicalCompletedDate:val('co-hist-completed'),projectDetails:val('co-hist-details').trim(),budget:Math.max(0,Number(val('co-hist-budget'))||0),workflowStatus:'ดำเนินการแล้ว',coordinationStatus:'ดำเนินการแล้ว',coordinationAnalysisStatus:'ดำเนินการแล้ว',roadStartChainage:Number(seg.start)||0,roadEndChainage:Number(seg.end)||0,roadSegmentLength:Number(seg.length)||0,type:'line',linePoints:route,distance:Number(seg.length)||0,startLat:first.lat,startLng:first.lng,endLat:last.lat,endLng:last.lng,lineColor:'#16a34a',lineWeight:7,lineStyle:'solid',updatedAt:now,createdAt:draft.old?.createdAt||now};
+                const id=await saveDataToDB(data,draft.id||undefined);if(!id)return;allProjectRecords[id]={...data,id};removeProjectFromMap(id);drawProjectOnMap(id,allProjectRecords[id]);this.historicalDraft=null;if(this.previewLayer)this.previewLayer.clearLayers();this.selectedRoadId=seg.road.id;this.openRoadManager(seg.road.id);window.showToast('บันทึกประวัติโครงการที่ดำเนินการแล้วเรียบร้อย','success');
+            },
+            async saveRoadSegmentEdit(seg){
+                const id=this.editingRoadSegmentId,old=this.get(id)||this.projects().find(p=>p.id===id);if(!id||!old)return window.showToast('ไม่พบข้อมูลโครงการที่กำลังแก้ไข','error');
+                if(!this.isHistoricalProject(old)&&seg.overlaps.length)return window.showToast(`ช่วงที่แก้ไขทับซ้อนกับโครงการเสนออื่น ${seg.overlaps.length} รายการ กรุณาปรับจุดเริ่มต้นหรือความยาว`,'warning');
+                const first=seg.route[0],last=seg.route.at(-1),coordinates={startLat:first.lat,startLng:first.lng,endLat:last.lat,endLng:last.lng};
+                const update={dataCategory:this.isHistoricalProject(old)?'historical_project':'plan_proposal',parentRoadId:seg.road.id,parentRoadName:seg.road.name||old.parentRoadName||'สายทาง',roadStartChainage:seg.start,roadEndChainage:seg.end,roadSegmentLength:seg.length,type:'line',linePoints:seg.route,distance:seg.length,coordinationCoordinatesStr:JSON.stringify(coordinates),updatedAt:Date.now()};
+                const savedId=await saveDataToDB(update,id);if(!savedId)return;const merged={...old,...update,id};allProjectRecords[id]=merged;
+                removeProjectFromMap(id);drawProjectOnMap(id,merged);this.editingRoadSegmentId=null;this.pendingRoadSegment=null;if(this.previewLayer)this.previewLayer.clearLayers();this.renderRoadManager();
+                window.showToast(`บันทึกช่วงใหม่ ${this.formatChainage(seg.start)} – ${this.formatChainage(seg.end)} ระยะ ${seg.length.toLocaleString('th-TH',{maximumFractionDigits:2})} เมตรแล้ว`,'success');
+            },
+            zoomRoad(id){const layer=loadedMarkers[id],road=this.get(id)||this.roads().find(r=>r.id===id);if(layer?.getBounds)map.fitBounds(layer.getBounds(),{padding:[50,50]});else if(road?.linePoints?.length)map.fitBounds(L.latLngBounds(road.linePoints.map(p=>[p.lat??p[0],p.lng??p[1]])),{padding:[50,50]});},
             pick(mode){ this.pickMode=mode; this.hide(); if(map)$id('map-container').style.cursor='crosshair'; window.showToast(`คลิกบนแผนที่เพื่อกำหนด${mode==='start'?'จุดเริ่มต้น':'จุดสิ้นสุด'}`,'info'); },
             toggleOther(){const box=$id('co-other-options');if(box)box.classList.toggle('hidden',!$id('co-chk5')?.checked);},
             updateBudgetYearLabels(){const start=Math.max(2400,Math.min(3000,parseInt(val('co-budget-start-year'))||2566));[0,1,2,3,4].forEach(i=>setTxt(`co-budget-year-label-${i}`,`ปี ${start+i}`));},
             handleMapClick(latlng){
-                if(!this.pickMode)return false; const mode=this.pickMode; this.pickMode=null; $id('map-container').style.cursor='';
+                if(!this.pickMode)return false;
+                if(this.pickMode==='road-master-start'||this.pickMode==='road-master-end'){
+                    const mode=this.pickMode.endsWith('start')?'start':'end';this.pickMode=null;$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;this.host.classList.remove('hidden');this.host.classList.add('flex');setVal(`co-new-road-${mode}-lat`,Number(latlng.lat).toFixed(7));setVal(`co-new-road-${mode}-lng`,Number(latlng.lng).toFixed(7));this.syncTransferredRoadEndpoints();window.showToast(`กำหนด${mode==='start'?'จุดเริ่มต้น':'จุดสิ้นสุด'}แล้ว`,'success');return true;
+                }
+                if(this.pickMode==='road-master-draw'){
+                    this.roadDraftRoute.push({lat:Number(latlng.lat),lng:Number(latlng.lng)});this.drawTransferredRoadDraft();return true;
+                }
+                if(this.pickMode==='historical-segment'){
+                    const pick=this.historicalPick,road=pick?.road,result=this.nearestRoadChainage(road,latlng);
+                    if(!result)return window.showToast('ไม่สามารถคำนวณตำแหน่งบนสายทางได้','error'),true;
+                    if(result.offset>200){window.showToast(`จุดที่เลือกห่างจากสายทาง ${result.offset.toLocaleString('th-TH',{maximumFractionDigits:0})} เมตร กรุณาคลิกใกล้เส้นสีเขียวกว่านี้`,'warning');return true;}
+                    if(!pick.start){
+                        pick.start=result;if(this.previewLayer)L.circleMarker([result.snap.lat,result.snap.lng],{radius:9,color:'#16a34a',weight:4,fillColor:'#fff',fillOpacity:1}).addTo(this.previewLayer);
+                        if(this.roadPreviewPanel)this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="text-red-700"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-600 text-white mr-2">2</span>คลิกจุดสิ้นสุดบนเส้นสีเขียว</b><div class="text-xs text-gray-500 mt-1">จุดเริ่มต้น ${this.formatChainage(result.chainage)} · คลิกปลายอีกด้านของโครงการ</div></div><button onclick="CoordinationUI.cancelHistoricalSegmentPick()" class="bg-gray-100 px-4 py-2 rounded font-bold">ยกเลิก</button>`;
+                        window.showToast(`กำหนดจุดเริ่มต้น ${this.formatChainage(result.chainage)} แล้ว กรุณาคลิกจุดสิ้นสุด`,'success');return true;
+                    }
+                    if(Math.abs(result.chainage-pick.start.chainage)<1){window.showToast('จุดสิ้นสุดต้องห่างจากจุดเริ่มต้นมากกว่า 1 เมตร','warning');return true;}
+                    const start=Math.min(pick.start.chainage,result.chainage),end=Math.max(pick.start.chainage,result.chainage),route=this.sliceRoad(road,start,end);if(route.length<2)return window.showToast('ไม่สามารถสร้างแนวช่วงจากจุดที่เลือกได้','error'),true;
+                    pick.end=result;pick.complete=true;pick.startChainage=start;pick.endChainage=end;pick.route=route;setVal('co-road-start',start.toFixed(2));setVal('co-road-length',(end-start).toFixed(2));setVal('co-road-end',end.toFixed(2));
+                    this.pendingRoadSegment={road,start,end,length:end-start,route,overlaps:this.roadPlanProjects(road.id).filter(p=>Math.max(start,Number(p.roadStartChainage)||0)<Math.min(end,Number(p.roadEndChainage)||0))};
+                    if(this.previewLayer){this.previewLayer.clearLayers();L.polyline(route,{color:'#16a34a',weight:11,opacity:.92}).addTo(this.previewLayer);L.circleMarker(route[0],{radius:8,color:'#15803d',weight:4,fillColor:'#fff',fillOpacity:1}).addTo(this.previewLayer);L.circleMarker(route.at(-1),{radius:8,color:'#dc2626',weight:4,fillColor:'#fff',fillOpacity:1}).addTo(this.previewLayer);map.fitBounds(this.previewLayer.getBounds(),{padding:[50,50],maxZoom:17});}
+                    if(this.roadPreviewPanel)this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="text-green-800">เลือกช่วงโครงการแล้ว</b><div class="text-xs text-gray-600 mt-1">${this.formatChainage(start)} – ${this.formatChainage(end)} · ${(end-start).toLocaleString('th-TH',{maximumFractionDigits:2})} เมตร</div></div><button onclick="CoordinationUI.pickHistoricalSegmentOnRoad()" class="bg-gray-100 px-4 py-2 rounded font-bold">เลือกใหม่</button><button onclick="CoordinationUI.useHistoricalPickedSegment()" class="bg-green-700 text-white px-5 py-2 rounded font-black"><i class="fas fa-check mr-1"></i>ใช้ช่วงนี้กรอกประวัติโครงการ</button>`;
+                    window.showToast('กำหนดจุดเริ่มต้นและจุดสิ้นสุดบนสายทางแล้ว','success');return true;
+                }
+                if(this.pickMode==='road-chainage'){
+                    const road=this.roads().find(r=>r.id===this.selectedRoadId),result=this.nearestRoadChainage(road,latlng);
+                    if(!result)return window.showToast('ไม่สามารถคำนวณตำแหน่งบนสายทางได้','error'),true;
+                    if(result.offset>200){window.showToast(`จุดที่เลือกห่างจากสายทาง ${result.offset.toLocaleString('th-TH',{maximumFractionDigits:0})} เมตร กรุณาคลิกใกล้เส้นสีส้มกว่านี้`,'warning');return true;}
+                    this.pickMode=null;$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;
+                    this.host.classList.remove('hidden');this.host.classList.add('flex');setVal('co-road-start',result.chainage.toFixed(2));this.updateRoadEnd();
+                    if(this.previewLayer){this.previewLayer.clearLayers();L.circleMarker([result.snap.lat,result.snap.lng],{radius:9,color:'#f59e0b',weight:4,fillColor:'#fff',fillOpacity:1}).addTo(this.previewLayer);}
+                    const status=$id('co-road-segment-status');if(status){status.className='text-xs bg-amber-50 border border-amber-300 text-amber-900 rounded p-3 mb-3';status.innerHTML=`กำหนดจุดเริ่มต้นจากแผนที่แล้ว<br><b>${this.formatChainage(result.chainage)}</b> (${result.chainage.toLocaleString('th-TH',{maximumFractionDigits:2})} เมตรจากต้นสาย)`;}
+                    window.showToast(`กำหนดจุดเริ่มต้นที่ ${this.formatChainage(result.chainage)} แล้ว`,'success');return true;
+                }
+                const mode=this.pickMode; this.pickMode=null; $id('map-container').style.cursor='';
                 const la=$id(`co-${mode}-lat`), ln=$id(`co-${mode}-lng`); if(la)la.value=latlng.lat.toFixed(6); if(ln)ln.value=latlng.lng.toFixed(6);
                 this.host.classList.remove('hidden'); this.host.classList.add('flex'); this.route=[]; this.drawPreview(); return true;
             },
@@ -1347,11 +1722,14 @@
             addAttachments(input){ const files=[...(input.files||[])]; files.forEach(f=>{if(f.size>700000)return window.showToast(`ไฟล์ ${f.name} ใหญ่เกิน 700 KB`,'warning');const r=new FileReader();r.onload=()=>{this.attachments.push({name:f.name,type:f.type,url:r.result});const el=$id('co-attachment-list');if(el)el.innerHTML=this.attachments.map(a=>`<div class="py-1"><i class="fas fa-paperclip mr-1"></i>${this.esc(a.name)}</div>`).join('');};r.readAsDataURL(f);}); },
             collectForm(){
                 const old=this.editingId?this.get(this.editingId):{}; const num=id=>val(id).trim()===''?NaN:Number(val(id)); const sl=num('co-start-lat'),sn=num('co-start-lng'),el=num('co-end-lat'),en=num('co-end-lng');
+                const editingRoadMaster=!!(this.editingId&&this.isRoadMaster(old));
                 let pts=this.route.length?this.route:([sl,sn,el,en].every(Number.isFinite)?[{lat:sl,lng:sn},{lat:el,lng:en}]:[]); const budget={};[2566,2567,2568,2569,2570].forEach(y=>budget[`b${y}`]=val(`co-b${y}`).replace(/,/g,''));
                 const other=[];if($id('co-chk5').checked){if($id('co-other1')?.checked)other.push('รอตรวจสอบพื้นที่');if($id('co-other2')?.checked)other.push('รอเอกสารการขออนุญาต');if($id('co-other3')?.checked&&val('co-other-text').trim())other.push(val('co-other-text').trim());}const checklist={chk1:$id('co-chk1').checked,chk2:$id('co-chk2').checked,chk3:$id('co-chk3').checked,chk4:$id('co-chk4').checked,chk5:$id('co-chk5').checked,otherText:other.join(', ')};
                 const coordinates={startLat:Number.isFinite(sl)?sl:null,startLng:Number.isFinite(sn)?sn:null,endLat:Number.isFinite(el)?el:null,endLng:Number.isFinite(en)?en:null};
                 const name=val('co-name-new').trim()||val('co-name-old').trim(); const sum=Object.values(budget).reduce((s,x)=>s+(Number(x)||0),0);
-                const pd={...old,recordType:old.projectType==='ordinance'?'ordinance':'project',coordinationEntrySource:old.coordinationEntrySource||this.entrySource(old),coordinationReportGroupId:old.coordinationReportGroupId||this.activeReportGroupId||'',name,projectNameOld:val('co-name-old').trim(),projectNameNew:val('co-name-new').trim(),projectDetails:val('co-details'),district:val('co-district'),agencyName:val('co-agency'),seqNo:val('co-seq'),coordinationBudgetStartYear:Math.max(2400,Math.min(3000,parseInt(val('co-budget-start-year'))||2566)),coordinationBudgetStr:JSON.stringify(budget),coordinationChecklistStr:JSON.stringify(checklist),coordinationCoordinatesStr:JSON.stringify(coordinates),coordinationAttachmentsStr:JSON.stringify(this.attachments),inspectorName:val('co-inspector'),inspectorPosition:val('co-position'),inspectionDate:val('co-date'),coordinationAnalysisStatus:this.analysisStatus(old),workflowStatus:old.workflowStatus||'รับเรื่อง',coordinationStatus:old.coordinationStatus||'รับเรื่อง',budget:sum,updatedAt:Date.now()};
+                const road=this.activeRoadContext;
+                const pd={...old,recordType:editingRoadMaster?'road':(old.projectType==='ordinance'?'ordinance':'project'),roadRole:editingRoadMaster?'transferred_road':old.roadRole,isTransferredRoad:editingRoadMaster?true:old.isTransferredRoad,coordinationEntrySource:editingRoadMaster?'highway':(old.coordinationEntrySource||this.entrySource(old)),coordinationReportGroupId:old.coordinationReportGroupId||this.activeReportGroupId||'',parentRoadId:road?.roadId||old.parentRoadId||'',parentRoadName:road?.roadName||old.parentRoadName||'',roadStartChainage:road?Number(road.start)||0:(Number(old.roadStartChainage)||0),roadEndChainage:road?Number(road.end)||0:(Number(old.roadEndChainage)||0),roadSegmentLength:road?Number(road.length)||0:(Number(old.roadSegmentLength)||0),name,projectNameOld:val('co-name-old').trim(),projectNameNew:val('co-name-new').trim(),projectDetails:val('co-details'),district:val('co-district'),agencyName:val('co-agency'),seqNo:val('co-seq'),coordinationBudgetStartYear:Math.max(2400,Math.min(3000,parseInt(val('co-budget-start-year'))||2566)),coordinationBudgetStr:JSON.stringify(budget),coordinationChecklistStr:JSON.stringify(checklist),coordinationCoordinatesStr:JSON.stringify(coordinates),coordinationAttachmentsStr:JSON.stringify(this.attachments),inspectorName:val('co-inspector'),inspectorPosition:val('co-position'),inspectionDate:val('co-date'),coordinationAnalysisStatus:this.analysisStatus(old),workflowStatus:old.workflowStatus||'รับเรื่อง',coordinationStatus:old.coordinationStatus||'รับเรื่อง',budget:sum,updatedAt:Date.now()};
+                pd.dataCategory=editingRoadMaster?'transferred_road':((road?.roadId||old.parentRoadId)?'plan_proposal':(old.dataCategory||'project'));
                 if(pts.length>1){pd.type='line';pd.linePoints=pts;pd.distance=pts.slice(1).reduce((s,p,i)=>s+(map?map.distance(pts[i],p):0),0);pd.lineStyle=val('co-line-style')||'solid';pd.lineColor=val('co-line-color')||'#3b82f6';pd.lineWeight=Number(val('co-line-weight'))||5;}else if(Number.isFinite(sl)&&Number.isFinite(sn)){pd.type='point';pd.lat=sl;pd.lng=sn;pd.color=pd.color||'#16a34a';pd.icon=pd.icon||'fa-map-marker-alt';}
                 return pd;
             },
@@ -1363,9 +1741,14 @@
                 if(continuous&&!pd.coordinationReportGroupId)pd.coordinationReportGroupId=`CRG_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
                 if(pd.coordinationReportGroupId)this.activeReportGroupId=pd.coordinationReportGroupId;
                 const keep={district:pd.district,agencyName:pd.agencyName,seqNo:(parseInt(pd.seqNo)||0)+1,budgetStartYear:pd.coordinationBudgetStartYear,reportGroupId:pd.coordinationReportGroupId};
-                this.rememberInspector(pd);const savedId=await saveDataToDB(pd,this.editingId);if(!savedId)return;allProjectRecords[savedId]={...pd};
-                window.showToast(continuous?'บันทึกและเปิดลำดับถัดไปแล้ว':'บันทึกข้อมูลโครงการสำเร็จ','success');
-                if(continuous){this.openForm(null,false,keep.reportGroupId);setVal('co-district',keep.district);setVal('co-agency',keep.agencyName);setVal('co-seq',keep.seqNo);setVal('co-budget-start-year',keep.budgetStartYear);this.updateBudgetYearLabels();}else this.close();
+                this.rememberInspector(pd);const savedId=await saveDataToDB(pd,this.editingId);if(!savedId)return;allProjectRecords[savedId]={...pd,id:savedId};
+                if(continuous&&pd.parentRoadId&&Number(pd.roadEndChainage)>Number(pd.roadStartChainage)){
+                    this.pendingNextProject={sourceId:savedId,sourceSeqNo:pd.seqNo||1,roadId:pd.parentRoadId,start:Number(pd.roadEndChainage),length:Number(pd.roadSegmentLength)||Number(pd.distance)||1000,district:keep.district,agencyName:keep.agencyName,seqNo:keep.seqNo,budgetStartYear:keep.budgetStartYear,reportGroupId:keep.reportGroupId,inspectorName:pd.inspectorName||'',inspectorPosition:pd.inspectorPosition||'',inspectionDate:pd.inspectionDate||''};
+                    this.selectedRoadId=pd.parentRoadId;this.selectedRoadDistrict=pd.district||'';this.openRoadManager(pd.parentRoadId);window.showToast(`บันทึกลำดับที่ ${pd.seqNo||1} แล้ว ระบบตั้งจุดเริ่มลำดับที่ ${keep.seqNo} ต่อจากจุดสิ้นสุดให้อัตโนมัติ`,'success');
+                }else{
+                    window.showToast(continuous?'บันทึกและเปิดลำดับถัดไปแล้ว':'บันทึกข้อมูลโครงการสำเร็จ','success');
+                    if(continuous){this.openForm(null,false,keep.reportGroupId);setVal('co-district',keep.district);setVal('co-agency',keep.agencyName);setVal('co-seq',keep.seqNo);setVal('co-budget-start-year',keep.budgetStartYear);this.updateBudgetYearLabels();}else this.close();
+                }
             },
             openAgencyListFromForm(){const q=`${val('co-district')} ${val('co-agency')}`.trim();this.openSearch();setVal('co-search',q);this.renderSearch();},
             prepareNext(){return this.saveForm(true);},
@@ -1411,20 +1794,136 @@
                 w.document.open();w.document.write(html);w.document.close();
             },
             openSearch(){
-                const body=`<input id="co-search" oninput="CoordinationUI.renderSearch()" placeholder="พิมพ์เพื่อค้นหา: อำเภอ, ชื่อโครงการ, หน่วยงาน..." class="w-full border rounded-lg px-4 py-2 mb-4"><div class="overflow-auto bg-white border rounded-lg max-h-[65vh]"><table class="w-full text-sm min-w-[900px]"><thead class="sticky top-0 bg-gray-100"><tr><th class="p-3">ลำดับ</th><th class="p-3 text-left">อำเภอ / หน่วยงานที่ขอ</th><th class="p-3 text-left">ชื่อโครงการ</th><th class="p-3 text-right">งบรวม</th><th class="p-3">สถานะ</th><th class="p-3">จัดการ / ลบ</th></tr></thead><tbody id="co-search-body"></tbody></table></div>`;
-                this.show('<i class="fas fa-magnifying-glass-location mr-2"></i>ค้นหาและจัดการข้อมูลโครงการ','bg-indigo-700',body,`<div class="flex justify-between"><span id="co-search-count" class="text-sm text-gray-500"></span><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded font-bold">ปิด</button></div>`); this.renderSearch();
+                const availableDistricts=[...new Set([...this.districts,...this.projects().map(p=>p.district),...this.roads().map(r=>r.district)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
+                const districtOptions=availableDistricts.map(d=>`<option value="${this.esc(d)}">อ.${this.esc(d)}</option>`).join('');
+                const body=`<div class="grid grid-cols-1 md:grid-cols-[240px_1fr_auto] gap-3 mb-4"><select id="co-search-district" onchange="CoordinationUI.renderSearch()" class="w-full border rounded-lg px-4 py-2 bg-white font-bold text-gray-700"><option value="">ทุกอำเภอ</option>${districtOptions}</select><input id="co-search" oninput="CoordinationUI.renderSearch()" placeholder="ค้นหาชื่อสายทาง, ชื่อโครงการ หรือหน่วยงาน..." class="w-full border rounded-lg px-4 py-2"><button onclick="CoordinationUI.openDataAudit()" class="bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 rounded-lg px-4 py-2 font-bold whitespace-nowrap"><i class="fas fa-clipboard-check mr-2"></i>ตรวจสอบความครบถ้วน</button></div><div class="mb-3 flex flex-wrap gap-4 text-xs text-gray-600"><span><span class="inline-block w-4 h-3 rounded bg-indigo-100 border border-indigo-200 mr-1"></span>สายทางหลัก</span><span><i class="fas fa-turn-up rotate-90 text-indigo-500 mr-1"></i>โครงการย่อยในสายทาง</span></div><div class="overflow-auto bg-white border rounded-lg max-h-[65vh]"><table class="w-full text-sm min-w-[940px]"><thead class="sticky top-0 bg-gray-100 z-10"><tr><th class="p-3">ลำดับ</th><th class="p-3 text-left">อำเภอ / หน่วยงานที่ขอ</th><th class="p-3 text-left">สายทางหลัก / โครงการย่อย</th><th class="p-3 text-right">งบรวม</th><th class="p-3">สถานะ</th><th class="p-3">จัดการ / ลบ</th></tr></thead><tbody id="co-search-body"></tbody></table></div>`;
+                this.show('<i class="fas fa-magnifying-glass-location mr-2"></i>ค้นหาและจัดการข้อมูลโครงการ','bg-indigo-700',body,`<div class="flex justify-between items-center gap-3"><span id="co-search-count" class="text-sm text-gray-500"></span><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded font-bold">ปิด</button></div>`); this.renderSearch();
             },
-            renderSearch(){ const kw=val('co-search').toLowerCase();const rows=this.projects().filter(p=>`${p.district||''} ${p.agencyName||''} ${this.name(p)}`.toLowerCase().includes(kw));setTxt('co-search-count',`พบ ${rows.length} รายการ`);$id('co-search-body').innerHTML=rows.length?rows.map((p,i)=>`<tr class="border-t hover:bg-indigo-50"><td class="p-3 text-center">${i+1}</td><td class="p-3">อ.${this.esc(p.district||'-')}<div class="text-xs text-gray-500">${this.esc(p.agencyName||'-')} (ลำดับ ${this.esc(p.seqNo||'-')})</div></td><td class="p-3 font-bold text-blue-700">${this.esc(this.name(p)||'ไม่มีชื่อ')}</td><td class="p-3 text-right font-bold">฿${this.totalBudget(p).toLocaleString()}</td><td class="p-3 text-center"><span class="bg-amber-100 px-2 py-1 rounded text-xs font-bold">${this.esc(this.analysisStatus(p))}</span><div class="text-[10px] text-indigo-700 mt-2">${this.esc(getCoordinationStatus(p))}</div></td><td class="p-3 text-center whitespace-nowrap"><button onclick="CoordinationUI.openDetail('${p.id}')" class="bg-sky-100 text-sky-700 p-2 rounded" title="รายละเอียด"><i class="fas fa-info"></i></button> <button onclick="CoordinationUI.panTo('${p.id}')" class="bg-indigo-100 text-indigo-700 p-2 rounded" title="ดูในแผนที่"><i class="fas fa-map"></i></button> <button onclick="CoordinationUI.openForm('${p.id}')" class="bg-amber-100 text-amber-700 p-2 rounded" title="แก้ไข"><i class="fas fa-pen"></i></button> <button onclick="CoordinationUI.remove('${p.id}')" class="bg-red-100 text-red-700 p-2 rounded" title="ลบ"><i class="fas fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="6" class="p-10 text-center text-gray-500">ไม่พบข้อมูล</td></tr>'; },
+            searchActions(p){
+                if(!p?.id||!this.get(p.id))return '<span class="text-xs text-gray-400">แนวสายทาง</span>';
+                const id=this.esc(p.id);
+                const edit=this.isHistoricalProject(p)?`CoordinationUI.openHistoricalProjectForm('${id}')`:`CoordinationUI.openForm('${id}')`;
+                return `<button onclick="CoordinationUI.openDetail('${id}')" class="bg-sky-100 text-sky-700 p-2 rounded" title="รายละเอียด"><i class="fas fa-info"></i></button> <button onclick="CoordinationUI.panTo('${id}')" class="bg-indigo-100 text-indigo-700 p-2 rounded" title="ดูในแผนที่"><i class="fas fa-map"></i></button> <button onclick="${edit}" class="${this.isHistoricalProject(p)?'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'} p-2 rounded" title="แก้ไข"><i class="fas fa-pen"></i></button> <button onclick="CoordinationUI.remove('${id}')" class="bg-red-100 text-red-700 p-2 rounded" title="ลบ"><i class="fas fa-trash"></i></button>`;
+            },
+            searchProjectRow(p,index,label){
+                const start=Number(p.roadStartChainage),end=Number(p.roadEndChainage);
+                const range=Number.isFinite(start)&&Number.isFinite(end)&&end>start?`<div class="text-[11px] text-gray-500 mt-1">ช่วง ${start.toLocaleString('th-TH',{maximumFractionDigits:2})} – ${end.toLocaleString('th-TH',{maximumFractionDigits:2})} ม.</div>`:'';
+                const hist=this.isHistoricalProject(p),status=hist?`<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">ดำเนินการแล้ว · พ.ศ. ${this.esc(p.historicalYear||'-')}</span>`:`<span class="bg-amber-100 px-2 py-1 rounded text-xs font-bold">${this.esc(this.analysisStatus(p))}</span><div class="text-[10px] text-indigo-700 mt-2">${this.esc(getCoordinationStatus(p))}</div>`;
+                return `<tr class="border-t ${hist?'hover:bg-green-50':'hover:bg-indigo-50'}"><td class="p-3 text-center text-gray-500">${label||index}</td><td class="p-3">อ.${this.esc(p.district||'-')}<div class="text-xs text-gray-500">${this.esc(p.agencyName||'-')} ${hist?'':'(ลำดับ '+this.esc(p.seqNo||'-')+')'}</div></td><td class="p-3"><div class="pl-5 border-l-2 ${hist?'border-green-300 text-green-700':'border-indigo-200 text-blue-700'} font-semibold"><i class="fas ${hist?'fa-clock-rotate-left':'fa-turn-up rotate-90'} ${hist?'text-green-500':'text-indigo-400'} mr-2"></i>${this.esc(this.name(p)||'ไม่มีชื่อ')}</div>${range}</td><td class="p-3 text-right font-bold">฿${this.totalBudget(p).toLocaleString()}</td><td class="p-3 text-center">${status}</td><td class="p-3 text-center whitespace-nowrap">${this.searchActions(p)}</td></tr>`;
+            },
+            renderSearch(){
+                const kw=val('co-search').trim().toLowerCase(),district=val('co-search-district');
+                const projects=this.projects(),roads=this.roads().slice().sort((a,b)=>String(a.district||'').localeCompare(String(b.district||''),'th')||this.name(a).localeCompare(this.name(b),'th'));
+                const roadIds=new Set();roads.forEach(r=>{roadIds.add(String(r.id));if(r.sourceRoadRecordId)roadIds.add(String(r.sourceRoadRecordId));});
+                const norm=p=>`${p?.district||''} ${p?.agencyName||''} ${this.name(p)} ${p?.parentRoadName||''}`.toLowerCase();
+                const districtMatch=p=>!district||String(p?.district||'')===district;
+                const keywordMatch=p=>!kw||norm(p).includes(kw);
+                let projectCount=0,roadCount=0,html='';
+                const usedProjectIds=new Set();
+                roads.forEach(road=>{
+                    const children=projects.filter(p=>p.id!==road.id&&String(p.parentRoadId||'')===String(road.id||'')).sort((a,b)=>(Number(a.roadStartChainage)||0)-(Number(b.roadStartChainage)||0)||(parseInt(a.seqNo)||0)-(parseInt(b.seqNo)||0));
+                    const visibleChildren=children.filter(p=>districtMatch(p)&&keywordMatch(p));
+                    const roadVisible=districtMatch(road)&&keywordMatch(road);
+                    if(!roadVisible&&!visibleChildren.length)return;
+                    const shownChildren=(districtMatch(road)&&keywordMatch(road))?children.filter(districtMatch):visibleChildren;
+                    roadCount++;projectCount+=shownChildren.length;shownChildren.forEach(p=>usedProjectIds.add(String(p.id)));
+                    const source=projects.find(p=>String(p.id)===String(road.id));if(source)usedProjectIds.add(String(source.id));
+                    const roadDistrict=road.district||shownChildren.find(p=>p.district)?.district||'-';
+                    html+=`<tr class="border-t-2 border-indigo-200 bg-indigo-50"><td class="p-3 text-center font-black text-indigo-700">${roadCount}</td><td class="p-3 font-bold">อ.${this.esc(roadDistrict)}<div class="text-xs text-indigo-600 mt-1">${shownChildren.length} โครงการย่อย</div></td><td class="p-3"><div class="font-black text-base text-indigo-900"><i class="fas fa-road mr-2 text-indigo-600"></i>${this.esc(this.name(road)||'สายทางไม่ระบุชื่อ')}</div><div class="text-[11px] text-indigo-600 mt-1">สายทางหลัก</div></td><td class="p-3 text-right font-black text-indigo-800">${shownChildren.length?`฿${shownChildren.filter(p=>!this.isHistoricalProject(p)).reduce((s,p)=>s+this.totalBudget(p),0).toLocaleString()}`:'-'}</td><td class="p-3 text-center"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">สายทางหลัก</span></td><td class="p-3 text-center whitespace-nowrap">${this.searchActions(source||road)}</td></tr>`;
+                    html+=shownChildren.map((p,i)=>this.searchProjectRow(p,i+1,`${roadCount}.${i+1}`)).join('');
+                });
+                const standalone=projects.filter(p=>!usedProjectIds.has(String(p.id))&&!roadIds.has(String(p.id))&&districtMatch(p)&&keywordMatch(p));
+                if(standalone.length){
+                    html+=`<tr class="border-t-2 bg-slate-100"><td colspan="6" class="p-3 font-black text-slate-700"><i class="fas fa-folder-open mr-2"></i>โครงการที่ยังไม่ได้เชื่อมกับสายทางหลัก <span class="ml-2 text-xs font-normal">(${standalone.length} รายการ)</span></td></tr>`;
+                    html+=standalone.map((p,i)=>this.searchProjectRow(p,i+1,`อิสระ ${i+1}`)).join('');projectCount+=standalone.length;
+                }
+                setTxt('co-search-count',`พบ ${roadCount} สายทางหลัก · ${projectCount} โครงการย่อย${standalone.length?` · ยังไม่เชื่อม ${standalone.length} รายการ`:''}`);
+                $id('co-search-body').innerHTML=html||'<tr><td colspan="6" class="p-10 text-center text-gray-500">ไม่พบข้อมูลในอำเภอหรือคำค้นหาที่เลือก</td></tr>';
+            },
+            auditData(){
+                const raw=getHighwayProjects(),projects=this.projects(),roads=this.roads();
+                const activeRaw=raw.filter(p=>p.projectType!=='ordinance'&&p.recordType!=='ordinance');
+                const roadKeys=new Set(),roadRecordIds=new Set();
+                roads.forEach(r=>{
+                    roadKeys.add(String(r.id));
+                    if(r.sourceRoadRecordId)roadKeys.add(String(r.sourceRoadRecordId));
+                    const sourceId=String(r.sourceRoadRecordId||r.id||'');
+                    if(sourceId&&allProjectRecords[sourceId])roadRecordIds.add(sourceId);
+                });
+                const searchIds=new Set(projects.map(p=>String(p.id)));
+                roadRecordIds.forEach(id=>searchIds.add(id));
+                const mapIds=new Set(Object.keys(loadedMarkers));
+                const byId=id=>allProjectRecords[id]||loadedMarkers[id]?.projectData||{id,name:'ไม่พบรายละเอียด'};
+                const mapOnly=[...mapIds].filter(id=>!searchIds.has(id)).map(byId);
+                const searchOnly=[...searchIds].filter(id=>!mapIds.has(id)).map(byId);
+                const orphan=projects.filter(p=>p.parentRoadId&&!roadKeys.has(String(p.parentRoadId)));
+                const unlinked=projects.filter(p=>!p.parentRoadId&&!this.isRoadMaster(p));
+                const unnamed=activeRaw.filter(p=>!this.name(p));
+                const duplicateMap=new Map();
+                activeRaw.forEach(p=>{
+                    const name=this.name(p).replace(/\s+/g,' ').trim().toLowerCase();
+                    if(!name)return;
+                    const key=`${String(p.district||'').trim().toLowerCase()}|${name}`;
+                    if(!duplicateMap.has(key))duplicateMap.set(key,[]);
+                    duplicateMap.get(key).push(p);
+                });
+                const duplicates=[...duplicateMap.values()].filter(group=>group.length>1);
+                const issues=[];
+                mapOnly.forEach(p=>issues.push({type:'บนแผนที่ แต่ไม่อยู่ในหน้าค้นหา',tone:'red',p}));
+                searchOnly.forEach(p=>issues.push({type:'อยู่ในหน้าค้นหา แต่ไม่มีรูปบนแผนที่',tone:'amber',p}));
+                orphan.forEach(p=>issues.push({type:'อ้างอิงสายทางหลักที่ไม่พบ',tone:'orange',p}));
+                unlinked.forEach(p=>issues.push({type:'โครงการยังไม่เชื่อมสายทางหลัก',tone:'slate',p}));
+                unnamed.forEach(p=>issues.push({type:'ไม่มีชื่อข้อมูล',tone:'purple',p}));
+                duplicates.forEach((group,index)=>group.forEach(p=>issues.push({type:`ชื่อซ้ำ กลุ่ม ${index+1} (${group.length} รายการ)`,tone:'blue',p})));
+                return {raw,activeRaw,projects,roads,roadRecordIds,mapIds,searchIds,mapOnly,searchOnly,orphan,unlinked,unnamed,duplicates,issues};
+            },
+            auditActionButtons(p){
+                const id=this.esc(p?.id||'');
+                if(!id||!this.get(p.id))return '<span class="text-xs text-gray-400">ไม่มีข้อมูลต้นทาง</span>';
+                const edit=this.isHistoricalProject(p)?`CoordinationUI.openHistoricalProjectForm('${id}')`:`CoordinationUI.openForm('${id}')`;
+                return `<button onclick="CoordinationUI.openDetail('${id}')" class="bg-sky-100 text-sky-700 px-2 py-1.5 rounded" title="รายละเอียด"><i class="fas fa-info"></i></button> <button onclick="CoordinationUI.panTo('${id}')" class="bg-indigo-100 text-indigo-700 px-2 py-1.5 rounded" title="ดูในแผนที่"><i class="fas fa-map"></i></button> <button onclick="${edit}" class="bg-amber-100 text-amber-700 px-2 py-1.5 rounded font-bold" title="เปิดแก้ไข"><i class="fas fa-pen"></i></button>`;
+            },
+            openDataAudit(){
+                const a=this.auditData(),cards=[
+                    ['ข้อมูลใช้งานในฐาน',a.activeRaw.length,'border-slate-200','text-slate-800'],
+                    ['แสดงบนแผนที่',a.mapIds.size,'border-emerald-200','text-emerald-700'],
+                    ['อยู่ในระบบค้นหา',a.searchIds.size,'border-indigo-200','text-indigo-700'],
+                    ['สายทางหลัก',a.roadRecordIds.size,'border-pink-200','text-pink-700'],
+                    ['โครงการเสนอเข้าแผน',this.planningProjects().length,'border-blue-200','text-blue-700'],
+                    ['ดำเนินการแล้ว',a.projects.filter(p=>this.isHistoricalProject(p)).length,'border-green-200','text-green-700'],
+                    ['ยังไม่เชื่อมสายทาง',a.unlinked.length,'border-amber-200','text-amber-700'],
+                    ['อ้างอิงสายทางไม่พบ',a.orphan.length,'border-orange-200','text-orange-700'],
+                    ['ชื่อซ้ำ',a.duplicates.reduce((s,g)=>s+g.length,0),'border-red-200','text-red-700']
+                ];
+                const summary=cards.map(c=>`<div class="bg-white border ${c[2]} rounded-xl p-3 shadow-sm"><div class="text-xs text-gray-500 font-bold">${c[0]}</div><div class="text-2xl font-black ${c[3]} mt-1">${c[1].toLocaleString()}</div></div>`).join('');
+                const rows=a.issues.map((item,i)=>`<tr class="border-t hover:bg-rose-50"><td class="p-3 text-center">${i+1}</td><td class="p-3"><span class="inline-block bg-${item.tone}-100 text-${item.tone}-700 px-2 py-1 rounded text-xs font-bold">${this.esc(item.type)}</span></td><td class="p-3 font-bold text-gray-800">${this.esc(this.name(item.p)||'(ไม่มีชื่อ)')}<div class="text-[10px] text-gray-400 font-mono mt-1">ID: ${this.esc(item.p.id||'-')}</div></td><td class="p-3">อ.${this.esc(item.p.district||'-')}<div class="text-xs text-gray-500">${this.esc(item.p.agencyName||'-')}</div></td><td class="p-3 text-center whitespace-nowrap">${this.auditActionButtons(item.p)}</td></tr>`).join('');
+                const body=`<div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-3 text-sm mb-4"><i class="fas fa-shield-halved mr-2"></i>หน้าตรวจสอบนี้เปรียบเทียบด้วยรหัสข้อมูลจริง และไม่มีคำสั่งลบข้อมูล</div><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">${summary}</div><div class="flex items-center justify-between gap-3 mb-3"><div class="font-bold text-gray-700">รายการที่ควรตรวจสอบ <span class="text-rose-600">${a.issues.length}</span> แถว</div><button onclick="CoordinationUI.exportAuditCSV()" class="bg-emerald-100 text-emerald-800 border border-emerald-200 px-4 py-2 rounded-lg font-bold text-sm"><i class="fas fa-file-csv mr-2"></i>ส่งออกรายการตรวจสอบ</button></div><div class="overflow-auto bg-white border rounded-lg max-h-[48vh]"><table class="w-full text-sm min-w-[900px]"><thead class="sticky top-0 bg-gray-100 z-10"><tr><th class="p-3">ลำดับ</th><th class="p-3 text-left">ประเภทปัญหา</th><th class="p-3 text-left">ชื่อข้อมูล</th><th class="p-3 text-left">อำเภอ / หน่วยงาน</th><th class="p-3">ตรวจสอบ</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="p-10 text-center text-emerald-700 font-bold"><i class="fas fa-circle-check mr-2"></i>ไม่พบรายการผิดปกติ</td></tr>'}</tbody></table></div>`;
+                this.show('<i class="fas fa-clipboard-check mr-2"></i>ตรวจสอบความครบถ้วนของข้อมูล','bg-rose-700',body,`<div class="flex justify-between gap-3"><button onclick="CoordinationUI.openSearch()" class="px-5 py-2 bg-indigo-100 text-indigo-800 rounded font-bold"><i class="fas fa-magnifying-glass mr-2"></i>กลับหน้าค้นหา</button><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded font-bold">ปิด</button></div>`,'max-w-7xl');
+            },
+            exportAuditCSV(){
+                const a=this.auditData(),q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+                let csv='\uFEFFประเภทปัญหา,รหัสข้อมูล,ชื่อข้อมูล,อำเภอ,หน่วยงาน,รหัสสายทางหลัก\n';
+                a.issues.forEach(item=>{csv+=[item.type,item.p.id,this.name(item.p),item.p.district,item.p.agencyName,item.p.parentRoadId].map(q).join(',')+'\n';});
+                this.download('highway_data_audit.csv','text/csv;charset=utf-8',csv);
+            },
             panTo(id){ const p=this.get(id),l=loadedMarkers[id]||loadedMarkers[p?.sourceCoordinationId];this.close();if(!l)return; if(l.getBounds)map.fitBounds(l.getBounds(),{padding:[40,40]});else if(l.getLatLng)map.flyTo(l.getLatLng(),15);l.openPopup?.(); },
             openDetail(id){
-                const p=this.get(id);if(!p)return;const attachments=this.parse(p.coordinationAttachmentsStr,p.attachments||[]),distance=Number(p.distance)||0;
+                const p=this.get(id);if(!p)return;const isRoad=this.isRoadMaster(p),isHistorical=this.isHistoricalProject(p),attachments=this.parse(p.coordinationAttachmentsStr,p.attachments||[]),distance=isRoad?this.roadLength(p):(Number(p.distance)||0);
                 const attHtml=attachments.length?`<div class="col-span-2 mt-2"><span class="text-gray-500 block text-xs mb-1">เอกสารแนบ</span><div class="grid grid-cols-1 md:grid-cols-2 gap-2">${attachments.map(f=>`<a href="${this.esc(f.url||'#')}" target="_blank" class="flex items-center gap-2 bg-white p-2 rounded border hover:bg-indigo-50"><i class="fas ${String(f.type||'').includes('pdf')?'fa-file-pdf text-red-500':'fa-image text-blue-500'}"></i><span class="text-blue-700 truncate">${this.esc(f.name||'ไฟล์แนบ')}</span></a>`).join('')}</div></div>`:'';
-                const body=`<div class="grid grid-cols-2 gap-3 text-sm"><div class="col-span-2 border-b pb-3 mb-2 flex justify-between items-center"><span class="font-bold">สถานะ:</span><span class="bg-amber-100 px-3 py-1 rounded font-bold">${this.esc(this.analysisStatus(p))}</span><span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold">ลำดับที่ ${this.esc(p.seqNo||1)}</span></div><div><span class="text-gray-500 block text-xs">อำเภอ</span><div class="font-bold">${this.esc(p.district||'-')}</div></div><div><span class="text-gray-500 block text-xs">หน่วยงานที่ขอ</span><div class="font-bold">${this.esc(p.agencyName||'-')}</div></div><div class="col-span-2"><span class="text-gray-500 block text-xs">ชื่อโครงการ</span><div class="font-medium">${this.esc(this.name(p)||'-')}</div></div><div class="col-span-2"><span class="text-gray-500 block text-xs">รายละเอียดโครงการ</span><div>${this.esc(p.projectDetails||'-')}</div></div><div class="col-span-2 bg-sky-50 p-3 rounded flex justify-between mt-2"><span class="font-bold text-sky-800 text-xs"><i class="fas fa-ruler mr-2"></i>ระยะทางบนแผนที่:</span><span class="font-bold text-sky-700">${distance>0?distance.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})+' เมตร':'-'}</span></div>${attHtml}</div>`;
-                this.show('<i class="fas fa-circle-info mr-2"></i>รายละเอียดโครงการ','bg-blue-700',body,`<div class="flex justify-end gap-3"><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded-lg font-bold">ปิด</button><button onclick="CoordinationUI.openForm('${id}')" class="px-6 py-2 bg-amber-500 text-white rounded-lg font-bold"><i class="fas fa-pen-to-square mr-2"></i>แก้ไขข้อมูล</button></div>`,'max-w-3xl');
+                const roadTargetId=isRoad?id:p.parentRoadId,roadName=isRoad?this.name(p):p.parentRoadName,roadStart=isRoad?0:p.roadStartChainage,roadEnd=isRoad?distance:p.roadEndChainage;
+                const roadHtml=roadTargetId?`<div class="col-span-2 bg-pink-50 border border-pink-200 p-3 rounded"><span class="text-xs text-pink-700">${isRoad?'แนวสายทางแม่ที่เลือก':'อ้างอิงทะเบียนสายทางถ่ายโอน'}</span><div class="font-bold text-pink-900">${this.esc(roadName||'-')}</div><div class="text-xs text-pink-800 mt-1">${this.formatChainage(roadStart)} – ${this.formatChainage(roadEnd)}</div><button onclick="CoordinationUI.openRoadManager('${this.esc(roadTargetId)}')" class="mt-2 bg-pink-700 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fas fa-road-circle-check mr-1"></i>เปิดทะเบียนสายทางและช่วงโครงการ</button></div>`:'';
+                const typeBanner=isRoad?`<div class="col-span-2 bg-pink-50 border border-pink-200 text-pink-800 rounded-lg p-3 font-black"><i class="fas fa-road mr-2"></i>ข้อมูลทะเบียนสายทางที่ได้รับถ่ายโอน <span class="font-normal text-xs">— เป็นแนวสายทางแม่ ไม่ใช่โครงการเสนอของบประมาณ</span></div>`:isHistorical?`<div class="col-span-2 bg-green-50 border border-green-200 text-green-800 rounded-lg p-3 font-black"><i class="fas fa-clock-rotate-left mr-2"></i>ประวัติโครงการที่ดำเนินการแล้ว <span class="font-normal text-xs">— แสดงเป็นช่วงสีเขียวและไม่รวมกับโครงการเสนอใหม่</span></div>`:`<div class="col-span-2 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-3 font-black"><i class="fas fa-file-circle-plus mr-2"></i>โครงการเสนอเข้าแผนงาน <span class="font-normal text-xs">— เป็นช่วงโครงการที่อ้างอิงแนวสายทางแม่</span></div>`;
+                const body=`<div class="grid grid-cols-2 gap-3 text-sm">${typeBanner}<div class="col-span-2 border-b pb-3 mb-2 flex justify-between items-center"><span class="font-bold">สถานะ:</span><span class="${isHistorical?'bg-green-100 text-green-700':'bg-amber-100'} px-3 py-1 rounded font-bold">${isHistorical?'ดำเนินการแล้ว พ.ศ. '+this.esc(p.historicalYear||'-'):this.esc(this.analysisStatus(p))}</span>${isRoad?'<span class="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded font-bold">สายทางแม่</span>':isHistorical?`<span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded font-bold">${this.esc(p.historicalWorkType||'โครงการเดิม')}</span>`:`<span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold">ลำดับที่ ${this.esc(p.seqNo||1)}</span>`}</div><div><span class="text-gray-500 block text-xs">อำเภอ</span><div class="font-bold">${this.esc(p.district||'-')}</div></div><div><span class="text-gray-500 block text-xs">${isRoad?'ประเภทข้อมูล':'หน่วยงานดำเนินการ/ที่ขอ'}</span><div class="font-bold">${isRoad?'สายทางถ่ายโอน':this.esc(p.agencyName||'-')}</div></div><div class="col-span-2"><span class="text-gray-500 block text-xs">${isRoad?'ชื่อสายทาง':'ชื่อโครงการ'}</span><div class="font-medium">${this.esc(this.name(p)||'-')}</div></div>${isHistorical?`<div><span class="text-gray-500 block text-xs">แหล่งงบประมาณ</span><div class="font-bold">${this.esc(p.historicalFundingSource||'-')}</div></div><div><span class="text-gray-500 block text-xs">งบประมาณ</span><div class="font-bold">฿${Number(p.budget||0).toLocaleString()}</div></div>`:''}${roadHtml}<div class="col-span-2"><span class="text-gray-500 block text-xs">รายละเอียด${isRoad?'สายทาง':'โครงการ'}</span><div>${this.esc(p.projectDetails||'-')}</div></div><div class="col-span-2 bg-sky-50 p-3 rounded flex justify-between mt-2"><span class="font-bold text-sky-800 text-xs"><i class="fas fa-ruler mr-2"></i>${isRoad?'ความยาวสายทางทั้งหมด':'ระยะทางช่วงโครงการ'}:</span><span class="font-bold text-sky-700">${distance>0?distance.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})+' เมตร':'-'}</span></div>${attHtml}</div>`;
+                const footer=isRoad?`<div class="flex justify-end gap-3"><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded-lg font-bold">ปิด</button><button onclick="CoordinationUI.openRoadEdit('${id}')" class="px-6 py-2 bg-amber-500 text-white rounded-lg font-bold"><i class="fas fa-pen-to-square mr-2"></i>แก้ไขข้อมูล</button></div>`:isHistorical?`<div class="flex justify-end gap-3"><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded-lg font-bold">ปิด</button><button onclick="CoordinationUI.openHistoricalProjectForm('${id}')" class="px-6 py-2 bg-green-700 text-white rounded-lg font-bold"><i class="fas fa-pen-to-square mr-2"></i>แก้ไขประวัติโครงการ</button></div>`:`<div class="flex justify-end gap-3"><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded-lg font-bold">ปิด</button><button onclick="CoordinationUI.openForm('${id}')" class="px-6 py-2 bg-amber-500 text-white rounded-lg font-bold"><i class="fas fa-pen-to-square mr-2"></i>แก้ไขข้อมูล</button></div>`;
+                this.show(isRoad?'<i class="fas fa-road mr-2"></i>ทะเบียนสายทางที่ได้รับถ่ายโอน':isHistorical?'<i class="fas fa-clock-rotate-left mr-2"></i>ประวัติโครงการที่ดำเนินการแล้ว':'<i class="fas fa-file-circle-plus mr-2"></i>รายละเอียดโครงการเสนอเข้าแผน',isRoad?'bg-pink-700':isHistorical?'bg-green-700':'bg-blue-700',body,footer,'max-w-3xl');
+            },
+            openRoadEdit(id){
+                const road=this.get(id);if(!road)return window.showToast('ไม่พบข้อมูลสายทางสำหรับแก้ไข','warning');
+                this.openForm(id);
             },
             async remove(id){ const p=this.get(id);if(!p||!confirm(`ยืนยันลบโครงการ “${this.name(p)}” หรือไม่?`))return;try{const {doc,deleteDoc}=window.FirebaseModule;await deleteDoc(doc(db,'artifacts',appId,'public','data','pmis_projects',id));window.showToast('ลบโครงการแล้ว','success');this.openSearch();}catch(e){window.showToast('ลบไม่สำเร็จ: '+e.message,'error');} },
             openAnalyze(){ const body=`<div class="flex flex-col md:flex-row gap-3 justify-between bg-white border rounded p-3 mb-4"><label class="font-bold">กรองตามอำเภอ: <select id="co-analyze-district" onchange="CoordinationUI.renderAnalyze()" class="border rounded px-3 py-2 font-normal"><option value="">-- ดูทั้งหมดทุกอำเภอ --</option>${this.districts.map(d=>`<option>${d}</option>`).join('')}</select></label><span id="co-analyze-count" class="bg-fuchsia-100 text-fuchsia-700 px-4 py-2 rounded-full font-bold text-sm"></span></div><div class="overflow-auto bg-white border rounded max-h-[65vh]"><table class="w-full text-sm min-w-[1150px]"><thead class="sticky top-0 bg-gray-100"><tr><th class="p-3">ลำดับ</th><th class="p-3 text-left">อำเภอ / หน่วยงาน</th><th class="p-3 text-left">ข้อมูลโครงการ</th><th class="p-3 text-left">ผลการตรวจสอบพื้นที่ 4 ข้อ</th><th class="p-3">วิเคราะห์ความเหมาะสม</th><th class="p-3">ขั้นตอนดำเนินงาน</th></tr></thead><tbody id="co-analyze-body"></tbody></table></div>`;this.show('<i class="fas fa-chart-area mr-2"></i>วิเคราะห์ความเหมาะสมโครงการ','bg-fuchsia-700',body,`<div class="text-right"><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded font-bold">ปิด</button></div>`);this.renderAnalyze(); },
-            renderAnalyze(){ const dist=val('co-analyze-district');const rows=this.projects().filter(p=>!dist||p.district===dist);setTxt('co-analyze-count',`รวม ${rows.length} โครงการ`);$id('co-analyze-body').innerHTML=rows.map((p,i)=>{const chk=this.checklist(p),wf=getCoordinationStatus(p);return `<tr class="border-t hover:bg-fuchsia-50"><td class="p-3 text-center">${i+1}</td><td class="p-3">อ.${this.esc(p.district||'-')}<div class="text-xs text-gray-500">${this.esc(p.agencyName||'-')} (ลำดับ ${this.esc(p.seqNo||'-')})</div></td><td class="p-3 font-bold">${this.esc(this.name(p)||'-')}</td><td class="p-3 text-xs leading-6">${['ขนาดพื้นที่','พิกัดถูกต้อง','ความพร้อมพื้นที่','หนังสืออนุญาต'].map((t,j)=>`<div class="${chk[`chk${j+1}`]?'text-emerald-600':'text-red-500'}">${chk[`chk${j+1}`]?'✓':'✗'} ${j+1}. ${t}</div>`).join('')}</td><td class="p-3"><select onchange="CoordinationUI.updateAnalysis('${p.id}',this.value)" class="w-full border rounded p-2 font-bold"><option ${this.analysisStatus(p)==='รอพิจารณา'?'selected':''}>รอพิจารณา</option><option ${this.analysisStatus(p)==='เหมาะสม'?'selected':''}>เหมาะสม</option><option ${this.analysisStatus(p)==='ไม่เหมาะสม'?'selected':''}>ไม่เหมาะสม</option></select></td><td class="p-3 min-w-[285px]"><select onchange="CoordinationUI.updateWorkflow('${p.id}',this.value)" ${p.ordinanceActive?'disabled':''} class="w-full border border-indigo-200 rounded p-2 font-bold ${p.ordinanceActive?'bg-indigo-100 text-indigo-800':'bg-white'}">${this.workflowOptions(wf)}</select>${wf==='ได้รับคัดเลือกเข้าสู่ข้อบัญญัติ'?`<button onclick="CoordinationUI.upgrade('${p.id}')" class="mt-2 w-full bg-indigo-700 text-white rounded p-2 font-bold text-xs">ยกระดับเข้าแฟ้มข้อบัญญัติ</button>`:''}${p.ordinanceActive?`<button onclick="CoordinationUI.openFolder()" class="mt-2 w-full bg-indigo-100 text-indigo-800 rounded p-2 font-bold text-xs">เปิดแฟ้มข้อบัญญัติ</button>`:''}</td></tr>`;}).join('')||'<tr><td colspan="6" class="p-10 text-center">ไม่มีข้อมูล</td></tr>'; },
+            renderAnalyze(){ const dist=val('co-analyze-district');const rows=this.planningProjects().filter(p=>!dist||p.district===dist);setTxt('co-analyze-count',`รวม ${rows.length} โครงการ`);$id('co-analyze-body').innerHTML=rows.map((p,i)=>{const chk=this.checklist(p),wf=getCoordinationStatus(p);return `<tr class="border-t hover:bg-fuchsia-50"><td class="p-3 text-center">${i+1}</td><td class="p-3">อ.${this.esc(p.district||'-')}<div class="text-xs text-gray-500">${this.esc(p.agencyName||'-')} (ลำดับ ${this.esc(p.seqNo||'-')})</div></td><td class="p-3 font-bold">${this.esc(this.name(p)||'-')}</td><td class="p-3 text-xs leading-6">${['ขนาดพื้นที่','พิกัดถูกต้อง','ความพร้อมพื้นที่','หนังสืออนุญาต'].map((t,j)=>`<div class="${chk[`chk${j+1}`]?'text-emerald-600':'text-red-500'}">${chk[`chk${j+1}`]?'✓':'✗'} ${j+1}. ${t}</div>`).join('')}</td><td class="p-3"><select onchange="CoordinationUI.updateAnalysis('${p.id}',this.value)" class="w-full border rounded p-2 font-bold"><option ${this.analysisStatus(p)==='รอพิจารณา'?'selected':''}>รอพิจารณา</option><option ${this.analysisStatus(p)==='เหมาะสม'?'selected':''}>เหมาะสม</option><option ${this.analysisStatus(p)==='ไม่เหมาะสม'?'selected':''}>ไม่เหมาะสม</option></select></td><td class="p-3 min-w-[285px]"><select onchange="CoordinationUI.updateWorkflow('${p.id}',this.value)" ${p.ordinanceActive?'disabled':''} class="w-full border border-indigo-200 rounded p-2 font-bold ${p.ordinanceActive?'bg-indigo-100 text-indigo-800':'bg-white'}">${this.workflowOptions(wf)}</select>${wf==='ได้รับคัดเลือกเข้าสู่ข้อบัญญัติ'?`<button onclick="CoordinationUI.upgrade('${p.id}')" class="mt-2 w-full bg-indigo-700 text-white rounded p-2 font-bold text-xs">ยกระดับเข้าแฟ้มข้อบัญญัติ</button>`:''}${p.ordinanceActive?`<button onclick="CoordinationUI.openFolder()" class="mt-2 w-full bg-indigo-100 text-indigo-800 rounded p-2 font-bold text-xs">เปิดแฟ้มข้อบัญญัติ</button>`:''}</td></tr>`;}).join('')||'<tr><td colspan="6" class="p-10 text-center">ไม่มีข้อมูล</td></tr>'; },
             async updateAnalysis(id,status){const p=this.get(id);if(!p)return;p.coordinationAnalysisStatus=status;await saveDataToDB(p,id);window.showToast('อัปเดตผลวิเคราะห์แล้ว','success');},
             async updateWorkflow(id,status){const p=this.get(id);if(!p)return;const old=getCoordinationStatus(p);p.workflowStatus=status;p.coordinationStatus=status;p.workflowHistoryStr=JSON.stringify([...(this.parse(p.workflowHistoryStr,p.workflowHistory||[])),{from:old,to:status,at:new Date().toISOString()}]);await saveDataToDB(p,id);this.refreshBadge();window.showToast('อัปเดตขั้นตอนดำเนินงานแล้ว','success');setTimeout(()=>this.renderAnalyze(),100);},
             async upgrade(id){const p=this.get(id);if(!p||getCoordinationStatus(p)!=='ได้รับคัดเลือกเข้าสู่ข้อบัญญัติ')return window.showToast('ต้องกำหนดขั้นตอนเป็น “ได้รับคัดเลือกเข้าสู่ข้อบัญญัติ” ก่อน','warning');if(!confirm(`ยืนยันยกระดับโครงการ “${this.name(p)}” เข้าแฟ้มข้อบัญญัติหรือไม่?\nระบบจะสร้างแฟ้มใหม่โดยไม่ลบหรือเขียนทับข้อมูลต้นทาง`))return;const ordinanceId=p.ordinanceProjectId||`ORD_${id}`;const now=new Date().toISOString();const ordinance={...p,recordType:'ordinance',projectType:'ordinance',ordinanceActive:true,ordinanceStatus:'เตรียมดำเนินการ',sourceCoordinationId:id,workflowStatus:'โครงการข้อบัญญัติ',coordinationStatus:'โครงการข้อบัญญัติ',upgradedAt:now};await saveDataToDB(ordinance,ordinanceId);allProjectRecords[ordinanceId]=ordinance;p.ordinanceProjectId=ordinanceId;p.upgradedAt=now;p.workflowStatus='ยกระดับเป็นโครงการข้อบัญญัติแล้ว';p.coordinationStatus=p.workflowStatus;await saveDataToDB(p,id);allProjectRecords[id]=p;this.refreshBadge();window.showToast('สร้างแฟ้มข้อบัญญัติและเชื่อมโครงการต้นทางแล้ว','success');this.openFolder();},
@@ -1432,17 +1931,17 @@
             openFolder(){ const body=`<div class="flex gap-3 justify-between bg-white border rounded p-3 mb-4"><input id="co-folder-search" oninput="CoordinationUI.renderFolder()" placeholder="ค้นหาชื่อโครงการ อำเภอ หรือหน่วยงาน" class="w-full max-w-md border rounded px-4 py-2"><span id="co-folder-count" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full font-bold text-sm"></span></div><div class="overflow-auto bg-white border rounded max-h-[65vh]"><table class="w-full text-sm min-w-[950px]"><thead class="sticky top-0 bg-gray-100"><tr><th class="p-3">ลำดับ</th><th class="p-3 text-left">อำเภอ / หน่วยงาน</th><th class="p-3 text-left">โครงการข้อบัญญัติ</th><th class="p-3">สถานะ</th><th class="p-3">วันที่ยกระดับ</th><th class="p-3">ดำเนินการ</th></tr></thead><tbody id="co-folder-body"></tbody></table></div>`;this.show('<div><i class="fas fa-folder-tree mr-2"></i>แฟ้มโครงการข้อบัญญัติ<div class="text-indigo-100 text-xs mt-1">โครงการที่ยกระดับจากแฟ้มประสานแผน พร้อมเชื่อมโยงข้อมูลต้นทาง</div></div>','bg-indigo-700',body,`<div class="text-right"><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded font-bold">ปิด</button></div>`);this.renderFolder(); },
             renderFolder(){const kw=val('co-folder-search').toLowerCase();const rows=this.ordinances().filter(p=>`${p.district||''} ${p.agencyName||''} ${this.name(p)}`.toLowerCase().includes(kw));setTxt('co-folder-count',`รวม ${rows.length} โครงการ`);$id('co-folder-body').innerHTML=rows.map((p,i)=>`<tr class="border-t hover:bg-indigo-50"><td class="p-3 text-center">${i+1}</td><td class="p-3">อ.${this.esc(p.district||'-')}<div class="text-xs text-gray-500">${this.esc(p.agencyName||'-')}</div></td><td class="p-3 font-bold">${this.esc(this.name(p))}</td><td class="p-3 text-center"><span class="bg-indigo-100 text-indigo-800 rounded-full px-3 py-1 text-xs font-bold">${this.esc(p.ordinanceStatus||'เตรียมดำเนินการ')}</span></td><td class="p-3 text-center">${p.upgradedAt?new Date(p.upgradedAt).toLocaleDateString('th-TH'):'-'}</td><td class="p-3 text-center"><div class="flex flex-col gap-1"><button onclick="CoordinationUI.returnToConsideration('${p.id}')" class="bg-orange-100 text-orange-800 rounded p-2 font-bold text-xs">ส่งกลับพิจารณา</button><button onclick="CoordinationUI.openForm('${p.id}')" class="bg-amber-100 text-amber-800 rounded p-2 font-bold text-xs">แก้ไขข้อมูล</button><button onclick="CoordinationUI.openDetail('${p.id}')" class="bg-sky-100 text-sky-700 rounded p-2 font-bold text-xs">รายละเอียด</button><button onclick="CoordinationUI.openDetail('${p.sourceCoordinationId||''}')" class="bg-gray-100 text-gray-700 rounded p-2 font-bold text-xs">โครงการต้นทาง</button></div></td></tr>`).join('')||'<tr><td colspan="6" class="p-10 text-center text-gray-500">ยังไม่มีโครงการที่ยกระดับเป็นข้อบัญญัติ</td></tr>'; },
             async returnToConsideration(id){const ordinance=this.get(id),source=ordinance?.sourceCoordinationId?this.get(ordinance.sourceCoordinationId):null;if(!ordinance||!source||!confirm(`ยืนยันส่ง “${this.name(ordinance)}” กลับไปรอการพิจารณาหรือไม่?`))return;const now=new Date().toISOString();ordinance.ordinanceActive=false;ordinance.ordinanceStatus='ส่งกลับพิจารณา';ordinance.returnedToConsiderationAt=now;source.workflowStatus='รอการพิจารณา';source.coordinationStatus='รอการพิจารณา';source.ordinanceProjectId='';source.returnedFromOrdinanceAt=now;await saveDataToDB(ordinance,id);await saveDataToDB(source,ordinance.sourceCoordinationId);this.refreshBadge();window.showToast('ส่งโครงการต้นทางกลับไปรอการพิจารณาแล้ว','success');setTimeout(()=>this.openFolder(),150);},
-            openDashboard(){const ps=this.projects(),approved=ps.filter(p=>this.analysisStatus(p)==='เหมาะสม').length,pending=ps.filter(p=>this.analysisStatus(p)==='รอพิจารณา').length,budget=ps.reduce((s,p)=>s+(Number(this.budgets(p).b2569)||0),0);const body=`<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"><div class="bg-white p-4 rounded-xl border"><div class="text-sm text-gray-500 font-bold">โครงการทั้งหมด</div><div class="text-2xl font-black">${ps.length}</div></div><div class="bg-white p-4 rounded-xl border"><div class="text-sm text-gray-500 font-bold">พิจารณาเหมาะสม</div><div class="text-2xl font-black text-emerald-600">${approved}</div></div><div class="bg-white p-4 rounded-xl border"><div class="text-sm text-gray-500 font-bold">รอพิจารณา</div><div class="text-2xl font-black text-amber-600">${pending}</div></div><div class="bg-white p-4 rounded-xl border"><div class="text-sm text-gray-500 font-bold">รวมงบปี 2569</div><div class="text-xl font-black text-fuchsia-700">฿${budget.toLocaleString()}</div></div></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="bg-white p-5 rounded-xl border"><h4 class="font-bold text-center mb-4">จำนวนโครงการ แยกตามอำเภอ</h4><div class="h-72"><canvas id="co-chart-count"></canvas></div></div><div class="bg-white p-5 rounded-xl border"><h4 class="font-bold text-center mb-4">งบประมาณปี 2569 แยกตามอำเภอ</h4><div class="h-72"><canvas id="co-chart-budget"></canvas></div></div></div>`;this.show('<i class="fas fa-chart-pie mr-2"></i>Dashboard ผู้บริหาร','bg-amber-600',body);setTimeout(()=>this.renderDashboardCharts(ps),50);},
+            openDashboard(){const ps=this.planningProjects(),approved=ps.filter(p=>this.analysisStatus(p)==='เหมาะสม').length,pending=ps.filter(p=>this.analysisStatus(p)==='รอพิจารณา').length,budget=ps.reduce((s,p)=>s+(Number(this.budgets(p).b2569)||0),0);const body=`<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"><div class="bg-white p-4 rounded-xl border"><div class="text-sm text-gray-500 font-bold">โครงการทั้งหมด</div><div class="text-2xl font-black">${ps.length}</div></div><div class="bg-white p-4 rounded-xl border"><div class="text-sm text-gray-500 font-bold">พิจารณาเหมาะสม</div><div class="text-2xl font-black text-emerald-600">${approved}</div></div><div class="bg-white p-4 rounded-xl border"><div class="text-sm text-gray-500 font-bold">รอพิจารณา</div><div class="text-2xl font-black text-amber-600">${pending}</div></div><div class="bg-white p-4 rounded-xl border"><div class="text-sm text-gray-500 font-bold">รวมงบปี 2569</div><div class="text-xl font-black text-fuchsia-700">฿${budget.toLocaleString()}</div></div></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="bg-white p-5 rounded-xl border"><h4 class="font-bold text-center mb-4">จำนวนโครงการ แยกตามอำเภอ</h4><div class="h-72"><canvas id="co-chart-count"></canvas></div></div><div class="bg-white p-5 rounded-xl border"><h4 class="font-bold text-center mb-4">งบประมาณปี 2569 แยกตามอำเภอ</h4><div class="h-72"><canvas id="co-chart-budget"></canvas></div></div></div>`;this.show('<i class="fas fa-chart-pie mr-2"></i>Dashboard ผู้บริหาร','bg-amber-600',body);setTimeout(()=>this.renderDashboardCharts(ps),50);},
             renderDashboardCharts(ps){this.charts.forEach(c=>c.destroy?.());const cnt={},bud={};this.districts.forEach(d=>{cnt[d]=0;bud[d]=0});ps.forEach(p=>{if(cnt[p.district]!=null){cnt[p.district]++;bud[p.district]+=Number(this.budgets(p).b2569)||0;}});const labels=this.districts;this.charts=[new Chart($id('co-chart-count'),{type:'bar',data:{labels,datasets:[{data:labels.map(d=>cnt[d]),backgroundColor:'#3b82f6',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}}),new Chart($id('co-chart-budget'),{type:'doughnut',data:{labels,datasets:[{data:labels.map(d=>bud[d]),backgroundColor:['#ef4444','#f97316','#f59e0b','#84cc16','#10b981','#06b6d4','#3b82f6','#8b5cf6','#d946ef']}]},options:{responsive:true,maintainAspectRatio:false}})];},
-            openDataManager(){const body=`<div class="max-w-md mx-auto flex flex-col gap-3"><button onclick="CoordinationUI.exportCSV()" class="w-full bg-emerald-100 text-emerald-800 font-bold py-3 rounded-lg border border-emerald-300"><i class="fas fa-file-csv mr-2"></i>ส่งออกเป็นไฟล์ CSV</button><button onclick="CoordinationUI.backupJSON()" class="w-full bg-slate-100 text-slate-700 font-bold py-3 rounded-lg border"><i class="fas fa-file-code mr-2"></i>สำรองข้อมูลแบบเต็ม (JSON)</button><div class="bg-blue-50 border border-blue-200 text-blue-800 rounded p-3 text-xs">ส่งออกเฉพาะข้อมูลจากฐาน Highway เดิม ไม่มีการย้ายหรือลบข้อมูล</div></div>`;this.show('<i class="fas fa-database mr-2"></i>จัดการข้อมูล','bg-emerald-600',body);},
+            openDataManager(){const body=`<div class="max-w-md mx-auto flex flex-col gap-3"><button onclick="CoordinationUI.openDataAudit()" class="w-full bg-rose-100 text-rose-800 font-bold py-3 rounded-lg border border-rose-300"><i class="fas fa-clipboard-check mr-2"></i>ตรวจสอบความครบถ้วนก่อนล้างข้อมูล</button><button onclick="CoordinationUI.exportCSV()" class="w-full bg-emerald-100 text-emerald-800 font-bold py-3 rounded-lg border border-emerald-300"><i class="fas fa-file-csv mr-2"></i>ส่งออกเป็นไฟล์ CSV</button><button onclick="CoordinationUI.backupJSON()" class="w-full bg-slate-100 text-slate-700 font-bold py-3 rounded-lg border"><i class="fas fa-file-code mr-2"></i>สำรองข้อมูลแบบเต็ม (JSON)</button><div class="bg-blue-50 border border-blue-200 text-blue-800 rounded p-3 text-xs">หน้าตรวจสอบและการส่งออกไม่มีการย้าย แก้ไข หรือลบข้อมูลในฐาน</div></div>`;this.show('<i class="fas fa-database mr-2"></i>จัดการข้อมูล','bg-emerald-600',body);},
             download(name,type,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},
-            exportCSV(){let csv='\uFEFFอำเภอ,หน่วยงาน,ชื่อโครงการ,งบ2566,งบ2567,งบ2568,งบ2569,งบ2570,สถานะ,ขั้นตอน\n';this.projects().forEach(p=>{const b=this.budgets(p),q=x=>`"${String(x??'').replace(/"/g,'""')}"`;csv+=[p.district,p.agencyName,this.name(p),b.b2566,b.b2567,b.b2568,b.b2569,b.b2570,this.analysisStatus(p),getCoordinationStatus(p)].map(q).join(',')+'\n';});this.download('highway_coordination_projects.csv','text/csv;charset=utf-8',csv);},
+            exportCSV(){let csv='\uFEFFอำเภอ,หน่วยงาน,ชื่อโครงการ,งบ2566,งบ2567,งบ2568,งบ2569,งบ2570,สถานะ,ขั้นตอน\n';this.planningProjects().forEach(p=>{const b=this.budgets(p),q=x=>`"${String(x??'').replace(/"/g,'""')}"`;csv+=[p.district,p.agencyName,this.name(p),b.b2566,b.b2567,b.b2568,b.b2569,b.b2570,this.analysisStatus(p),getCoordinationStatus(p)].map(q).join(',')+'\n';});this.download('highway_coordination_projects.csv','text/csv;charset=utf-8',csv);},
             backupJSON(){this.download('highway_coordination_backup.json','application/json',JSON.stringify(this.projects(),null,2));},
             openSpatial(){const layer=(key,label,icon)=>`<label class="block border rounded-lg p-3 hover:bg-teal-50 cursor-pointer"><div class="flex justify-between text-xs"><span class="font-bold"><i class="fas ${icon} w-5"></i>${label}</span><span id="co-spatial-${key}" class="text-gray-400">ยังไม่มีข้อมูล</span></div><input type="file" accept=".geojson,.json,.kml" class="hidden" onchange="CoordinationUI.importSpatial('${key}',this)"></label>`;const body=`<div class="grid grid-cols-1 xl:grid-cols-12 gap-4"><aside class="xl:col-span-4 space-y-4"><section class="bg-white border rounded-xl p-4"><h4 class="font-bold text-teal-800 mb-3">ชั้นข้อมูลกายภาพ</h4><div class="space-y-2">${layer('slope','ความลาดชัน','fa-mountain-sun')}${layer('flood','น้ำท่วมซ้ำซาก','fa-water')}${layer('community','ชุมชน/ประชากร','fa-house-user')}${layer('road','โครงข่ายถนน','fa-road')}${layer('facility','สถานที่สำคัญ','fa-school')}</div></section><section class="bg-white border rounded-xl p-4"><h4 class="font-bold text-teal-800 mb-3">น้ำหนักการวิเคราะห์</h4><div class="grid grid-cols-2 gap-2 text-xs">${[['slope',20],['flood',20],['community',25],['road',25],['facility',10]].map(x=>`<label>${({slope:'ลาดชัน',flood:'น้ำท่วม',community:'ชุมชน',road:'เชื่อมถนน',facility:'สถานที่'})[x[0]]} (%)<input id="co-w-${x[0]}" type="number" value="${x[1]}" class="mt-1 w-full border rounded p-2"></label>`).join('')}<label>รัศมีชุมชน (ม.)<input id="co-buffer" type="number" value="500" class="mt-1 w-full border rounded p-2"></label></div><button onclick="CoordinationUI.runSpatial()" class="mt-3 w-full bg-teal-700 text-white rounded p-3 font-bold">วิเคราะห์และจัดอันดับ</button></section></aside><main class="xl:col-span-8"><div class="grid grid-cols-3 gap-3 mb-4"><div class="bg-white border rounded p-3"><small>โครงการที่วิเคราะห์</small><div id="co-sp-count" class="text-2xl font-bold">0</div></div><div class="bg-white border rounded p-3"><small>ข้อมูลครบเฉลี่ย</small><div id="co-sp-confidence" class="text-2xl font-bold text-blue-700">0%</div></div><div class="bg-white border rounded p-3"><small>ระดับ A</small><div id="co-sp-a" class="text-2xl font-bold text-emerald-700">0</div></div></div><div class="bg-white border rounded overflow-auto max-h-[60vh]"><table class="w-full text-xs min-w-[850px]"><thead class="sticky top-0 bg-gray-100"><tr><th class="p-3">อันดับ</th><th class="p-3 text-left">โครงการ</th><th class="p-3">คะแนน</th><th class="p-3">ระดับ</th><th class="p-3">ข้อมูลครบ</th><th class="p-3">ลาดชัน</th><th class="p-3">น้ำท่วม</th><th class="p-3">ชุมชน</th><th class="p-3">เชื่อมถนน</th><th class="p-3">สถานที่</th></tr></thead><tbody id="co-sp-body"><tr><td colspan="10" class="p-10 text-center text-gray-400">นำเข้าชั้นข้อมูลแล้วกดวิเคราะห์</td></tr></tbody></table></div></main></div>`;this.show('<div><i class="fas fa-layer-group mr-2"></i>วิเคราะห์ความเหมาะสมเชิงพื้นที่<div class="text-teal-100 text-xs mt-1">วิเคราะห์โครงการถนนจากชั้นข้อมูล GIS พร้อมคะแนนและความครบถ้วน</div></div>','bg-teal-700',body,`<div class="flex justify-between text-xs text-gray-500"><span>ผลวิเคราะห์เป็นข้อมูลประกอบ ต้องตรวจสอบกับการสำรวจภาคสนาม</span><button onclick="CoordinationUI.close()" class="px-5 py-2 bg-gray-200 rounded font-bold">ปิด</button></div>`);},
             importSpatial(key,input){const f=input.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{let fc;if(f.name.toLowerCase().endsWith('.kml')){const layer=omnivore.kml.parse(r.result);fc=layer.toGeoJSON();}else fc=JSON.parse(r.result);if(fc.type==='Feature')fc={type:'FeatureCollection',features:[fc]};if(!Array.isArray(fc.features))throw new Error('รูปแบบชั้นข้อมูลไม่ถูกต้อง');this.spatialLayers[key]=fc;const el=$id(`co-spatial-${key}`);el.textContent=`${fc.features.length} รายการ`;el.className='text-emerald-700 font-bold';window.showToast('นำเข้าชั้นข้อมูลแล้ว','success');}catch(e){window.showToast('อ่านชั้นข้อมูลไม่สำเร็จ: '+e.message,'error');}};r.readAsText(f);},
             projectFeature(p){if(typeof turf==='undefined')return null;const pts=Array.isArray(p.linePoints)?p.linePoints.map(x=>[Number(x.lng??x[1]),Number(x.lat??x[0])]).filter(x=>x.every(Number.isFinite)):[];if(pts.length>1)return turf.lineString(pts);const c=this.coords(p);if(Number.isFinite(Number(c.startLat))&&Number.isFinite(Number(c.startLng)))return turf.point([Number(c.startLng),Number(c.startLat)]);return null;},
             factorScore(key,feature,buffer){const fc=this.spatialLayers[key];if(!fc)return null;try{const center=turf.centroid(feature);if(key==='slope'){let vals=fc.features.filter(x=>turf.booleanIntersects(turf.buffer(feature,0.03,{units:'kilometers'}),x)).map(x=>Number(x.properties?.slope_pct??x.properties?.slope)).filter(Number.isFinite);return vals.length?Math.max(0,100-Math.max(...vals)*5):70;}if(key==='flood')return fc.features.some(x=>turf.booleanIntersects(turf.buffer(feature,0.01,{units:'kilometers'}),x))?10:100;const distances=fc.features.map(x=>turf.distance(center,turf.centroid(x),{units:'kilometers'})*1000).filter(Number.isFinite);const min=distances.length?Math.min(...distances):99999;if(key==='community')return Math.max(0,100-min/Math.max(1,buffer)*50);if(key==='road')return Math.max(0,100-min/10);return Math.max(0,100-min/20);}catch{return 0;}},
-            runSpatial(){const weights={};['slope','flood','community','road','facility'].forEach(k=>weights[k]=Math.max(0,Number(val(`co-w-${k}`))||0));const total=Object.values(weights).reduce((a,b)=>a+b,0);if(total!==100)return window.showToast(`รวมน้ำหนักต้องเท่ากับ 100% (ปัจจุบัน ${total}%)`,'warning');const buffer=Number(val('co-buffer'))||500;this.spatialResults=this.projects().map(p=>{const f=this.projectFeature(p);if(!f)return {...p,score:0,confidence:0,grade:'-',factors:{}};let used=0,sum=0,factors={};Object.keys(weights).forEach(k=>{const s=this.factorScore(k,f,buffer);factors[k]=s;if(s!=null){used+=weights[k];sum+=s*weights[k];}});const score=used?sum/used:0,confidence=used;return {...p,score,confidence,grade:score>=80?'A':score>=65?'B':score>=50?'C':'D',factors};}).sort((a,b)=>b.score-a.score);setTxt('co-sp-count',this.spatialResults.length);setTxt('co-sp-confidence',`${this.spatialResults.length?Math.round(this.spatialResults.reduce((s,p)=>s+p.confidence,0)/this.spatialResults.length):0}%`);setTxt('co-sp-a',this.spatialResults.filter(p=>p.grade==='A').length);$id('co-sp-body').innerHTML=this.spatialResults.map((p,i)=>`<tr class="border-t"><td class="p-3 text-center">${i+1}</td><td class="p-3 font-bold">${this.esc(this.name(p))}</td><td class="p-3 text-center font-black">${p.score.toFixed(1)}</td><td class="p-3 text-center">${p.grade}</td><td class="p-3 text-center">${p.confidence}%</td>${['slope','flood','community','road','facility'].map(k=>`<td class="p-3 text-center">${p.factors[k]==null?'-':p.factors[k].toFixed(0)}</td>`).join('')}</tr>`).join('');}
+            runSpatial(){const weights={};['slope','flood','community','road','facility'].forEach(k=>weights[k]=Math.max(0,Number(val(`co-w-${k}`))||0));const total=Object.values(weights).reduce((a,b)=>a+b,0);if(total!==100)return window.showToast(`รวมน้ำหนักต้องเท่ากับ 100% (ปัจจุบัน ${total}%)`,'warning');const buffer=Number(val('co-buffer'))||500;this.spatialResults=this.planningProjects().map(p=>{const f=this.projectFeature(p);if(!f)return {...p,score:0,confidence:0,grade:'-',factors:{}};let used=0,sum=0,factors={};Object.keys(weights).forEach(k=>{const s=this.factorScore(k,f,buffer);factors[k]=s;if(s!=null){used+=weights[k];sum+=s*weights[k];}});const score=used?sum/used:0,confidence=used;return {...p,score,confidence,grade:score>=80?'A':score>=65?'B':score>=50?'C':'D',factors};}).sort((a,b)=>b.score-a.score);setTxt('co-sp-count',this.spatialResults.length);setTxt('co-sp-confidence',`${this.spatialResults.length?Math.round(this.spatialResults.reduce((s,p)=>s+p.confidence,0)/this.spatialResults.length):0}%`);setTxt('co-sp-a',this.spatialResults.filter(p=>p.grade==='A').length);$id('co-sp-body').innerHTML=this.spatialResults.map((p,i)=>`<tr class="border-t"><td class="p-3 text-center">${i+1}</td><td class="p-3 font-bold">${this.esc(this.name(p))}</td><td class="p-3 text-center font-black">${p.score.toFixed(1)}</td><td class="p-3 text-center">${p.grade}</td><td class="p-3 text-center">${p.confidence}%</td>${['slope','flood','community','road','facility'].map(k=>`<td class="p-3 text-center">${p.factors[k]==null?'-':p.factors[k].toFixed(0)}</td>`).join('')}</tr>`).join('');}
         };
         window.CoordinationUI=CoordinationUI;
 
@@ -1513,21 +2012,62 @@
 
         function buildPopupContent(id, data) {
             const e = escapeHtml;
+            if(window.CoordinationUI?.isRoadMaster(data)){
+                const length=window.CoordinationUI.roadLength(data);
+                const history=window.CoordinationUI.roadHistoricalProjects(id).sort((a,b)=>(Number(a.roadStartChainage)||0)-(Number(b.roadStartChainage)||0));
+                const plans=window.CoordinationUI.roadPlanProjects(id).sort((a,b)=>(Number(a.roadStartChainage)||0)-(Number(b.roadStartChainage)||0));
+                const children=[...history.map(p=>({p,kind:'history'})),...plans.map(p=>({p,kind:'plan'}))];
+                const projectRows=children.slice(0,6).map(({p,kind})=>{
+                    const start=Number(p.roadStartChainage)||0,end=Number(p.roadEndChainage)||0;
+                    const color=kind==='history'?'#15803d':'#1d4ed8',bg=kind==='history'?'#f0fdf4':'#eff6ff';
+                    const meta=kind==='history'?`ดำเนินการแล้ว${p.historicalYear?` · พ.ศ. ${e(p.historicalYear)}`:''}`:`เสนอเข้าแผน · ${e(getCoordinationStatus(p))}`;
+                    return `<div class="highway-map-card__project" style="border-left:4px solid ${color};background:${bg}"><div style="font-size:11px;font-weight:800;color:${color};overflow-wrap:anywhere">${e(CoordinationUI.name(p)||'ไม่มีชื่อโครงการ')}</div><div style="font-size:10px;color:#64748b;margin-top:3px">${meta}</div><div style="font-size:10px;color:#475569;margin-top:2px"><i class="fas fa-route" style="margin-right:4px"></i>${CoordinationUI.formatChainage(start)} – ${CoordinationUI.formatChainage(end)}</div></div>`;
+                }).join('');
+                const more=children.length>6?`<div style="font-size:10px;color:#64748b;text-align:center;margin-top:7px">และอีก ${children.length-6} โครงการ — คลิกเพื่อดูทั้งหมด</div>`:'';
+                return `<div class="highway-map-card">
+                    <div class="highway-map-card__head" style="background:#fdf2f8">
+                        <span class="highway-map-card__badge" style="background:#fce7f3;color:#9d174d;border:1px solid #fbcfe8"><i class="fas fa-road"></i>สายทางหลักที่ได้รับถ่ายโอน</span>
+                        <div class="highway-map-card__title" style="color:#9d174d">${e(data.name||'ไม่มีชื่อสายทาง')}</div>
+                    </div>
+                    <div class="highway-map-card__body">
+                        ${data.district?`<div class="highway-map-card__row"><span class="highway-map-card__label">อำเภอ</span><span class="highway-map-card__value">${e(data.district)}</span></div>`:''}
+                        <div class="highway-map-card__row"><span class="highway-map-card__label">ความยาว</span><span class="highway-map-card__value">${(length/1000).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:3})} กม.</span></div>
+                        <div class="highway-map-card__row"><span class="highway-map-card__label">โครงการในสาย</span><span class="highway-map-card__value"><span style="color:#15803d">เดิม ${history.length}</span> · <span style="color:#1d4ed8">เสนอ ${plans.length}</span></span></div>
+                        ${children.length?`<div style="font-size:11px;font-weight:800;color:#334155;margin:9px 0 6px"><i class="fas fa-list-check" style="margin-right:5px"></i>รายละเอียดโครงการบนสายทาง</div>${projectRows}${more}`:`<div style="margin-top:8px;padding:9px;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;text-align:center">ยังไม่มีโครงการเชื่อมโยงกับสายทางนี้</div>`}
+                    </div>
+                    <div class="highway-map-card__foot" style="color:#9d174d;background:#fff7fb"><i class="fas fa-hand-pointer" style="margin-right:5px"></i>คลิกเพื่อเปิดทะเบียนสายทางและจัดการโครงการ</div>
+                </div>`;
+            }
+            if(window.CoordinationUI?.isHistoricalProject(data)){
+                const name=CoordinationUI.name(data)||'ไม่มีชื่อโครงการ',distance=Number(data.distance)||0,budget=Number(data.budget)||0;
+                return `<div class="highway-map-card">
+                    <div class="highway-map-card__head" style="background:#f0fdf4"><span class="highway-map-card__badge" style="background:#dcfce7;color:#166534;border:1px solid #bbf7d0"><i class="fas fa-clock-rotate-left"></i>โครงการที่ดำเนินการแล้ว</span><div class="highway-map-card__title" style="color:#166534">${e(name)}</div></div>
+                    <div class="highway-map-card__body">
+                        <div class="highway-map-card__row"><span class="highway-map-card__label">ปีงบประมาณ</span><span class="highway-map-card__value">พ.ศ. ${e(data.historicalYear||'-')}</span></div>
+                        <div class="highway-map-card__row"><span class="highway-map-card__label">ประเภทงาน</span><span class="highway-map-card__value">${e(data.historicalWorkType||'-')}</span></div>
+                        ${data.parentRoadName?`<div class="highway-map-card__row"><span class="highway-map-card__label">สายทางหลัก</span><span class="highway-map-card__value">${e(data.parentRoadName)}</span></div>`:''}
+                        ${distance>0?`<div class="highway-map-card__row"><span class="highway-map-card__label">ระยะทาง</span><span class="highway-map-card__value">${distance.toLocaleString('th-TH',{maximumFractionDigits:2})} เมตร</span></div>`:''}
+                        ${budget>0?`<div class="highway-map-card__row"><span class="highway-map-card__label">งบประมาณ</span><span class="highway-map-card__value">${budget.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} บาท</span></div>`:''}
+                    </div>
+                    <div class="highway-map-card__foot" style="color:#166534;background:#f7fff9"><i class="fas fa-hand-pointer" style="margin-right:5px"></i>คลิกเพื่อดูรายละเอียดและแก้ไขข้อมูล</div>
+                </div>`;
+            }
             if (data.recordType === 'project') {
                 const name = CoordinationUI.name(data) || 'ไม่มีชื่อโครงการ';
                 const workflow = getCoordinationStatus(data);
                 const distance = Number(data.distance) || 0;
-                return `<div class="font-sans w-56 md:w-64 whitespace-normal break-words">
-                    <div style="display:block!important;color:#1e40af!important;font-size:13px!important;font-weight:700!important;line-height:1.45!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;padding:0 0 6px 0!important;margin:0 0 6px 0!important;border-bottom:1px solid #e5e7eb!important">
-                        <i class="fas fa-diagram-project" style="margin-right:5px"></i><span>ชื่อโครงการ: ${e(name)}</span>
+                const budget=Number(data.budget)||0;
+                return `<div class="highway-map-card">
+                    <div class="highway-map-card__head" style="background:#eff6ff"><span class="highway-map-card__badge" style="background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe"><i class="fas fa-file-circle-plus"></i>โครงการเสนอเข้าแผน · ลำดับ ${e(data.seqNo||1)}</span><div class="highway-map-card__title" style="color:#1e40af">${e(name)}</div></div>
+                    <div class="highway-map-card__body">
+                        <div class="highway-map-card__row"><span class="highway-map-card__label">หน่วยงาน</span><span class="highway-map-card__value">${e(data.agencyName||'-')}</span></div>
+                        <div class="highway-map-card__row"><span class="highway-map-card__label">อำเภอ</span><span class="highway-map-card__value">${e(data.district||'-')}</span></div>
+                        ${data.parentRoadName?`<div class="highway-map-card__row"><span class="highway-map-card__label">สายทางหลัก</span><span class="highway-map-card__value">${e(data.parentRoadName)}</span></div>`:''}
+                        ${distance>0?`<div class="highway-map-card__row"><span class="highway-map-card__label">ระยะทาง</span><span class="highway-map-card__value">${distance.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} เมตร</span></div>`:''}
+                        ${budget>0?`<div class="highway-map-card__row"><span class="highway-map-card__label">งบประมาณ</span><span class="highway-map-card__value">${budget.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} บาท</span></div>`:''}
+                        <div class="highway-map-card__row"><span class="highway-map-card__label">สถานะ</span><span class="highway-map-card__value" style="color:#4338ca">${e(workflow)}</span></div>
                     </div>
-                    <div class="flex justify-between items-start text-[11px] text-gray-600 mb-2 gap-2">
-                        <div class="leading-tight"><i class="fas fa-building mr-1 text-gray-400"></i>${e(data.agencyName||'-')}<br><span class="text-gray-400 text-[10px] ml-3">(อ.${e(data.district||'-')})</span></div>
-                        <div class="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-bold whitespace-nowrap border border-slate-200 shadow-sm">ลำดับ ${e(data.seqNo||1)}</div>
-                    </div>
-                    ${distance>0?`<div class="text-sky-700 font-bold text-[11px] bg-sky-50/80 px-2 py-1 rounded border border-sky-100 mb-1.5"><i class="fas fa-ruler mr-1.5 text-sky-500"></i>ระยะทางบนแผนที่: ${distance.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} ม.</div>`:''}
-                    <div class="text-indigo-700 font-bold text-[11px] bg-indigo-50 px-2 py-1 rounded border border-indigo-100 mb-1.5"><i class="fas fa-route mr-1.5"></i>ขั้นตอน: ${e(workflow)}</div>
-                    <div class="text-indigo-600 text-[11px] font-bold mt-1 pt-1 border-t border-dashed border-gray-200 text-center"><i class="fas fa-hand-pointer mr-1"></i>คลิกเพื่อดูรายละเอียด</div>
+                    <div class="highway-map-card__foot" style="color:#1d4ed8;background:#f7faff"><i class="fas fa-hand-pointer" style="margin-right:5px"></i>คลิกเพื่อดูรายละเอียดโครงการ</div>
                 </div>`;
             }
             return `<div class="font-sarabun min-w-[200px] max-w-[300px]"><h4 class="font-bold text-blue-800 text-sm border-b pb-1.5 mb-2">${e(data.name||'ไม่มีชื่อ')}</h4>${data.distance?`<div class="text-green-700 font-bold text-xs"><i class="fas fa-route mr-1"></i>${Number(data.distance).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})} ม.</div>`:''}</div>`;
@@ -1537,7 +2077,9 @@
         function drawProjectOnMap(id, data) {
             if (loadedMarkers[id]) removeProjectFromMap(id); 
             let mapLayer = null;
-            
+            const isRoad=window.CoordinationUI?.isRoadMaster(data);
+            const isHistorical=!isRoad&&window.CoordinationUI?.isHistoricalProject(data);
+            const isPlanProposal=!isRoad&&!isHistorical&&data.recordType==='project'&&!!(data.parentRoadId||data.coordinationEntrySource==='coordination'||data.coordinationBudgetStr);
             const popupContent = buildPopupContent(id, data);
 
             if (data.recordType === 'issue') {
@@ -1547,10 +2089,10 @@
                 mapLayer = L.marker([data.lat, data.lng], { icon: createCustomIcon(data.color, data.icon, data.pinSize) }).addTo(map);
             }
             else if (data.type === 'line' || data.type === 'polygon') {
-                const lColor = data.lineColor || data.color || '#3b82f6';
-                const lWeight = data.lineWeight || 6;
-                const lStyle = data.lineStyle === 'dashed' ? '10, 10' : null;
-                const options = { color: lColor, weight: lWeight, opacity: 0.9, dashArray: lStyle, className: 'project-polyline' };
+                const lColor = isRoad?'#db2777':(isHistorical?'#16a34a':(isPlanProposal?'#2563eb':(data.lineColor||data.color||'#3b82f6')));
+                const lWeight = isRoad?5:(isHistorical?7:(isPlanProposal?8:(data.lineWeight||6)));
+                const lStyle = (isPlanProposal||isHistorical)?null:(data.lineStyle === 'dashed' ? '10, 10' : null);
+                const options = { color: lColor, weight: lWeight, opacity: isRoad?0.82:0.92, dashArray: lStyle, className: isRoad?'transferred-road-polyline':(isHistorical?'historical-project-polyline':(isPlanProposal?'plan-proposal-polyline':'project-polyline')) };
                 
                 if (data.type === 'polygon') {
                     options.fillColor = lColor;
@@ -1561,12 +2103,12 @@
                 }
             }
             else if (data.type === 'kml') {
-                const kColor = data.lineColor || data.color || '#9333ea';
-                const kWeight = data.lineWeight || 5;
+                const kColor = isRoad?'#db2777':(data.lineColor||data.color||'#9333ea');
+                const kWeight = isRoad?5:(data.lineWeight||5);
                 const kStyle = data.lineStyle === 'dashed' ? '10, 10' : null;
                 
                 const customLayer = L.geoJson(null, { 
-                    style: function(f) { return { color: kColor, weight: kWeight, opacity: 0.8, dashArray: kStyle }; },
+                    style: function(f) { return { color: kColor, weight: kWeight, opacity: 0.8, dashArray: kStyle, className:isRoad?'transferred-road-polyline':'project-polyline' }; },
                     coordsToLatLng: function (coords) {
                         if (!coords || isNaN(coords[0]) || isNaN(coords[1])) return new L.LatLng(0, 0);
                         return new L.LatLng(coords[1], coords[0], coords[2]);
@@ -1578,10 +2120,12 @@
             }
             
             if (mapLayer) {
-                if(data.recordType === 'project') mapLayer.bindTooltip(popupContent, { direction:'auto', sticky:true, className:'bg-white px-3 py-2.5 rounded-lg shadow-lg border border-gray-200', opacity:1 });
+                if(isRoad)mapLayer.bringToBack?.();else if(isPlanProposal||isHistorical)mapLayer.bringToFront?.();
+                if(isRoad||(data.recordType === 'project'&&!isRoad)) mapLayer.bindTooltip(popupContent, { direction:'auto', sticky:true, className:'highway-hover-card', opacity:1, offset:[12,12] });
                 else mapLayer.bindPopup(popupContent, { autoPanPadding: [50, 50] });
                 mapLayer.projectData = data; 
-                mapLayer.on('click', function() { if(data.recordType === 'project') CoordinationUI.openDetail(id); else window.selectProject(id); });
+                mapLayer.on('tooltipopen',function(){if(window.CoordinationUI?.pickMode)this.closeTooltip?.();});
+                mapLayer.on('click', function() { if(window.CoordinationUI?.pickMode)return;if(isRoad)CoordinationUI.openDetail(id);else if(data.recordType === 'project') CoordinationUI.openDetail(id); else window.selectProject(id); });
                 loadedMarkers[id] = mapLayer;
             }
             return mapLayer;
@@ -1987,7 +2531,7 @@
                             if (l instanceof L.Marker || l instanceof L.CircleMarker) {
                                 let ll = l.getLatLng(); if (ll.lat === 0 && ll.lng === 0) return; 
                                 if (currentImportTarget === 'material') pendingImportData.push({ recordType: 'material', materialType: materialTypeFromForm, name: fName, type: 'point', lat: ll.lat, lng: ll.lng, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
-                                else pendingImportData.push({ recordType: 'project', name: fName, district: 'เมืองพิษณุโลก', type: 'point', color: '#9333ea', icon: 'fa-map-marker-alt', lat: ll.lat, lng: ll.lng, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
+                                else if(currentImportTarget !== 'road') pendingImportData.push({ recordType: 'project', name: fName, district: 'เมืองพิษณุโลก', type: 'point', color: '#9333ea', icon: 'fa-map-marker-alt', lat: ll.lat, lng: ll.lng, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
                             } else if (l instanceof L.Polyline || l instanceof L.Polygon) {
                                 function flattenLatLngs(arr) { let res = []; arr.forEach(item => { if (Array.isArray(item)) res = res.concat(flattenLatLngs(item)); else if (item && typeof item.lat !== 'undefined' && !(item.lat === 0 && item.lng === 0)) res.push(item); }); return res; }
                                 let linePts = flattenLatLngs(l.getLatLngs()); 
@@ -2000,6 +2544,7 @@
                                     let eLat = linePts[linePts.length-1].lat; let eLng = linePts[linePts.length-1].lng;
 
                                     if (currentImportTarget === 'material') pendingImportData.push({ recordType: 'material', materialType: materialTypeFromForm, name: fName, type: shapeType, linePoints: linePts, distance: dist, startLat: sLat, startLng: sLng, endLat: eLat, endLng: eLng, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
+                                    else if(currentImportTarget === 'road') pendingImportData.push({ recordType:'road',roadRole:'transferred_road',isTransferredRoad:true,dataCategory:'transferred_road',name:fName,type:'line',linePoints:linePts,distance:dist,startLat:sLat,startLng:sLng,endLat:eLat,endLng:eLng,importedRawData:cleanProps,sourceFile:file.name,createdAt:Date.now()+pendingImportData.length });
                                     else pendingImportData.push({ recordType: 'project', name: fName, district: 'เมืองพิษณุโลก', type: shapeType, lineColor: '#9333ea', lineWeight: 5, lineStyle: 'solid', linePoints: linePts, distance: dist, startLat: sLat, startLng: sLng, endLat: eLat, endLng: eLng, importedRawData: cleanProps, sourceFile: file.name, createdAt: Date.now() + pendingImportData.length });
                                 }
                             }
@@ -2053,33 +2598,6 @@
             } catch (error) { console.error(error); window.showToast('เกิดข้อผิดพลาดในการอ่านไฟล์', 'error'); }
             e.target.value = '';
         }
-
-        // 🟢 บันทึกการตั้งค่าสีลงไปในข้อมูลนำเข้า 🟢
-        addEvent('btn-confirm-import', 'click', async () => { 
-            const batchColor = val('import-batch-color') || '#9333ea';
-            const batchWeight = parseInt(val('import-batch-weight')) || 6;
-            
-            const inputs = document.querySelectorAll('.import-name-input'); 
-            inputs.forEach(input => { 
-                const idx = input.getAttribute('data-index'); 
-                pendingImportData[idx].name = input.value || `รายการนำเข้าที่ ${parseInt(idx)+1}`; 
-                
-                if (pendingImportData[idx].type === 'line' || pendingImportData[idx].type === 'polygon' || pendingImportData[idx].type === 'kml') {
-                    pendingImportData[idx].lineColor = batchColor;
-                    pendingImportData[idx].color = batchColor;
-                    pendingImportData[idx].lineWeight = batchWeight;
-                } else if (pendingImportData[idx].type === 'point') {
-                    pendingImportData[idx].color = batchColor;
-                }
-            }); 
-            
-            const im = document.getElementById('import-confirm-modal'); if(im) im.classList.add('hidden'); 
-            window.showToast('กำลังบันทึกข้อมูลเข้าสู่ระบบ...', 'info'); 
-            let successCount = 0; 
-            for (const data of pendingImportData) { data.isProcessed = false; await saveDataToDB(data); successCount++; } 
-            window.showToast(`นำเข้าสำเร็จ ${successCount} รายการ`, 'success'); 
-            pendingImportData = []; 
-        });
 
         // ==========================================
         // 🟢 8. ANALYSIS DASHBOARD & CHARTS
@@ -2569,7 +3087,7 @@
             
             // 🟢 Event ลอจิกสำหรับปุ่มนำเข้า KML ถนน 🟢
             addEvent('btn-import-kml-road', 'click', () => { 
-                currentImportTarget = 'project'; 
+                currentImportTarget = 'road'; 
                 setVal('import-batch-color', '#ec4899');
                 document.getElementById('import-modal-header').className = "bg-pink-600 text-white px-4 py-3 flex justify-between items-center shrink-0"; 
                 document.getElementById('import-modal-info').className = "bg-pink-50 text-pink-800 p-3 rounded-lg border border-pink-200 text-sm mb-3"; 
