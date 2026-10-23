@@ -137,8 +137,8 @@
 
                     <!-- เมนูหลักรูปแบบเดียวกับระบบประสานแผน โดยคง ID เดิมของ Highway -->
                     <div class="absolute top-6 left-6 max-md:top-4 max-md:left-4 z-[40] flex flex-col gap-2 w-64 max-md:w-12 max-h-[calc(100vh-130px)] overflow-y-auto custom-scrollbar pb-2 pointer-events-none">
-                        <button id="btn-open-add" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-gray-200 hover:bg-blue-50 text-blue-700 font-bold py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="ป้อนรายละเอียดโครงการ">
-                            <i class="fas fa-file-circle-plus w-6 text-center md:mr-3 text-lg"></i><span class="max-md:hidden">ป้อนรายละเอียดโครงการ</span>
+                        <button id="btn-open-add" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-pink-200 hover:bg-pink-50 text-pink-700 font-bold py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="เพิ่มทะเบียนสายทางถ่ายโอน">
+                            <i class="fas fa-road-circle-plus w-6 text-center md:mr-3 text-lg"></i><span class="max-md:hidden">เพิ่มสายทางถ่ายโอน</span>
                         </button>
                         <button id="btn-open-filter" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="ค้นหาโครงการ">
                             <i class="fas fa-magnifying-glass-location w-6 text-center md:mr-3 text-lg"></i><span class="max-md:hidden">ค้นหาโครงการ</span>
@@ -154,9 +154,6 @@
                         </button>
                         <button id="btn-spatial-analysis" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-teal-200 hover:bg-teal-50 text-teal-800 font-bold py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="วิเคราะห์ความเหมาะสมเชิงพื้นที่">
                             <i class="fas fa-layer-group w-6 text-center md:mr-3 text-lg text-teal-600"></i><span class="max-md:hidden">วิเคราะห์ความเหมาะสมเชิงพื้นที่</span>
-                        </button>
-                        <button id="btn-selected-folder" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-indigo-200 hover:bg-indigo-50 text-indigo-800 font-bold py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="แฟ้มโครงการข้อบัญญัติ">
-                            <i class="fas fa-folder-tree w-6 text-center md:mr-3 text-lg text-indigo-600"></i><span class="max-md:hidden">แฟ้มโครงการข้อบัญญัติ</span><span id="selected-folder-count" class="max-md:hidden ml-auto bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full border border-indigo-200">0</span>
                         </button>
                         <button id="btn-open-global-dashboard" class="pointer-events-auto bg-white/95 backdrop-blur-sm shadow-md border border-gray-200 hover:bg-amber-50 text-gray-700 font-medium py-3 px-4 max-md:p-3 rounded-lg text-sm flex items-center justify-start max-md:justify-center transition-all active:scale-95" title="Dashboard ผู้บริหาร">
                             <i class="fas fa-chart-pie w-6 text-center md:mr-3 text-lg text-amber-500"></i><span class="max-md:hidden">Dashboard ผู้บริหาร</span>
@@ -194,8 +191,18 @@
                         <button id="btn-center-map" class="pointer-events-auto bg-white w-10 h-10 flex items-center justify-center rounded shadow-lg text-blue-600 hover:bg-gray-50 mt-2 cursor-pointer"><i class="fas fa-location-crosshairs"></i></button>
                     </div>
 
+                    <!-- DISTRICT MAP FILTER -->
+                    <div class="absolute bottom-6 left-6 max-md:left-4 max-md:bottom-72 z-[40] bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-md border border-emerald-200 text-xs pointer-events-auto min-w-[220px] max-md:min-w-[190px]">
+                        <label for="map-district-filter" class="flex items-center gap-2 font-black text-emerald-800 mb-1.5"><i class="fas fa-filter"></i>กรองข้อมูลตามอำเภอ</label>
+                        <select id="map-district-filter" onchange="window.applyMapDistrictFilter(this.value)" class="w-full border border-emerald-200 rounded-md px-2.5 py-2 bg-white font-bold text-gray-700 outline-none focus:ring-2 focus:ring-emerald-200">
+                            <option value="">แสดงทุกอำเภอ</option>
+                            <option value="เมืองพิษณุโลก">เมืองพิษณุโลก</option><option value="นครไทย">นครไทย</option><option value="ชาติตระการ">ชาติตระการ</option><option value="บางระกำ">บางระกำ</option><option value="บางกระทุ่ม">บางกระทุ่ม</option><option value="พรหมพิราม">พรหมพิราม</option><option value="วัดโบสถ์">วัดโบสถ์</option><option value="วังทอง">วังทอง</option><option value="เนินมะปราง">เนินมะปราง</option>
+                        </select>
+                        <div id="map-district-filter-count" class="mt-1.5 text-[10px] text-emerald-700 font-bold">กำลังแสดงข้อมูลทุกอำเภอ</div>
+                    </div>
+
                     <!-- COORDINATES -->
-                    <div class="coord-card absolute bottom-6 left-6 max-md:left-4 z-[40] bg-white/95 backdrop-blur-sm p-2.5 rounded shadow-md border border-gray-200 text-xs flex flex-col gap-1 pointer-events-auto">
+                    <div class="coord-card absolute bottom-6 right-16 max-md:right-4 max-md:bottom-44 z-[40] bg-white/95 backdrop-blur-sm p-2.5 rounded shadow-md border border-gray-200 text-xs flex flex-col gap-1 pointer-events-auto">
                         <div class="flex items-center justify-between border-b border-gray-300 pb-1">
                         <i class="fas fa-globe text-blue-500"></i>
                         <select id="coord-format" class="bg-transparent font-bold text-gray-700 outline-none cursor-pointer border-none p-0 m-0"><option value="latlng">Lat / Long</option><option value="utm">UTM (Zone 47N)</option></select>
@@ -206,7 +213,7 @@
                     <!-- แยกประเภทข้อมูลบนแผนที่ให้ชัดเจน -->
                     <div id="road-project-legend" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-[40] bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-gray-200 text-xs pointer-events-auto flex flex-wrap items-center justify-center gap-x-5 gap-y-1 whitespace-nowrap">
                         <div class="font-black text-gray-700"><i class="fas fa-layer-group mr-1 text-gray-500"></i>ประเภทแนว</div>
-                        <div class="flex items-center gap-2"><span class="inline-block w-9 border-t-[5px] border-pink-600 rounded"></span><span><b class="text-pink-700">สายทางถ่ายโอน</b> <span class="text-gray-500">(สายทางแม่)</span></span></div>
+                        <div class="flex items-center gap-2"><span class="inline-block w-9 h-[5px] rounded" style="background:linear-gradient(90deg,#dc2626,#ea580c,#ca8a04,#16a34a,#0891b2,#2563eb,#7c3aed)"></span><span><b class="text-pink-700">สายทางถ่ายโอน</b> <span class="text-gray-500">(สีประจำอำเภอ/ปรับรายสาย)</span></span></div>
                         <div class="flex items-center gap-2"><span class="inline-block w-9 border-t-[7px] border-green-600 rounded"></span><span><b class="text-green-700">ดำเนินการแล้ว</b> <span class="text-gray-500">(ประวัติโครงการ)</span></span></div>
                         <div class="flex items-center gap-2"><span class="inline-flex items-center w-12"><i class="block w-2.5 h-2.5 rounded-full border-2 border-blue-600 bg-white"></i><i class="block grow border-t-[7px] border-violet-600"></i><i class="block w-2.5 h-2.5 rounded-full border-2 border-white bg-orange-600 shadow"></i></span><span><b class="text-blue-700">โครงการเสนอเข้าแผน</b> <span class="text-gray-500">(แยกสีรายช่วง · วงกลมคือต้น–ปลาย)</span></span></div>
                     </div>
@@ -938,6 +945,7 @@
         let tempEditTasks = []; 
         let tempEditSCurve = [];
         let currentFilter = { district: null, budgetType: null, year: null };
+        let activeMapDistrict = '';
 
         let map, googleStreets, googleSat;
         let currentMapType = 'street';
@@ -1133,6 +1141,7 @@
             unsubscribeProjects = onSnapshot(projectsRef, (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
                     let data = deserializeProjectData(change.doc.data());
+                    data.id = change.doc.id;
                     // ข้อมูล Highway เดิมไม่มี recordType: กำหนดเฉพาะในหน่วยความจำ
                     // เพื่อให้เมนูประสานแผนและรายงานมองเห็นข้อมูลเดิม โดยไม่เขียนทับฐานข้อมูล
                     if (!data.recordType) data.recordType = data.projectType === 'ordinance' ? 'ordinance' : 'project';
@@ -1170,6 +1179,7 @@
             
             const safeData = {};
             for (let k in dataToSave) {
+                if (k === 'id') continue;
                 if (dataToSave[k] !== undefined && typeof dataToSave[k] !== 'function') {
                     if (typeof dataToSave[k] === 'object' && dataToSave[k] !== null) {
                     } else { 
@@ -1190,7 +1200,8 @@
                 }
             } catch (e) { 
                 console.error(e); 
-                window.showToast('บันทึกข้อมูลออนไลน์ไม่สำเร็จ!', 'error'); 
+                window.showToast('บันทึกข้อมูลออนไลน์ไม่สำเร็จ: '+(e?.message||'ไม่ทราบสาเหตุ'), 'error');
+                return null;
             }
             return id;
         }
@@ -1259,9 +1270,10 @@
         // ใช้ collection เดิมและเพิ่มเฉพาะฟิลด์งานประสานแผนแบบ merge
         // ==========================================
         const CoordinationUI = {
-            host:null, editingId:null, editingRoadSegmentId:null, activeReportGroupId:null, activeRoadContext:null, selectedRoadId:null, selectedRoadDistrict:'', pendingRoadSegment:null, pendingNextProject:null, roadPreviewPanel:null, pickMode:null, route:[], roadDraftRoute:[], previewLayer:null, attachments:[], charts:[],
+            host:null, editingId:null, editingRoadSegmentId:null, editingTransferredRoadId:null, activeReportGroupId:null, activeRoadContext:null, selectedRoadId:null, selectedRoadDistrict:'', pendingRoadSegment:null, pendingNextProject:null, roadPreviewPanel:null, pickMode:null, route:[], roadDraftRoute:[], roadEditBackup:null, roadEditHistory:[], roadEditSelectedIndex:null, roadEditPolyline:null, roadRepairStartIndex:null, roadRepairEndIndex:null, roadRepairBusy:false, roadRepairController:null, roadColorTouched:false, previewLayer:null, attachments:[], charts:[],
             spatialLayers:{slope:null,flood:null,community:null,road:null,facility:null}, spatialResults:[],
             districts:['เมืองพิษณุโลก','นครไทย','ชาติตระการ','บางระกำ','บางกระทุ่ม','พรหมพิราม','วัดโบสถ์','วังทอง','เนินมะปราง'],
+            roadDistrictColors:{'เมืองพิษณุโลก':'#dc2626','นครไทย':'#2563eb','ชาติตระการ':'#7c3aed','บางระกำ':'#0891b2','บางกระทุ่ม':'#ea580c','พรหมพิราม':'#16a34a','วัดโบสถ์':'#ca8a04','วังทอง':'#db2777','เนินมะปราง':'#475569'},
             workflow:[
                 'รับเรื่อง','รอสำรวจ','อยู่ระหว่างสำรวจ','ตรวจสอบแล้ว','ส่งฝ่ายแผน','บรรจุแผนประจำปี','รอการพิจารณา',
                 'ได้รับคัดเลือกเข้าสู่ข้อบัญญัติ','ได้รับคัดเลือกเข้าสู่จ่ายขาดเงินสะสม','ได้รับคัดเลือกเข้าสู่โอนตั้งจ่ายรายการใหม่',
@@ -1270,7 +1282,7 @@
             init(){
                 if(!this.host){ this.host=document.createElement('div'); this.host.id='coordination-workflow-modal'; document.body.appendChild(this.host); }
                 const bindings={
-                    'btn-open-add':()=>this.openForm(), 'btn-open-filter':()=>this.openSearch(), 'btn-open-analyze-list':()=>this.openAnalyze(),
+                    'btn-open-add':()=>this.openTransferredRoadForm(), 'btn-open-filter':()=>this.openSearch(), 'btn-open-analyze-list':()=>this.openAnalyze(),
                     'btn-road-corridor-manager':()=>this.openRoadManager(),
                     'btn-spatial-analysis':()=>this.openSpatial(), 'btn-selected-folder':()=>this.openFolder(),
                     'btn-open-global-dashboard':()=>this.openDashboard(), 'btn-open-data-mgr':()=>this.openDataManager()
@@ -1279,6 +1291,7 @@
                 this.refreshBadge();
             },
             parse(value,fallback){ try{return typeof value==='string'?JSON.parse(value):(value??fallback);}catch{return fallback;} },
+            roadColor(value){const item=typeof value==='string'?{district:value}:(value||{}),custom=item.roadColorCustomized===true?String(item.roadDisplayColor||item.lineColor||''):'';return /^#[0-9a-f]{6}$/i.test(custom)?custom:(this.roadDistrictColors[String(item.district||'').trim()]||'#db2777');},
             isExplicitRoadMaster(p){
                 return !!p&&(p.recordType==='road'||p.roadRole==='transferred_road'||p.isTransferredRoad===true);
             },
@@ -1335,7 +1348,7 @@
                 });
             },
             ordinances(){ return getHighwayProjects().filter(p=>p.projectType==='ordinance'&&p.ordinanceActive!==false); },
-            get(id){ return allProjectRecords[id]||loadedMarkers[id]?.projectData||null; },
+            get(id){ const item=allProjectRecords[id]||loadedMarkers[id]?.projectData||null;return item?{...item,id:String(id)}:null; },
             name(p){ return String(p?.projectNameNew||p?.projectNameOld||p?.name||p?.title||'').trim(); },
             reportStem(p){
                 return String(p?.projectNameOld||p?.projectNameNew||p?.name||'')
@@ -1486,17 +1499,82 @@
                 roadContent?.insertAdjacentHTML('beforebegin',`<div class="flex justify-end mb-4"><button type="button" onclick="CoordinationUI.openTransferredRoadForm()" class="w-full md:w-auto bg-pink-700 hover:bg-pink-800 text-white rounded-lg px-5 py-2.5 font-black shadow-sm"><i class="fas fa-road-circle-plus mr-2"></i>เพิ่มสายทางถ่ายโอน / สร้างแนวสายทางแม่</button></div>`);
                 this.renderRoadManager();
             },
-            openTransferredRoadForm(){
-                this.roadDraftRoute=[];this.pickMode=null;if(this.previewLayer)this.previewLayer.clearLayers();
-                const body=`<div class="bg-pink-50 border border-pink-200 rounded-xl p-4 mb-4 text-sm text-pink-900"><div class="font-black"><i class="fas fa-road mr-2"></i>ทะเบียนสายทางที่ได้รับถ่ายโอน</div><div class="text-xs mt-1">ข้อมูลชุดนี้เป็นแนวสายทางแม่สำหรับใช้อ้างอิง ไม่ใช่โครงการเสนอเข้าแผนและไม่มีข้อมูลงบประมาณ</div></div><form onsubmit="return false" class="space-y-4"><section class="bg-white border rounded-xl p-4"><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="block text-sm font-bold mb-1">อำเภอ *</label><select id="co-new-road-district" class="w-full border rounded-lg px-3 py-2">${this.districtOptions(this.selectedRoadDistrict)}</select></div><div><label class="block text-sm font-bold mb-1">รหัสสายทาง</label><input id="co-new-road-code" placeholder="เช่น พล.ถ. 1-0033" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">ชื่อสายทาง *</label><input id="co-new-road-name" placeholder="เช่น แยกทางหลวงหมายเลข 2013 - บ้านวังชมพู" class="w-full border rounded-lg px-3 py-2"></div><div class="md:col-span-3"><label class="block text-sm font-bold mb-1">รายละเอียดสายทาง</label><textarea id="co-new-road-details" rows="2" placeholder="รายละเอียดการถ่ายโอน หน่วยงานเดิม หรือหมายเหตุ" class="w-full border rounded-lg px-3 py-2"></textarea></div></div></section><section class="bg-white border rounded-xl p-4"><h4 class="font-black text-pink-800 mb-3"><i class="fas fa-draw-polygon mr-2"></i>กำหนดแนวสายทางแม่</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3"><button type="button" onclick="CoordinationUI.beginTransferredRoadDraw()" class="bg-pink-700 hover:bg-pink-800 text-white rounded-lg px-4 py-3 font-black"><i class="fas fa-map-location-dot mr-2"></i>วาดแนวสายทางบนแผนที่</button><label class="bg-white text-pink-700 border-2 border-pink-300 hover:bg-pink-50 rounded-lg px-4 py-3 font-black text-center cursor-pointer"><i class="fas fa-file-import mr-2"></i>นำเข้าแนวสายทางจาก KML<input type="file" accept=".kml" class="hidden" onchange="CoordinationUI.importTransferredRoadKML(this)"></label></div><div id="co-new-road-status" class="bg-slate-50 border rounded-lg p-3 text-sm text-gray-600">ยังไม่ได้กำหนดแนวสายทาง กรุณาวาดบนแผนที่หรือนำเข้า KML</div><div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 text-xs"><div class="bg-gray-50 border rounded p-2"><span class="text-gray-500">จุดเริ่มต้น</span><div id="co-new-road-start" class="font-mono font-bold mt-1">-</div></div><div class="bg-gray-50 border rounded p-2"><span class="text-gray-500">จุดสิ้นสุด</span><div id="co-new-road-end" class="font-mono font-bold mt-1">-</div></div><div class="bg-pink-50 border border-pink-200 rounded p-2"><span class="text-pink-600">ความยาวสายทางทั้งหมด</span><div id="co-new-road-distance" class="font-black text-pink-800 text-lg mt-1">0.00 กม.</div></div></div></section></form>`;
-                const footer=`<div class="flex flex-wrap justify-between gap-3"><button onclick="CoordinationUI.openRoadManager()" class="px-5 py-2 bg-gray-200 rounded-lg font-bold"><i class="fas fa-arrow-left mr-1"></i>กลับหน้าบริหารสายทาง</button><button onclick="CoordinationUI.saveTransferredRoad()" class="px-6 py-2 bg-pink-700 hover:bg-pink-800 text-white rounded-lg font-black"><i class="fas fa-floppy-disk mr-2"></i>บันทึกเป็นสายทางถ่ายโอน</button></div>`;
-                this.show('<i class="fas fa-road-circle-plus mr-2"></i>เพิ่มทะเบียนสายทางที่ได้รับถ่ายโอน','bg-pink-700',body,footer,'max-w-4xl');
+            openTransferredRoadForm(roadId=null){
+                const road=roadId?this.get(roadId):null;
+                if(roadId&&(!road||!this.isRoadMaster(road)))return window.showToast('ไม่พบข้อมูลทะเบียนสายทางที่ต้องการแก้ไข','warning');
+                this.editingTransferredRoadId=roadId?String(roadId):(road?.id?String(road.id):null);this.roadColorTouched=road?.roadColorCustomized===true;
+                this.roadDraftRoute=(road?.linePoints||[]).map(p=>({lat:Number(p.lat??p[0]),lng:Number(p.lng??p[1])})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
+                this.pickMode=null;if(this.previewLayer)this.previewLayer.clearLayers();
+                const body=`<div class="bg-pink-50 border border-pink-200 rounded-xl p-4 mb-4 text-sm text-pink-900"><div class="font-black"><i class="fas fa-road mr-2"></i>ทะเบียนสายทางที่ได้รับถ่ายโอน</div><div class="text-xs mt-1">ข้อมูลชุดนี้เป็นแนวสายทางแม่สำหรับใช้อ้างอิง ไม่ใช่โครงการเสนอเข้าแผนและไม่มีข้อมูลงบประมาณ</div></div><form onsubmit="return false" class="space-y-4"><section class="bg-white border rounded-xl p-4"><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="block text-sm font-bold mb-1">อำเภอ *</label><select id="co-new-road-district" onchange="CoordinationUI.changeTransferredRoadDistrict(this.value)" class="w-full border rounded-lg px-3 py-2">${this.districtOptions(this.selectedRoadDistrict)}</select></div><div><label class="block text-sm font-bold mb-1">รหัสสายทาง</label><input id="co-new-road-code" placeholder="เช่น พล.ถ. 1-0033" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">ชื่อสายทาง *</label><input id="co-new-road-name" placeholder="เช่น แยกทางหลวงหมายเลข 2013 - บ้านวังชมพู" class="w-full border rounded-lg px-3 py-2"></div><div class="md:col-span-3"><label class="block text-sm font-bold mb-1">รายละเอียดสายทาง</label><textarea id="co-new-road-details" rows="2" placeholder="รายละเอียดการถ่ายโอน หน่วยงานเดิม หรือหมายเหตุ" class="w-full border rounded-lg px-3 py-2"></textarea></div></div></section><section class="bg-white border rounded-xl p-4"><h4 class="font-black text-pink-800 mb-3"><i class="fas fa-draw-polygon mr-2"></i>กำหนดแนวสายทางแม่</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3"><button type="button" onclick="CoordinationUI.beginTransferredRoadDraw()" class="bg-pink-700 hover:bg-pink-800 text-white rounded-lg px-4 py-3 font-black"><i class="fas fa-map-location-dot mr-2"></i>วาดแนวสายทางบนแผนที่</button><label class="bg-white text-pink-700 border-2 border-pink-300 hover:bg-pink-50 rounded-lg px-4 py-3 font-black text-center cursor-pointer"><i class="fas fa-file-import mr-2"></i>นำเข้าแนวสายทางจาก KML<input type="file" accept=".kml" class="hidden" onchange="CoordinationUI.importTransferredRoadKML(this)"></label></div><div id="co-new-road-status" class="bg-slate-50 border rounded-lg p-3 text-sm text-gray-600">ยังไม่ได้กำหนดแนวสายทาง กรุณาวาดบนแผนที่หรือนำเข้า KML</div><div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 text-xs"><div class="bg-gray-50 border rounded p-2"><span class="text-gray-500">จุดเริ่มต้น</span><div id="co-new-road-start" class="font-mono font-bold mt-1">-</div></div><div class="bg-gray-50 border rounded p-2"><span class="text-gray-500">จุดสิ้นสุด</span><div id="co-new-road-end" class="font-mono font-bold mt-1">-</div></div><div class="bg-pink-50 border border-pink-200 rounded p-2"><span class="text-pink-600">ความยาวสายทางทั้งหมด</span><div id="co-new-road-distance" class="font-black text-pink-800 text-lg mt-1">0.00 กม.</div></div></div></section></form>`;
+                const footer=`<div class="flex flex-wrap justify-between gap-3"><button onclick="CoordinationUI.openRoadManager('${this.esc(road?.id||this.selectedRoadId||'')}')" class="px-5 py-2 bg-gray-200 rounded-lg font-bold"><i class="fas fa-arrow-left mr-1"></i>กลับหน้าบริหารสายทาง</button><button onclick="CoordinationUI.saveTransferredRoad()" class="px-6 py-2 bg-pink-700 hover:bg-pink-800 text-white rounded-lg font-black"><i class="fas fa-floppy-disk mr-2"></i>${road?'บันทึกการแก้ไขทะเบียน':'บันทึกเป็นสายทางถ่ายโอน'}</button></div>`;
+                this.show(`<i class="fas fa-road-circle-plus mr-2"></i>${road?'แก้ไข':'เพิ่ม'}ทะเบียนสายทางที่ได้รับถ่ายโอน`,'bg-pink-700',body,footer,'max-w-5xl');
                 this.mountTransferredRoadCoordinateControls();
+                this.mountTransferredRoadRegistryFields();
+                setVal('co-new-road-district',road?.district||this.selectedRoadDistrict||'');
+                setVal('co-new-road-code',road?.roadCode||'');setVal('co-new-road-name',road?.name||'');setVal('co-new-road-details',road?.projectDetails||'');
+                setVal('co-new-road-transfer-agency',road?.transferAgency||'');setVal('co-new-road-transfer-document',road?.transferDocumentNo||'');setVal('co-new-road-transfer-date',road?.transferDate||'');
+                setVal('co-new-road-registered-length',road?.registeredLengthKm||'');setVal('co-new-road-surface',road?.surfaceType||'');setVal('co-new-road-width',road?.carriagewayWidth||'');setVal('co-new-road-row-width',road?.rightOfWayWidth||'');
+                setVal('co-new-road-start-name',road?.startLocationName||'');setVal('co-new-road-end-name',road?.endLocationName||'');
+                setVal('co-new-road-line-style',road?.lineStyle||'solid');setVal('co-new-road-line-weight',road?.lineWeight||5);setVal('co-new-road-line-color',this.roadColor(road||{district:this.selectedRoadDistrict}));
+                if(this.roadDraftRoute.length>1)this.refreshTransferredRoadDraft();
+            },
+            mountTransferredRoadRegistryFields(){
+                const form=this.host?.querySelector('form'),infoSection=form?.querySelector('section'),grid=infoSection?.querySelector('.grid');if(!infoSection||!grid)return;
+                infoSection.insertAdjacentHTML('beforebegin',`<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4"><div class="flex flex-col md:flex-row md:items-center justify-between gap-3"><div><div class="font-black text-emerald-900"><i class="fas fa-file-excel mr-2"></i>เพิ่มข้อมูลหลายสายทางจากเทมเพลต</div><div class="text-xs text-emerald-700 mt-1">ดาวน์โหลดไฟล์ตัวอย่าง กรอกข้อมูล แล้วโหลดกลับเข้าระบบ รองรับ .xlsx .xls และ .csv</div></div><div class="flex flex-wrap gap-2"><button type="button" onclick="CoordinationUI.downloadTransferredRoadTemplate()" class="bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-100 rounded-lg px-4 py-2 font-black text-sm"><i class="fas fa-download mr-1"></i>ดาวน์โหลดเทมเพลต</button><label class="bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg px-4 py-2 font-black text-sm cursor-pointer"><i class="fas fa-file-import mr-1"></i>โหลดข้อมูลจากเทมเพลต<input type="file" accept=".xlsx,.xls,.csv" class="hidden" onchange="CoordinationUI.importTransferredRoadTemplate(this)"></label></div></div><div id="co-road-template-status" class="hidden mt-3 text-xs rounded-lg border p-3"></div></div>`);
+                infoSection.insertAdjacentHTML('afterbegin','<h4 class="font-black text-pink-800 border-b border-pink-100 pb-2 mb-4"><i class="fas fa-clipboard-list mr-2"></i>1. ข้อมูลทะเบียนและการรับถ่ายโอน</h4>');
+                grid.insertAdjacentHTML('beforeend',`<div><label class="block text-sm font-bold mb-1">หน่วยงานเดิม/ผู้ถ่ายโอน</label><input id="co-new-road-transfer-agency" placeholder="ระบุหน่วยงานผู้ถ่ายโอน" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">เลขที่หนังสือหรือคำสั่งถ่ายโอน</label><input id="co-new-road-transfer-document" placeholder="เลขที่เอกสาร" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">วันที่รับถ่ายโอน</label><input id="co-new-road-transfer-date" type="date" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">ความยาวตามทะเบียน (กม.)</label><input id="co-new-road-registered-length" type="number" step="0.001" min="0" placeholder="0.000" class="w-full border rounded-lg px-3 py-2"></div><div><label class="block text-sm font-bold mb-1">ประเภทผิวทาง</label><select id="co-new-road-surface" class="w-full border rounded-lg px-3 py-2 bg-white"><option value="">-- เลือกประเภทผิวทาง --</option><option>ลาดยาง</option><option>คอนกรีต</option><option>ลูกรัง</option><option>ดิน</option><option>อื่น ๆ</option></select></div><div class="grid grid-cols-2 gap-2"><label class="block text-sm font-bold">ผิวจราจร (ม.)<input id="co-new-road-width" type="number" step="0.01" min="0" class="mt-1 w-full border rounded-lg px-3 py-2"></label><label class="block text-sm font-bold">เขตทาง (ม.)<input id="co-new-road-row-width" type="number" step="0.01" min="0" class="mt-1 w-full border rounded-lg px-3 py-2"></label></div><div class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 border rounded-lg p-3"><div><label class="block text-sm font-bold mb-1"><i class="fas fa-play-circle text-blue-600 mr-1"></i>ชื่อจุดเริ่มต้นสายทาง</label><input id="co-new-road-start-name" placeholder="เช่น แยกทางหลวงหมายเลข..." class="w-full border rounded-lg px-3 py-2 bg-white"></div><div><label class="block text-sm font-bold mb-1"><i class="fas fa-stop-circle text-red-600 mr-1"></i>ชื่อจุดสิ้นสุดสายทาง</label><input id="co-new-road-end-name" placeholder="เช่น บ้าน..." class="w-full border rounded-lg px-3 py-2 bg-white"></div></div>`);
+                const mapHeading=form.querySelectorAll('section')[1]?.querySelector('h4');if(mapHeading)mapHeading.innerHTML='<i class="fas fa-draw-polygon mr-2"></i>2. กำหนดแนวสายทางแม่บนแผนที่';
+            },
+            transferredRoadTemplateHeaders(){
+                return ['รหัสสายทาง','ชื่อสายทาง','ประเภทสายทาง/หมายเหตุ','ความยาว (กม.)','ละติจูดจุดเริ่มต้น','ลองจิจูดจุดเริ่มต้น','ละติจูดจุดสิ้นสุด','ลองจิจูดจุดสิ้นสุด','ที่ตั้ง (ตำบล/อำเภอ)'];
+            },
+            downloadTransferredRoadTemplate(){
+                if(typeof XLSX==='undefined')return window.showToast('ไม่พบชุดคำสั่งสร้างไฟล์ Excel กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่','error');
+                const rows=[this.transferredRoadTemplateHeaders(),['พล.ถ 1-0001','บ้านดงซ่อม - บ้านบางสะพาน','',13.490,16.795741,100.337306,16.808599,100.429946,'ต.วังพิกุล อ.วังทอง']];
+                const sheet=XLSX.utils.aoa_to_sheet(rows);sheet['!cols']=[{wch:18},{wch:42},{wch:25},{wch:16},{wch:22},{wch:22},{wch:22},{wch:22},{wch:32}];sheet['!autofilter']={ref:'A1:I1'};
+                const book=XLSX.utils.book_new();XLSX.utils.book_append_sheet(book,sheet,'ทะเบียนสายทาง');XLSX.writeFile(book,'เทมเพลตทะเบียนสายทางถ่ายโอน.xlsx');window.showToast('ดาวน์โหลดเทมเพลตทะเบียนสายทางแล้ว','success');
+            },
+            async importTransferredRoadTemplate(input){
+                const file=input.files?.[0];if(!file)return;if(typeof XLSX==='undefined'){input.value='';return window.showToast('ไม่พบชุดคำสั่งอ่านไฟล์ Excel','error');}
+                const status=$id('co-road-template-status');if(status){status.className='mt-3 text-xs rounded-lg border border-blue-200 bg-blue-50 text-blue-800 p-3';status.textContent=`กำลังตรวจสอบไฟล์ ${file.name}…`;}
+                try{
+                    const buffer=await file.arrayBuffer(),book=XLSX.read(buffer,{type:'array'}),sheet=book.Sheets[book.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:true});
+                    if(rows.length<2)throw new Error('ไม่พบแถวข้อมูลในเทมเพลต');
+                    const expected=this.transferredRoadTemplateHeaders(),header=(rows[0]||[]).map(v=>String(v||'').trim());
+                    if(expected.some((name,index)=>header[index]!==name))throw new Error('หัวตารางไม่ตรงกับเทมเพลต กรุณาดาวน์โหลดเทมเพลตล่าสุดจากระบบ');
+                    const clean=rows.slice(1).map((row,index)=>({row,index:index+2})).filter(item=>item.row.some(v=>String(v??'').trim()!==''));
+                    if(!clean.length)throw new Error('ไม่พบข้อมูลสายทางใต้หัวตาราง');
+                    const existing=this.roads(),usedCodes=new Set(existing.map(r=>String(r.roadCode||'').trim().toLowerCase()).filter(Boolean)),usedNames=new Set(existing.map(r=>this.name(r).trim().toLowerCase()).filter(Boolean)),valid=[],errors=[],duplicates=[];
+                    const number=value=>{const n=Number(String(value??'').replace(/,/g,'').trim());return Number.isFinite(n)?n:NaN;};
+                    clean.forEach(({row,index})=>{
+                        const code=String(row[0]||'').trim(),roadName=String(row[1]||'').trim(),note=String(row[2]||'').trim(),registeredLengthKm=number(row[3]),startLat=number(row[4]),startLng=number(row[5]),endLat=number(row[6]),endLng=number(row[7]),locationText=String(row[8]||'').trim(),fullName=code&&!roadName.includes(code)?`${code} ${roadName}`:roadName;
+                        const district=this.districts.find(d=>locationText.includes(d)||locationText.includes(d.replace('เมืองพิษณุโลก','เมือง')));
+                        if(!code||!roadName){errors.push(`แถว ${index}: ต้องมีรหัสและชื่อสายทาง`);return;}
+                        if(![startLat,startLng,endLat,endLng].every(Number.isFinite)||Math.abs(startLat)>90||Math.abs(endLat)>90||Math.abs(startLng)>180||Math.abs(endLng)>180){errors.push(`แถว ${index}: พิกัดจุดเริ่มต้นหรือจุดสิ้นสุดไม่ถูกต้อง`);return;}
+                        if(!district){errors.push(`แถว ${index}: ไม่พบชื่ออำเภอพิษณุโลกในช่องที่ตั้ง`);return;}
+                        const codeKey=code.toLowerCase(),nameKey=fullName.toLowerCase();if(usedCodes.has(codeKey)||usedNames.has(nameKey)){duplicates.push(`แถว ${index}: ${code} ${roadName}`);return;}
+                        usedCodes.add(codeKey);usedNames.add(nameKey);valid.push({index,code,roadName,fullName,note,registeredLengthKm:Number.isFinite(registeredLengthKm)&&registeredLengthKm>0?registeredLengthKm:0,startLat,startLng,endLat,endLng,locationText,district});
+                    });
+                    if(!valid.length)throw new Error(`ไม่มีรายการที่พร้อมนำเข้า${errors.length?' — '+errors.slice(0,3).join(' | '):duplicates.length?' — พบข้อมูลซ้ำทั้งหมด':''}`);
+                    const message=`พร้อมนำเข้า ${valid.length} สายทาง${duplicates.length?' · ซ้ำและจะข้าม '+duplicates.length+' รายการ':''}${errors.length?' · ข้อมูลผิด '+errors.length+' รายการ':''}\n\nยืนยันบันทึกข้อมูลหรือไม่?`;
+                    if(!confirm(message)){if(status){status.className='mt-3 text-xs rounded-lg border border-gray-200 bg-gray-50 text-gray-600 p-3';status.textContent='ยกเลิกการนำเข้าข้อมูลแล้ว';}return;}
+                    let saved=0,lastId=null;const saveErrors=[];for(const item of valid){
+                        const pts=[{lat:item.startLat,lng:item.startLng},{lat:item.endLat,lng:item.endLng}],measured=this.pointDistance(pts[0],pts[1]),now=Date.now(),districtColor=this.roadColor(item.district),data={recordType:'road',roadRole:'transferred_road',isTransferredRoad:true,dataCategory:'transferred_road',coordinationEntrySource:'highway',roadCode:item.code,name:item.fullName,projectDetails:item.note,district:item.district,roadCategoryNote:item.note,registeredLengthKm:item.registeredLengthKm,locationText:item.locationText,type:'line',linePoints:pts,distance:measured,startLat:item.startLat,startLng:item.startLng,endLat:item.endLat,endLng:item.endLng,lineColor:districtColor,roadDisplayColor:districtColor,roadColorCustomized:false,lineWeight:5,lineStyle:'solid',sourceFile:file.name,createdAt:now,updatedAt:now};
+                        const id=await saveDataToDB(data);if(!id){saveErrors.push(`แถว ${item.index}`);continue;}allProjectRecords[id]={...data,id};drawProjectOnMap(id,allProjectRecords[id]);saved++;lastId=id;
+                    }
+                    if(!saved)throw new Error('ไม่สามารถบันทึกรายการจากเทมเพลตได้');
+                    this.selectedRoadId=lastId;this.selectedRoadDistrict=valid.at(-1)?.district||this.selectedRoadDistrict;if(status){status.className='mt-3 text-xs rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 p-3';status.innerHTML=`<b>นำเข้าสำเร็จ ${saved} สายทาง</b>${duplicates.length?`<br>ข้ามข้อมูลซ้ำ ${duplicates.length} รายการ`:''}${errors.length?`<br>ข้อมูลไม่ครบ ${errors.length} รายการ`:''}${saveErrors.length?`<br>บันทึกไม่สำเร็จ ${saveErrors.length} รายการ`:''}`;}
+                    window.showToast(`นำเข้าสายทางจากเทมเพลตสำเร็จ ${saved} รายการ`,'success');setTimeout(()=>this.openRoadManager(lastId),900);
+                }catch(error){if(status){status.className='mt-3 text-xs rounded-lg border border-red-200 bg-red-50 text-red-700 p-3';status.textContent=error.message||'อ่านเทมเพลตไม่สำเร็จ';}window.showToast(error.message||'อ่านเทมเพลตไม่สำเร็จ','error');}
+                finally{input.value='';}
             },
             mountTransferredRoadCoordinateControls(){
                 const status=$id('co-new-road-status'),section=status?.closest('section'),heading=section?.querySelector('h4');if(!heading)return;
-                heading.insertAdjacentHTML('afterend',`<div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-3"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-xs font-black mb-1">จุดเริ่มต้น (Lat, Lng)</label><div class="grid grid-cols-2 gap-2"><input id="co-new-road-start-lat" type="number" step="any" placeholder="Latitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"><input id="co-new-road-start-lng" type="number" step="any" placeholder="Longitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"></div></div><div><label class="block text-xs font-black mb-1">จุดสิ้นสุด (Lat, Lng)</label><div class="grid grid-cols-2 gap-2"><input id="co-new-road-end-lat" type="number" step="any" placeholder="Latitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"><input id="co-new-road-end-lng" type="number" step="any" placeholder="Longitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"></div></div></div><div class="flex flex-wrap gap-2 mt-4"><button type="button" onclick="CoordinationUI.pickTransferredRoadEndpoint('start')" class="bg-blue-100 text-blue-700 border border-blue-200 rounded-lg px-4 py-2 font-black"><i class="fas fa-location-dot mr-1"></i>จุดเริ่มต้น</button><button type="button" onclick="CoordinationUI.pickTransferredRoadEndpoint('end')" class="bg-red-100 text-red-700 border border-red-200 rounded-lg px-4 py-2 font-black"><i class="fas fa-location-dot mr-1"></i>จุดสิ้นสุด</button><button type="button" onclick="CoordinationUI.routeTransferredRoad()" class="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-4 py-2 font-black"><i class="fas fa-route mr-1"></i>ตามถนน</button><div class="ml-auto flex flex-wrap items-center gap-2 bg-white border rounded-lg px-3 py-2"><select id="co-new-road-line-style" onchange="CoordinationUI.drawTransferredRoadDraft()" class="border rounded px-2 py-1 text-xs"><option value="solid">เส้นทึบ</option><option value="dashed">เส้นประ</option></select><span class="w-7 h-7 rounded border-2 border-white shadow bg-pink-600" title="สีประจำสายทางถ่ายโอน"></span><select id="co-new-road-line-weight" onchange="CoordinationUI.drawTransferredRoadDraft()" class="border rounded px-2 py-1 text-xs"><option value="3">บาง</option><option value="5" selected>กลาง</option><option value="8">หนา</option></select><span class="text-[10px] font-bold text-pink-700">สีสายทางถ่ายโอน</span></div></div></div>`);
+                heading.insertAdjacentHTML('afterend',`<div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-3"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-xs font-black mb-1">จุดเริ่มต้น (Lat, Lng)</label><div class="grid grid-cols-2 gap-2"><input id="co-new-road-start-lat" type="number" step="any" placeholder="Latitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"><input id="co-new-road-start-lng" type="number" step="any" placeholder="Longitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"></div></div><div><label class="block text-xs font-black mb-1">จุดสิ้นสุด (Lat, Lng)</label><div class="grid grid-cols-2 gap-2"><input id="co-new-road-end-lat" type="number" step="any" placeholder="Latitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"><input id="co-new-road-end-lng" type="number" step="any" placeholder="Longitude" onchange="CoordinationUI.syncTransferredRoadEndpoints()" class="border rounded-lg px-3 py-2"></div></div></div><div class="flex flex-wrap gap-2 mt-4"><button type="button" onclick="CoordinationUI.pickTransferredRoadEndpoint('start')" class="bg-blue-100 text-blue-700 border border-blue-200 rounded-lg px-4 py-2 font-black"><i class="fas fa-location-dot mr-1"></i>จุดเริ่มต้น</button><button type="button" onclick="CoordinationUI.pickTransferredRoadEndpoint('end')" class="bg-red-100 text-red-700 border border-red-200 rounded-lg px-4 py-2 font-black"><i class="fas fa-location-dot mr-1"></i>จุดสิ้นสุด</button><button type="button" onclick="CoordinationUI.routeTransferredRoad()" class="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-4 py-2 font-black"><i class="fas fa-route mr-1"></i>ตามถนน</button><button type="button" onclick="CoordinationUI.beginTransferredRoadEdit()" class="bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-4 py-2 font-black"><i class="fas fa-pen-to-square mr-1"></i>แก้ไขแนวสายทาง</button><div class="ml-auto flex flex-wrap items-center gap-2 bg-white border rounded-lg px-3 py-2"><select id="co-new-road-line-style" onchange="CoordinationUI.drawTransferredRoadDraft()" class="border rounded px-2 py-1 text-xs"><option value="solid">เส้นทึบ</option><option value="dashed">เส้นประ</option></select><label class="flex items-center gap-1.5 text-[10px] font-black text-gray-700">สีสายทาง<input id="co-new-road-line-color" type="color" value="#db2777" onchange="CoordinationUI.changeTransferredRoadColor(this.value)" class="w-9 h-8 rounded border cursor-pointer"></label><select id="co-new-road-line-weight" onchange="CoordinationUI.drawTransferredRoadDraft()" class="border rounded px-2 py-1 text-xs"><option value="3">บาง</option><option value="5" selected>กลาง</option><option value="8">หนา</option></select><button type="button" onclick="CoordinationUI.resetTransferredRoadColor()" class="text-[10px] bg-gray-100 hover:bg-gray-200 rounded px-2 py-1.5 font-bold" title="กลับไปใช้สีประจำอำเภอ"><i class="fas fa-rotate-left mr-1"></i>สีอำเภอ</button></div></div><div class="mt-2 text-[11px] text-amber-700"><i class="fas fa-circle-info mr-1"></i>ระบบกำหนดสีเริ่มต้นต่างกันตามอำเภอ และสามารถเลือกสีเฉพาะสายทางเพื่อแยกถนนที่อยู่ติดกันได้</div></div>`);
             },
+            changeTransferredRoadDistrict(district){if(!this.roadColorTouched)setVal('co-new-road-line-color',this.roadColor(district));this.drawTransferredRoadDraft();},
+            changeTransferredRoadColor(color){this.roadColorTouched=true;this.drawTransferredRoadDraft();},
+            resetTransferredRoadColor(){this.roadColorTouched=false;setVal('co-new-road-line-color',this.roadColor(val('co-new-road-district')));this.drawTransferredRoadDraft();window.showToast('กลับมาใช้สีประจำอำเภอแล้ว','info');},
             pickTransferredRoadEndpoint(mode){
                 this.pickMode=`road-master-${mode}`;this.hide();if(map)$id('map-container').style.cursor='crosshair';this.roadPreviewPanel?.remove();this.roadPreviewPanel=document.createElement('div');this.roadPreviewPanel.className='fixed left-1/2 -translate-x-1/2 bottom-8 z-[4900] bg-white border-2 border-pink-300 rounded-xl shadow-2xl p-3 flex items-center gap-3';this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="${mode==='start'?'text-blue-700':'text-red-700'}">คลิกเลือก${mode==='start'?'จุดเริ่มต้น':'จุดสิ้นสุด'}บนแผนที่</b><div class="text-xs text-gray-500">ระบบจะนำค่าพิกัดกลับไปใส่ในแบบฟอร์ม</div></div><button onclick="CoordinationUI.cancelTransferredRoadEndpoint()" class="bg-gray-100 px-4 py-2 rounded font-bold">ยกเลิก</button>`;document.body.appendChild(this.roadPreviewPanel);
             },
@@ -1508,14 +1586,67 @@
                 const read=id=>val(id).trim()===''?NaN:Number(val(id)),start={lat:read('co-new-road-start-lat'),lng:read('co-new-road-start-lng')},end={lat:read('co-new-road-end-lat'),lng:read('co-new-road-end-lng')};if(![start.lat,start.lng,end.lat,end.lng].every(Number.isFinite))return window.showToast('กรุณาระบุจุดเริ่มต้นและจุดสิ้นสุดให้ครบก่อนกด “ตามถนน”','warning');
                 try{window.showToast('กำลังคำนวณแนวตามถนน…','info');const response=await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson&alternatives=false`),json=await response.json();if(json.code!=='Ok'||!json.routes?.[0])throw new Error('ไม่พบแนวถนนระหว่างจุดที่เลือก');this.roadDraftRoute=json.routes[0].geometry.coordinates.map(p=>({lat:Number(p[1]),lng:Number(p[0])}));this.refreshTransferredRoadDraft();window.showToast('สร้างแนวสายทางตามถนนสำเร็จ กรุณาตรวจสอบแนวก่อนบันทึก','success');}catch(error){window.showToast(error.message||'บริการค้นหาแนวถนนไม่พร้อม','error');}
             },
+            beginTransferredRoadEdit(){
+                if(this.roadDraftRoute.length<2)return window.showToast('กรุณากำหนดแนวสายทางก่อนแก้ไข','warning');
+                this.roadEditBackup=this.roadDraftRoute.map(p=>({...p}));this.roadDraftRoute=[];this.roadEditHistory=[];this.roadEditSelectedIndex=null;this.roadRepairStartIndex=null;this.roadRepairEndIndex=null;this.roadRepairBusy=false;this.pickMode='road-master-edit';this.hide();if(map)$id('map-container').style.cursor='crosshair';
+                this.roadPreviewPanel?.remove();this.roadPreviewPanel=document.createElement('div');this.roadPreviewPanel.className='fixed left-1/2 -translate-x-1/2 bottom-5 z-[4900] bg-white border-2 border-amber-300 rounded-xl shadow-2xl p-3 max-w-[96vw]';
+                this.roadPreviewPanel.innerHTML=`<div class="flex flex-wrap items-center gap-2"><div class="mr-2"><b class="text-amber-700"><i class="fas fa-pencil mr-1"></i>วาดแนวสายทางใหม่ทับบนแผนที่</b><div class="text-[11px] text-gray-600">เส้นประสีเทา = แนวเดิม • คลิกจุดเริ่มต้น แล้วคลิกตามแนวถนนจริงทีละจุดจนถึงจุดสิ้นสุด</div></div><span id="co-road-edit-status" class="bg-amber-50 text-amber-800 border border-amber-200 rounded-lg px-3 py-2 text-xs font-bold">ยังไม่ได้วาด — คลิกจุดเริ่มต้นบนแผนที่</span><button onclick="CoordinationUI.undoTransferredRoadEdit()" class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg font-bold text-xs"><i class="fas fa-rotate-left mr-1"></i>ย้อนจุดล่าสุด</button><button onclick="CoordinationUI.resetTransferredRoadEdit()" class="bg-sky-50 text-sky-700 hover:bg-sky-100 px-3 py-2 rounded-lg font-bold text-xs"><i class="fas fa-eraser mr-1"></i>ล้างแนวที่วาด</button><button onclick="CoordinationUI.cancelTransferredRoadEdit()" class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg font-bold text-xs">ยกเลิก</button><button onclick="CoordinationUI.finishTransferredRoadEdit()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-black text-xs"><i class="fas fa-check mr-1"></i>ใช้แนวใหม่</button></div>`;document.body.appendChild(this.roadPreviewPanel);
+                this.renderTransferredRoadEditor();
+                if(map&&this.previewLayer?.getBounds?.().isValid())map.fitBounds(this.previewLayer.getBounds(),{padding:[60,60],maxZoom:18});
+            },
+            pushTransferredRoadEditHistory(){
+                this.roadEditHistory.push(this.roadDraftRoute.map(p=>({...p})));if(this.roadEditHistory.length>30)this.roadEditHistory.shift();
+            },
+            transferredRoadEditAnchorIndexes(){
+                const count=this.roadDraftRoute.length;if(count<2)return[];const indexes=[0,count-1];if(Number.isInteger(this.roadRepairStartIndex))indexes.push(this.roadRepairStartIndex);if(Number.isInteger(this.roadRepairEndIndex))indexes.push(this.roadRepairEndIndex);return [...new Set(indexes)].sort((a,b)=>a-b);
+            },
+            renderTransferredRoadEditor(){
+                if(!map)return;if(!this.previewLayer)this.previewLayer=L.featureGroup().addTo(map);this.previewLayer.clearLayers();const old=this.roadEditBackup||[],pts=this.roadDraftRoute,roadColor=val('co-new-road-line-color')||this.roadColor(val('co-new-road-district'));
+                if(old.length>1)L.polyline(old,{color:'#64748b',weight:7,opacity:.72,dashArray:'12,10',interactive:false}).bindTooltip('แนวสายทางเดิม',{sticky:true}).addTo(this.previewLayer);
+                if(pts.length>1)this.roadEditPolyline=L.polyline(pts,{color:roadColor,weight:8,opacity:.95,interactive:false}).addTo(this.previewLayer);else this.roadEditPolyline=null;
+                pts.forEach((p,index)=>{const first=index===0,last=index===pts.length-1,color=first?'#16a34a':last?'#dc2626':'#f59e0b',radius=first||last?7:4;L.circleMarker([p.lat,p.lng],{radius,color,fillColor:'#fff',fillOpacity:1,weight:3,interactive:false}).addTo(this.previewLayer);});
+                this.updateTransferredRoadEditStatus();
+            },
+            nearestTransferredRoadEditSegment(latlng){
+                const pts=this.roadDraftRoute;let bestIndex=0,best=Infinity;for(let i=0;i<pts.length-1;i++){const a=map.latLngToLayerPoint([pts[i].lat,pts[i].lng]),b=map.latLngToLayerPoint([pts[i+1].lat,pts[i+1].lng]),p=map.latLngToLayerPoint(latlng),dx=b.x-a.x,dy=b.y-a.y,den=dx*dx+dy*dy,t=den?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/den)):0,x=a.x+t*dx,y=a.y+t*dy,d=(p.x-x)**2+(p.y-y)**2;if(d<best){best=d;bestIndex=i;}}return bestIndex;
+            },
+            nearestTransferredRoadEditVertex(latlng){
+                const pts=this.roadDraftRoute,p=map.latLngToLayerPoint(latlng);let bestIndex=0,best=Infinity;pts.forEach((item,index)=>{const v=map.latLngToLayerPoint([item.lat,item.lng]),distance=(p.x-v.x)**2+(p.y-v.y)**2;if(distance<best){best=distance;bestIndex=index;}});return bestIndex;
+            },
+            selectTransferredRoadRepairPoint(latlng){
+                if(this.pickMode!=='road-master-edit'||this.roadRepairBusy)return;const index=this.nearestTransferredRoadEditVertex(latlng);if(!Number.isInteger(this.roadRepairStartIndex)){this.roadRepairStartIndex=index;this.roadRepairEndIndex=null;this.renderTransferredRoadEditor();this.updateTransferredRoadEditStatus('ขั้นที่ 2: คลิกจุดสิ้นสุดหลังช่วงที่แนวผิด');return;}if(index===this.roadRepairStartIndex)return window.showToast('กรุณาเลือกจุดที่สองให้ห่างจากจุดแรก','warning');this.roadRepairEndIndex=index;this.renderTransferredRoadEditor();this.rerouteTransferredRoadSection();
+            },
+            async rerouteTransferredRoadSection(){
+                if(this.roadRepairBusy||!Number.isInteger(this.roadRepairStartIndex)||!Number.isInteger(this.roadRepairEndIndex))return;const startIndex=Math.min(this.roadRepairStartIndex,this.roadRepairEndIndex),endIndex=Math.max(this.roadRepairStartIndex,this.roadRepairEndIndex),start=this.roadDraftRoute[startIndex],end=this.roadDraftRoute[endIndex];if(endIndex-startIndex<1)return;
+                this.roadRepairBusy=true;this.updateTransferredRoadEditStatus('กำลังค้นหาแนวถนนใหม่ระหว่างจุด 1 และจุด 2…');this.roadRepairController?.abort();const controller=new AbortController();this.roadRepairController=controller;const timeout=setTimeout(()=>controller.abort(),20000);
+                try{const response=await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson&alternatives=false`,{signal:controller.signal});if(!response.ok)throw new Error('บริการหาเส้นทางยังไม่พร้อม');const json=await response.json();if(this.pickMode!=='road-master-edit'||controller!==this.roadRepairController)return;if(json.code!=='Ok'||!json.routes?.[0]?.geometry?.coordinates?.length)throw new Error('ไม่พบแนวถนนเชื่อมระหว่างสองจุดนี้');const routed=json.routes[0].geometry.coordinates.map(p=>({lat:Number(p[1]),lng:Number(p[0])}));if(routed.length<2)throw new Error('แนวถนนใหม่ไม่สมบูรณ์');routed[0]={...start};routed[routed.length-1]={...end};this.pushTransferredRoadEditHistory();this.roadDraftRoute=[...this.roadDraftRoute.slice(0,startIndex),...routed,...this.roadDraftRoute.slice(endIndex+1)];this.roadRepairStartIndex=null;this.roadRepairEndIndex=null;this.renderTransferredRoadEditor();this.updateTransferredRoadEditStatus('เปลี่ยนช่วงให้แล้ว ตรวจสอบแนวใหม่ หรือคลิก 2 จุดเพื่อแก้ช่วงอื่นต่อ');window.showToast('ระบบเปลี่ยนเฉพาะช่วงระหว่างสองจุดแล้ว','success');}catch(error){if(this.pickMode!=='road-master-edit'||controller!==this.roadRepairController)return;this.roadRepairEndIndex=null;this.renderTransferredRoadEditor();this.updateTransferredRoadEditStatus(error.name==='AbortError'?'ค้นหาแนวถนนใช้เวลานานเกินไป กรุณาเลือกจุดใหม่':'หาแนวใหม่ไม่สำเร็จ กรุณาเลือกจุดที่สองใหม่');window.showToast(error.message||'ไม่สามารถหาแนวถนนใหม่ได้','error');}finally{clearTimeout(timeout);if(controller===this.roadRepairController){this.roadRepairBusy=false;this.roadRepairController=null;}}
+            },
+            undoTransferredRoadEdit(){
+                if(!this.roadDraftRoute.length)return window.showToast('ยังไม่มีจุดที่วาดให้ย้อนกลับ','info');this.roadDraftRoute.pop();this.renderTransferredRoadEditor();this.updateTransferredRoadEditStatus(this.roadDraftRoute.length?'ย้อนจุดล่าสุดแล้ว คลิกเพื่อวาดต่อ':'ล้างจุดแรกแล้ว กรุณาคลิกเริ่มวาดใหม่');
+            },
+            resetTransferredRoadEdit(){
+                this.roadDraftRoute=[];this.renderTransferredRoadEditor();this.updateTransferredRoadEditStatus('ล้างแนวที่วาดแล้ว กรุณาคลิกจุดเริ่มต้นใหม่');
+            },
+            updateTransferredRoadEditStatus(message=''){
+                const status=$id('co-road-edit-status'),pts=this.roadDraftRoute,distance=pts.slice(1).reduce((sum,p,i)=>sum+this.pointDistance(pts[i],p),0);if(status)status.textContent=message||(pts.length?`วาดแล้ว ${pts.length} จุด • ระยะ ${(distance/1000).toLocaleString('th-TH',{minimumFractionDigits:3,maximumFractionDigits:3})} กม. • คลิกเพื่อวาดต่อ`:'ยังไม่ได้วาด — คลิกจุดเริ่มต้นบนแผนที่');
+            },
+            closeTransferredRoadEditor(){
+                this.roadRepairController?.abort();this.roadRepairController=null;this.roadRepairBusy=false;this.roadRepairStartIndex=null;this.roadRepairEndIndex=null;this.pickMode=null;if(map)$id('map-container').style.cursor='';this.roadPreviewPanel?.remove();this.roadPreviewPanel=null;this.roadEditPolyline=null;this.roadEditSelectedIndex=null;this.roadEditHistory=[];if(this.previewLayer)this.previewLayer.clearLayers();this.host?.classList.remove('hidden');this.host?.classList.add('flex');
+            },
+            cancelTransferredRoadEdit(){
+                if(this.roadEditBackup)this.roadDraftRoute=this.roadEditBackup.map(p=>({...p}));this.roadEditBackup=null;this.closeTransferredRoadEditor();this.refreshTransferredRoadDraft();window.showToast('ยกเลิกการแก้ไข แนวเดิมยังคงอยู่','info');
+            },
+            finishTransferredRoadEdit(){
+                if(this.roadDraftRoute.length<2)return window.showToast('กรุณาวาดแนวใหม่อย่างน้อย 2 จุดก่อนกดใช้แนวใหม่','warning');this.roadEditBackup=null;this.closeTransferredRoadEditor();this.refreshTransferredRoadDraft();window.showToast('นำแนวที่วาดใหม่กลับมาแล้ว กรุณาตรวจสอบและกดบันทึกทะเบียนสายทาง','success');
+            },
             beginTransferredRoadDraw(){
                 this.roadDraftRoute=[];this.pickMode='road-master-draw';this.hide();if(map)$id('map-container').style.cursor='crosshair';if(!this.previewLayer)this.previewLayer=L.featureGroup().addTo(map);this.previewLayer.clearLayers();
                 this.roadPreviewPanel?.remove();this.roadPreviewPanel=document.createElement('div');this.roadPreviewPanel.className='fixed left-1/2 -translate-x-1/2 bottom-8 z-[4900] bg-white border-2 border-pink-300 rounded-xl shadow-2xl p-3 flex flex-wrap items-center gap-3';this.roadPreviewPanel.innerHTML=`<div class="text-sm"><b class="text-pink-700">คลิกตามแนวสายทางทีละจุด</b><div class="text-xs text-gray-500">เลือกจุดเริ่มต้น จุดผ่านโค้ง และจุดสิ้นสุดตามลำดับ</div></div><span id="co-road-draw-count" class="bg-pink-100 text-pink-800 rounded-full px-3 py-1 text-xs font-black">0 จุด</span><button onclick="CoordinationUI.undoTransferredRoadPoint()" class="bg-gray-100 px-3 py-2 rounded font-bold">ย้อนจุด</button><button onclick="CoordinationUI.cancelTransferredRoadDraw()" class="bg-gray-100 px-3 py-2 rounded font-bold">ยกเลิก</button><button onclick="CoordinationUI.finishTransferredRoadDraw()" class="bg-pink-700 text-white px-4 py-2 rounded font-black">เสร็จสิ้นแนวสายทาง</button>`;document.body.appendChild(this.roadPreviewPanel);
             },
             drawTransferredRoadDraft(){
                 if(!this.previewLayer)this.previewLayer=L.featureGroup().addTo(map);this.previewLayer.clearLayers();const pts=this.roadDraftRoute;
-                pts.forEach((p,i)=>L.circleMarker([p.lat,p.lng],{radius:i===0||i===pts.length-1?7:4,color:'#db2777',fillColor:'#fff',fillOpacity:1,weight:3}).addTo(this.previewLayer));
-                if(pts.length>1)L.polyline(pts,{color:'#db2777',weight:Number(val('co-new-road-line-weight'))||5,opacity:.9,dashArray:val('co-new-road-line-style')==='dashed'?'10,10':null}).addTo(this.previewLayer);
+                const color=val('co-new-road-line-color')||this.roadColor(val('co-new-road-district'));pts.forEach((p,i)=>L.circleMarker([p.lat,p.lng],{radius:i===0||i===pts.length-1?7:4,color,fillColor:'#fff',fillOpacity:1,weight:3}).addTo(this.previewLayer));
+                if(pts.length>1)L.polyline(pts,{color,weight:Number(val('co-new-road-line-weight'))||5,opacity:.9,dashArray:val('co-new-road-line-style')==='dashed'?'10,10':null}).addTo(this.previewLayer);
                 setTxt('co-road-draw-count',`${pts.length} จุด`);
             },
             undoTransferredRoadPoint(){if(this.roadDraftRoute.length)this.roadDraftRoute.pop();this.drawTransferredRoadDraft();},
@@ -1529,8 +1660,9 @@
             },
             async saveTransferredRoad(){
                 const district=val('co-new-road-district'),code=val('co-new-road-code').trim(),roadName=val('co-new-road-name').trim(),details=val('co-new-road-details').trim(),pts=this.roadDraftRoute;if(!district||!roadName)return window.showToast('กรุณาเลือกอำเภอและกรอกชื่อสายทาง','warning');if(pts.length<2)return window.showToast('กรุณากำหนดแนวสายทางอย่างน้อย 2 จุด','warning');
-                const distance=pts.slice(1).reduce((sum,p,i)=>sum+this.pointDistance(pts[i],p),0),first=pts[0],last=pts.at(-1),name=code&&!roadName.includes(code)?`${code} ${roadName}`:roadName,now=Date.now();const data={recordType:'road',roadRole:'transferred_road',isTransferredRoad:true,dataCategory:'transferred_road',coordinationEntrySource:'highway',roadCode:code,name,projectDetails:details,district,type:'line',linePoints:pts,distance,startLat:first.lat,startLng:first.lng,endLat:last.lat,endLng:last.lng,lineColor:'#db2777',lineWeight:Number(val('co-new-road-line-weight'))||5,lineStyle:val('co-new-road-line-style')||'solid',sourceFile:'สร้างแนวสายทางในระบบ',createdAt:now,updatedAt:now};
-                const id=await saveDataToDB(data);if(!id)return;allProjectRecords[id]={...data,id};drawProjectOnMap(id,allProjectRecords[id]);this.selectedRoadId=id;this.selectedRoadDistrict=district;this.roadDraftRoute=[];if(this.previewLayer)this.previewLayer.clearLayers();this.openRoadManager(id);window.showToast(`บันทึกสายทางถ่ายโอน “${name}” แล้ว`,'success');
+                const distance=pts.slice(1).reduce((sum,p,i)=>sum+this.pointDistance(pts[i],p),0),first=pts[0],last=pts.at(-1),name=code&&!roadName.includes(code)?`${code} ${roadName}`:roadName,now=Date.now(),editingId=this.editingTransferredRoadId,old=editingId?this.get(editingId)||{}:{};
+                const selectedColor=val('co-new-road-line-color')||this.roadColor(district),data={...old,recordType:'road',roadRole:'transferred_road',isTransferredRoad:true,dataCategory:'transferred_road',coordinationEntrySource:'highway',roadCode:code,name,projectDetails:details,district,transferAgency:val('co-new-road-transfer-agency').trim(),transferDocumentNo:val('co-new-road-transfer-document').trim(),transferDate:val('co-new-road-transfer-date'),registeredLengthKm:Math.max(0,Number(val('co-new-road-registered-length'))||0),surfaceType:val('co-new-road-surface'),carriagewayWidth:Math.max(0,Number(val('co-new-road-width'))||0),rightOfWayWidth:Math.max(0,Number(val('co-new-road-row-width'))||0),startLocationName:val('co-new-road-start-name').trim(),endLocationName:val('co-new-road-end-name').trim(),type:'line',linePoints:pts,distance,startLat:first.lat,startLng:first.lng,endLat:last.lat,endLng:last.lng,lineColor:selectedColor,roadDisplayColor:selectedColor,roadColorCustomized:this.roadColorTouched===true,lineWeight:Number(val('co-new-road-line-weight'))||5,lineStyle:val('co-new-road-line-style')||'solid',sourceFile:old.sourceFile||'สร้างแนวสายทางในระบบ',createdAt:old.createdAt||now,updatedAt:now};
+                const id=await saveDataToDB(data,editingId||undefined);if(!id)return;if(editingId&&String(id)!==String(editingId))return window.showToast('รหัสรายการที่บันทึกไม่ตรงกับรายการเดิม กรุณาลองใหม่','error');if(editingId)removeProjectFromMap(editingId);allProjectRecords[id]={...data,id};drawProjectOnMap(id,allProjectRecords[id]);this.editingTransferredRoadId=null;this.roadColorTouched=false;this.selectedRoadId=id;this.selectedRoadDistrict=district;this.roadDraftRoute=[];if(this.previewLayer)this.previewLayer.clearLayers();this.openRoadManager(id);window.showToast(`${editingId?'แก้ไขทะเบียนเดิม':'บันทึก'}สายทางถ่ายโอน “${name}” แล้ว`,'success');
             },
             selectRoadDistrict(district){this.selectedRoadDistrict=String(district||'');},
             selectRoad(id){this.selectedRoadId=id;this.editingRoadSegmentId=null;this.pendingRoadSegment=null;this.renderRoadManager();},
@@ -1549,7 +1681,7 @@
                         <button id="co-road-method-continue" type="button" onclick="CoordinationUI.setRoadSegmentMethod('continue')" class="rounded-lg border px-2 py-2 text-[10px] font-black leading-tight"><i class="fas fa-link block text-base mb-1"></i>ต่อโครงการเดิม</button>
                         <button id="co-road-method-manual" type="button" onclick="CoordinationUI.setRoadSegmentMethod('manual')" class="rounded-lg border px-2 py-2 text-[10px] font-black leading-tight"><i class="fas fa-keyboard block text-base mb-1"></i>กรอกระยะเอง</button>
                     </div>
-                    <div id="co-road-method-panel-map" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-3 mb-3"><div class="text-xs font-black text-blue-900 mb-1">กำหนดตำแหน่งบนแผนที่</div><div class="text-[10px] text-blue-700 mb-2">เลือกวิธีที่เหมาะกับข้อมูลโครงการ</div><div class="space-y-2"><button type="button" onclick="CoordinationUI.pickRoadStart()" class="w-full bg-white hover:bg-blue-100 text-blue-800 border border-blue-300 rounded-lg p-2.5 font-black text-left"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white mr-2">1</span>เลือกจุดเริ่มต้น 1 จุด<div class="ml-8 mt-0.5 text-[10px] text-blue-600 font-normal">แล้วป้อนความยาว ระบบคำนวณจุดสิ้นสุดไปตามต้นสาย–ปลายสาย</div></button><div class="bg-blue-700 rounded-lg p-2"><button id="co-directed-start-button" type="button" onclick="CoordinationUI.beginDirectedSegmentPick()" class="w-full text-white p-1 font-black text-left"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-blue-700 mr-2">2</span>กำหนด 2 จุดเพื่อเลือกทิศทาง<div class="ml-8 mt-0.5 text-[10px] text-blue-100 font-normal">จุดที่ 1 = จุดเริ่มต้น · ป้อนระยะ · จุดที่ 2 = บอกทิศทาง</div></button><div id="co-directed-pick-status" class="hidden mt-2 bg-white/15 border border-white/30 rounded-lg p-2 text-[10px] text-white"></div><button id="co-directed-direction-button" type="button" onclick="CoordinationUI.pickDirectedSegmentDirection()" class="hidden mt-2 w-full bg-white text-blue-800 rounded-lg p-2.5 font-black"><i class="fas fa-location-arrow mr-2"></i>เพิ่มจุดที่ 2 เพื่อกำหนดทิศทาง</button></div></div></div>
+                    <div id="co-road-method-panel-map" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-3 mb-3"><div class="text-xs font-black text-blue-900 mb-1">กำหนดตำแหน่งบนแผนที่</div><div class="text-[10px] text-blue-700 mb-2">เลือกวิธีที่เหมาะกับข้อมูลโครงการ</div><div class="space-y-2"><button type="button" onclick="CoordinationUI.pickRoadStart()" class="w-full bg-white hover:bg-blue-100 text-blue-800 border border-blue-300 rounded-lg p-2.5 font-black text-left"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white mr-2">1</span>เลือกจุดเริ่มต้น 1 จุด<div class="ml-8 mt-0.5 text-[10px] text-blue-600 font-normal">แล้วป้อนความยาว ระบบคำนวณจุดสิ้นสุดไปตามต้นสาย–ปลายสาย</div></button><div class="bg-blue-700 rounded-lg p-2"><button id="co-directed-start-button" type="button" onclick="CoordinationUI.beginDirectedSegmentPick()" class="w-full text-white p-1 font-black text-left"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-blue-700 mr-2">2</span>กำหนด 2 จุดเพื่อเลือกทิศทาง<div class="ml-8 mt-0.5 text-[10px] text-blue-100 font-normal">จุดที่ 1 = จุดเริ่มต้น · ป้อนระยะ · จุดที่ 2 = บอกทิศทาง</div></button><div id="co-directed-pick-status" class="hidden mt-2 bg-white/15 border border-white/30 rounded-lg p-2 text-[10px] text-white"></div><button id="co-directed-direction-button" type="button" onclick="CoordinationUI.pickDirectedSegmentDirection()" class="hidden mt-2 w-full bg-white text-blue-800 rounded-lg p-2.5 font-black"><i class="fas fa-location-arrow mr-2"></i>เพิ่มจุดที่ 2 เพื่อกำหนดทิศทาง</button></div><button type="button" onclick="CoordinationUI.pickPlanSegmentOnRoad()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 rounded-lg p-2.5 font-black text-left shadow-sm"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-emerald-700 mr-2">3</span>กำหนดจุดเริ่มต้นและจุดสิ้นสุด<div class="ml-8 mt-0.5 text-[10px] text-emerald-50 font-normal">คลิก 2 จุดบนสายทาง ระบบคำนวณระยะทางตามแนวถนนและเติมค่าความยาวให้อัตโนมัติ</div></button></div></div>
                     <div id="co-road-method-panel-continue" class="hidden bg-sky-50 border border-sky-200 rounded-xl p-3 mb-3">${planProjects.length?`<label class="block text-xs font-black text-sky-900 mb-1">เลือกโครงการต้นทาง</label><select id="co-road-continue-project" class="w-full border border-sky-300 rounded-lg p-2 text-xs mb-2 bg-white">${continueOptions}</select><button type="button" onclick="CoordinationUI.continueAfterProject(document.getElementById('co-road-continue-project').value)" class="w-full bg-sky-700 hover:bg-sky-800 text-white rounded-lg p-2.5 font-black text-xs"><i class="fas fa-arrow-right-long mr-1"></i>ใช้จุดสิ้นสุดเป็นจุดเริ่มโครงการใหม่</button>`:`<div class="text-xs text-sky-800 text-center py-2">ยังไม่มีโครงการเดิมบนสายทางนี้<br>กรุณาเลือกตำแหน่งบนแผนที่หรือกรอกระยะเอง</div>`}</div>
                     <div id="co-road-method-panel-manual" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3 text-xs text-amber-900"><i class="fas fa-circle-info mr-1"></i>กรอกค่าระยะด้านล่างได้โดยตรง ระบบจะคำนวณจุดสิ้นสุดให้ทันที</div>
                     <div class="bg-slate-50 border rounded-xl p-3 mb-3"><div class="text-xs font-black text-slate-700 mb-2"><i class="fas fa-ruler-combined mr-1"></i>ตำแหน่งและระยะทางโครงการ</div><div class="grid grid-cols-2 gap-2"><label class="text-[10px] font-bold text-gray-600">จุดเริ่มต้นจากต้นสาย (เมตร)<input id="co-road-start" type="number" min="0" max="${total}" value="0" oninput="CoordinationUI.updateRoadEnd()" class="mt-1 w-full border rounded-lg p-2 text-sm bg-white"></label><label class="text-[10px] font-bold text-gray-600">ความยาวที่ต้องการ (เมตร)<input id="co-road-length" type="number" min="1" max="${total}" value="1000" oninput="CoordinationUI.updateRoadEnd()" class="mt-1 w-full border-2 border-blue-300 rounded-lg p-2 text-sm bg-white font-black text-blue-800"><span class="block mt-1 text-[9px] text-blue-600">สามารถแก้ไขตัวเลขได้</span></label><label class="col-span-2 text-[10px] font-bold text-gray-600">จุดสิ้นสุดจากต้นสาย (เมตร)<input id="co-road-end" type="number" value="1000" readonly class="mt-1 w-full border rounded-lg p-2 text-sm bg-gray-100 font-black text-blue-800"></label></div></div>
@@ -1748,6 +1880,9 @@
                 if(this.pickMode==='road-master-draw'){
                     this.roadDraftRoute.push({lat:Number(latlng.lat),lng:Number(latlng.lng)});this.drawTransferredRoadDraft();return true;
                 }
+                if(this.pickMode==='road-master-edit'){
+                    this.roadDraftRoute.push({lat:Number(latlng.lat),lng:Number(latlng.lng)});this.renderTransferredRoadEditor();return true;
+                }
                 if(this.pickMode==='directed-segment-start'){
                     const pick=this.directedSegmentPick,road=pick?.road,result=this.nearestRoadChainage(road,latlng);if(!result)return window.showToast('ไม่สามารถคำนวณตำแหน่งบนสายทางได้','error'),true;
                     if(result.offset>200){window.showToast(`จุดที่เลือกห่างจากสายทาง ${result.offset.toLocaleString('th-TH',{maximumFractionDigits:0})} เมตร กรุณาคลิกใกล้เส้นสีน้ำเงินกว่านี้`,'warning');return true;}
@@ -1907,8 +2042,8 @@
             searchActions(p){
                 if(!p?.id||!this.get(p.id))return '<span class="text-xs text-gray-400">แนวสายทาง</span>';
                 const id=this.esc(p.id);
-                const edit=this.isHistoricalProject(p)?`CoordinationUI.openHistoricalProjectForm('${id}')`:`CoordinationUI.openForm('${id}')`;
-                return `<button onclick="CoordinationUI.openDetail('${id}')" class="bg-sky-100 text-sky-700 p-2 rounded" title="รายละเอียด"><i class="fas fa-info"></i></button> <button onclick="CoordinationUI.panTo('${id}')" class="bg-indigo-100 text-indigo-700 p-2 rounded" title="ดูในแผนที่"><i class="fas fa-map"></i></button> <button onclick="${edit}" class="${this.isHistoricalProject(p)?'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'} p-2 rounded" title="แก้ไข"><i class="fas fa-pen"></i></button> <button onclick="CoordinationUI.remove('${id}')" class="bg-red-100 text-red-700 p-2 rounded" title="ลบ"><i class="fas fa-trash"></i></button>`;
+                const isRoad=this.isRoadMaster(p),edit=isRoad?`CoordinationUI.openRoadEdit('${id}')`:this.isHistoricalProject(p)?`CoordinationUI.openHistoricalProjectForm('${id}')`:`CoordinationUI.openForm('${id}')`;
+                return `<button onclick="CoordinationUI.openDetail('${id}')" class="bg-sky-100 text-sky-700 p-2 rounded" title="รายละเอียด"><i class="fas fa-info"></i></button> <button onclick="CoordinationUI.panTo('${id}')" class="bg-indigo-100 text-indigo-700 p-2 rounded" title="ดูในแผนที่"><i class="fas fa-map"></i></button> <button onclick="${edit}" class="${isRoad?'bg-pink-100 text-pink-700':this.isHistoricalProject(p)?'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'} p-2 rounded" title="${isRoad?'แก้ไขทะเบียนสายทาง':'แก้ไข'}"><i class="fas fa-pen"></i></button> <button onclick="CoordinationUI.remove('${id}')" class="bg-red-100 text-red-700 p-2 rounded" title="ลบ"><i class="fas fa-trash"></i></button>`;
             },
             searchProjectRow(p,index,label){
                 const start=Number(p.roadStartChainage),end=Number(p.roadEndChainage);
@@ -1985,7 +2120,7 @@
             auditActionButtons(p){
                 const id=this.esc(p?.id||'');
                 if(!id||!this.get(p.id))return '<span class="text-xs text-gray-400">ไม่มีข้อมูลต้นทาง</span>';
-                const edit=this.isHistoricalProject(p)?`CoordinationUI.openHistoricalProjectForm('${id}')`:`CoordinationUI.openForm('${id}')`;
+                const edit=this.isRoadMaster(p)?`CoordinationUI.openRoadEdit('${id}')`:this.isHistoricalProject(p)?`CoordinationUI.openHistoricalProjectForm('${id}')`:`CoordinationUI.openForm('${id}')`;
                 return `<button onclick="CoordinationUI.openDetail('${id}')" class="bg-sky-100 text-sky-700 px-2 py-1.5 rounded" title="รายละเอียด"><i class="fas fa-info"></i></button> <button onclick="CoordinationUI.panTo('${id}')" class="bg-indigo-100 text-indigo-700 px-2 py-1.5 rounded" title="ดูในแผนที่"><i class="fas fa-map"></i></button> <button onclick="${edit}" class="bg-amber-100 text-amber-700 px-2 py-1.5 rounded font-bold" title="เปิดแก้ไข"><i class="fas fa-pen"></i></button>`;
             },
             openDataAudit(){
@@ -2025,7 +2160,7 @@
             },
             openRoadEdit(id){
                 const road=this.get(id);if(!road)return window.showToast('ไม่พบข้อมูลสายทางสำหรับแก้ไข','warning');
-                this.openForm(id);
+                this.openTransferredRoadForm(id);
             },
             async remove(id){ const p=this.get(id);if(!p||!confirm(`ยืนยันลบโครงการ “${this.name(p)}” หรือไม่?`))return;try{const {doc,deleteDoc}=window.FirebaseModule;await deleteDoc(doc(db,'artifacts',appId,'public','data','pmis_projects',id));window.showToast('ลบโครงการแล้ว','success');this.openSearch();}catch(e){window.showToast('ลบไม่สำเร็จ: '+e.message,'error');} },
             openAnalyze(){ const body=`<div class="flex flex-col md:flex-row gap-3 justify-between bg-white border rounded p-3 mb-4"><label class="font-bold">กรองตามอำเภอ: <select id="co-analyze-district" onchange="CoordinationUI.renderAnalyze()" class="border rounded px-3 py-2 font-normal"><option value="">-- ดูทั้งหมดทุกอำเภอ --</option>${this.districts.map(d=>`<option>${d}</option>`).join('')}</select></label><span id="co-analyze-count" class="bg-fuchsia-100 text-fuchsia-700 px-4 py-2 rounded-full font-bold text-sm"></span></div><div class="overflow-auto bg-white border rounded max-h-[65vh]"><table class="w-full text-sm min-w-[1150px]"><thead class="sticky top-0 bg-gray-100"><tr><th class="p-3">ลำดับ</th><th class="p-3 text-left">อำเภอ / หน่วยงาน</th><th class="p-3 text-left">ข้อมูลโครงการ</th><th class="p-3 text-left">ผลการตรวจสอบพื้นที่ 4 ข้อ</th><th class="p-3">วิเคราะห์ความเหมาะสม</th><th class="p-3">ขั้นตอนดำเนินงาน</th></tr></thead><tbody id="co-analyze-body"></tbody></table></div>`;this.show('<i class="fas fa-chart-area mr-2"></i>วิเคราะห์ความเหมาะสมโครงการ','bg-fuchsia-700',body,`<div class="text-right"><button onclick="CoordinationUI.close()" class="px-6 py-2 bg-gray-200 rounded font-bold">ปิด</button></div>`);this.renderAnalyze(); },
@@ -2218,7 +2353,7 @@
                 mapLayer = L.marker([data.lat, data.lng], { icon: createCustomIcon(data.color, data.icon, data.pinSize) }).addTo(map);
             }
             else if (data.type === 'line' || data.type === 'polygon') {
-                const lColor = isRoad?'#db2777':(isHistorical?'#16a34a':(isPlanProposal?planVisual.color:(data.lineColor||data.color||'#3b82f6')));
+                const lColor = isRoad?CoordinationUI.roadColor(data):(isHistorical?'#16a34a':(isPlanProposal?planVisual.color:(data.lineColor||data.color||'#3b82f6')));
                 const lWeight = isRoad?5:(isHistorical?7:(isPlanProposal?8:(data.lineWeight||6)));
                 const lStyle = (isPlanProposal||isHistorical)?null:(data.lineStyle === 'dashed' ? '10, 10' : null);
                 const options = { color: lColor, weight: lWeight, opacity: isRoad?0.82:0.92, dashArray: lStyle, className: isRoad?'transferred-road-polyline':(isHistorical?'historical-project-polyline':(isPlanProposal?'plan-proposal-polyline':'project-polyline')) };
@@ -2247,7 +2382,7 @@
                 }
             }
             else if (data.type === 'kml') {
-                const kColor = isRoad?'#db2777':(data.lineColor||data.color||'#9333ea');
+                const kColor = isRoad?CoordinationUI.roadColor(data):(data.lineColor||data.color||'#9333ea');
                 const kWeight = isRoad?5:(data.lineWeight||5);
                 const kStyle = data.lineStyle === 'dashed' ? '10, 10' : null;
                 
@@ -2274,6 +2409,7 @@
                 primaryLayer.on('tooltipopen',function(){if(window.CoordinationUI?.pickMode)this.closeTooltip?.();});
                 mapLayer.on('click', function() { if(window.CoordinationUI?.pickMode)return;if(isRoad)CoordinationUI.openDetail(id);else if(data.recordType === 'project') CoordinationUI.openDetail(id); else window.selectProject(id); });
                 loadedMarkers[id] = mapLayer;
+                if(activeMapDistrict && String(data.district||'').trim()!==activeMapDistrict && map.hasLayer(mapLayer))map.removeLayer(mapLayer);
             }
             return mapLayer;
         }
@@ -2972,6 +3108,23 @@
         // ==========================================
         // 🟢 9. FILTER SYSTEM LOGIC (4 ขั้นตอน)
         // ==========================================
+        window.applyMapDistrictFilter = function(district = '') {
+            activeMapDistrict = String(district||'').trim();
+            currentFilter = { district: null, budgetType: null, year: null };
+            const cfc=$id('clear-filter-container'),fab=$id('filter-active-bar');if(cfc)cfc.classList.add('hidden');if(fab)fab.classList.add('hidden');
+            let visible=0;const bounds=L.latLngBounds();
+            for(const id in loadedMarkers){
+                const layer=loadedMarkers[id],data=layer?.projectData||{},matches=!activeMapDistrict||String(data.district||'').trim()===activeMapDistrict;
+                if(matches){if(!map.hasLayer(layer))map.addLayer(layer);visible++;if(layer.getLatLng)bounds.extend(layer.getLatLng());else if(layer.getBounds){const b=layer.getBounds();if(b?.isValid?.())bounds.extend(b);}}
+                else if(map.hasLayer(layer))map.removeLayer(layer);
+            }
+            const select=$id('map-district-filter');if(select&&select.value!==activeMapDistrict)select.value=activeMapDistrict;
+            setTxt('map-district-filter-count',activeMapDistrict?`อ.${activeMapDistrict} · พบ ${visible} รายการ`:`กำลังแสดงข้อมูลทุกอำเภอ · ${visible} รายการ`);
+            if(activeMapDistrict&&visible&&bounds.isValid())map.fitBounds(bounds,{padding:[50,50],maxZoom:14});
+            else if(!activeMapDistrict)map.setView([16.8211,100.2659],10);
+            window.closeDetailPanel?.();window.showToast(activeMapDistrict?`แสดงข้อมูลอำเภอ${activeMapDistrict} ${visible} รายการ`:'แสดงข้อมูลทุกอำเภอ','success');
+        };
+
         window.showFilterStep = function(step) {
             const f1 = $id('filter-step-1'); if(f1) f1.classList.add('hidden');
             const f2 = $id('filter-step-2'); if(f2) f2.classList.add('hidden');
@@ -3099,6 +3252,7 @@
             const cfc = $id('clear-filter-container'); if(cfc) cfc.classList.add('hidden');
             const fab = $id('filter-active-bar'); if(fab) fab.classList.add('hidden');
             currentFilter = { district: null, budgetType: null, year: null };
+            activeMapDistrict = '';const districtSelect=$id('map-district-filter');if(districtSelect)districtSelect.value='';setTxt('map-district-filter-count',`กำลังแสดงข้อมูลทุกอำเภอ · ${Object.keys(loadedMarkers).length} รายการ`);
             window.showToast('ล้างตัวกรองและแสดงข้อมูลทั้งหมด', 'info');
             map.setView([16.8211, 100.2659], 10);
             window.closeDetailPanel();
